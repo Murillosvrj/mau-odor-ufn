@@ -1,0 +1,47 @@
+/* Engraved vector line language and short, tactile responses. */
+.odor-art,.odor-hero,.wind-art{display:block;width:100%;height:auto;color:#111;overflow:visible}
+.odor-art{max-height:132px}
+.odor-art .paper-fill,.odor-hero .paper-fill{fill:var(--art-paper,#fff)}
+.etch-lines{stroke-width:.65;opacity:.87}
+.secondary-line{stroke-width:.9}
+.ink-dots{stroke:none;fill:currentColor;opacity:.72}
+.odor-flow{color:var(--intensity-color,#111);stroke:currentColor;transition:color .42s cubic-bezier(.22,1,.36,1)}
+.odor-hero .etch-lines{stroke-width:.77;opacity:1}
+.odor-hero .paper-fill{fill:var(--paper,#faf8f5)}
+.odor-hero .hero-city{opacity:.75}
+.odor-hero .hero-compass{opacity:.75}
+.odor-hero .hero-little-volutes{stroke-width:.85}
+.bag-body,.bag-tie,.bin-lid,.compass-needle,.organic-body,.drop-main,.drop-small{transform-box:fill-box;transform-origin:center}
+.bag-body{transform-origin:50% 100%}
+.bag-tie{transform-origin:50% 85%}
+.bin-lid{transform-origin:97% 100%}
+.organic-body{transform-origin:50% 100%}
+.drop-main,.drop-small{transform-origin:50% 100%}
+.odor-card.is-animating .bag-body{animation:ink-bag-squish .7s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .bag-tie{animation:ink-tie .8s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .bag-air{animation:ink-plume .9s ease-out}
+.odor-card.is-animating .bin-lid{animation:ink-lid 1.1s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .bin-vapor{animation:ink-plume 1.1s ease-out}
+.odor-card.is-animating .sewer-vapor{animation:ink-vapor 1.15s cubic-bezier(.22,1,.36,1)}
+.odor-card.is-animating .ditch-flow{animation:ink-water .85s cubic-bezier(.22,1,.36,1)}
+.odor-card.is-animating .organic-body{animation:ink-organic .9s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .organic-vapor{animation:ink-vapor 1s ease-out}
+.odor-card.is-animating .drop-main{animation:ink-drop .8s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .drop-small{animation:ink-drop .8s .12s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .metabolic-ring{animation:ink-ring 1s ease-out}
+.odor-card.is-animating .chemical-bubbles{animation:ink-bubbles .95s ease-out}
+.odor-card.is-animating .chemical-liquid{animation:ink-liquid .95s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .compass-needle{animation:ink-compass 1.15s cubic-bezier(.34,1.56,.64,1)}
+@keyframes ink-bag-squish{0%,100%{transform:scale(1)}35%{transform:scale(1.075,.9)}65%{transform:scale(.97,1.045)}}
+@keyframes ink-tie{0%,100%{transform:scale(1) rotate(0)}35%{transform:scale(.67,1.1) rotate(-12deg)}66%{transform:scale(1.05,.98) rotate(4deg)}}
+@keyframes ink-lid{0%,100%{transform:rotate(0)}32%,48%{transform:rotate(31deg)}76%{transform:rotate(-3deg)}}
+@keyframes ink-plume{0%{opacity:.15;transform:translateY(9px)}45%{opacity:1;transform:translateY(-5px)}75%{opacity:.3;transform:translateY(-13px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes ink-vapor{0%,100%{transform:translateY(0)}45%{transform:translateY(-8px)}65%{transform:translateY(-5px)}}
+@keyframes ink-water{0%,100%{transform:translateX(0)}35%{transform:translateX(7px)}70%{transform:translateX(-2px)}}
+@keyframes ink-organic{0%,100%{transform:scale(1)}40%{transform:scale(1.055,.95)}70%{transform:scale(.985,1.02)}}
+@keyframes ink-drop{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-6px) scale(.95,1.05)}65%{transform:translateY(1px) scale(1.06,.94)}}
+@keyframes ink-ring{0%,100%{opacity:1}45%{opacity:.2}}
+@keyframes ink-bubbles{0%,100%{transform:translateY(0);opacity:1}60%{transform:translateY(-14px);opacity:.5}70%{opacity:0}71%{transform:translateY(10px);opacity:0}}
+@keyframes ink-liquid{0%,100%{transform:translateY(0)}35%{transform:translateY(-3px)}65%{transform:translateY(2px)}}
+@keyframes ink-compass{0%{transform:rotate(0)}65%{transform:rotate(405deg)}100%{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.odor-art *,.odor-hero *,.wind-art *{animation:none!important;transition:none!important}}

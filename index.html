@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FAF8F5">
+  <meta name="description" content="Uma experiência de ciência cidadã para registrar percepções de mau odor no entorno da UFN, Santa Maria. Protótipo interativo em papel e nanquim.">
+  <title>Mau Odor — Caderno de campo urbano</title>
+  <style>
+/* tailwind.css */
+/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial}}}@layer theme{:root,:host{--font-sans:"Segoe UI", Arial, sans-serif;--font-mono:"Cascadia Mono", Consolas, monospace;--spacing:.25rem;--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono);--color-paper:#faf8f5;--color-ink:#111}}@layer base{*,:after,:before,::backdrop{box-sizing:border-box;border:0 solid;margin:0;padding:0}::file-selector-button{box-sizing:border-box;border:0 solid;margin:0;padding:0}html,:host{-webkit-text-size-adjust:100%;tab-size:4;line-height:1.5;font-family:var(--default-font-family,-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");font-feature-settings:var(--default-font-feature-settings,normal);font-variation-settings:var(--default-font-variation-settings,normal);-webkit-tap-highlight-color:transparent}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;-webkit-text-decoration:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:var(--default-mono-font-family,ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);font-feature-settings:var(--default-mono-font-feature-settings,normal);font-variation-settings:var(--default-mono-font-variation-settings,normal);font-size:1em}small{font-size:80%}sub,sup{vertical-align:baseline;font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring:where(:not(iframe)){outline:auto}progress{vertical-align:baseline}summary{display:list-item}ol,ul,menu{list-style:none}img,svg,video,canvas,audio,iframe,embed,object{vertical-align:middle;display:block}img,video{max-width:100%;height:auto}button,input,select,optgroup,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}::file-selector-button{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1}@supports (not ((-webkit-appearance:-apple-pay-button))) or (contain-intrinsic-size:1px){::placeholder{color:currentColor}@supports (color:color-mix(in lab, red, red)){::placeholder{color:color-mix(in oklab, currentcolor 50%, transparent)}}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit{padding-block:0}::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-datetime-edit-month-field{padding-block:0}::-webkit-datetime-edit-day-field{padding-block:0}::-webkit-datetime-edit-hour-field{padding-block:0}::-webkit-datetime-edit-minute-field{padding-block:0}::-webkit-datetime-edit-second-field{padding-block:0}::-webkit-datetime-edit-millisecond-field{padding-block:0}::-webkit-datetime-edit-meridiem-field{padding-block:0}::-webkit-calendar-picker-indicator{line-height:1}:-moz-ui-invalid{box-shadow:none}button,input:where([type=button],[type=reset],[type=submit]){appearance:button}::file-selector-button{appearance:button}::-webkit-inner-spin-button{height:auto}::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden=until-found])){display:none!important}}@layer components;@layer utilities{.invisible{visibility:hidden}.sr-only{clip-path:inset(50%);white-space:nowrap;border-width:0;width:1px;height:1px;margin:-1px;padding:0;position:absolute;overflow:hidden}.flex{display:flex}.grid{display:grid}.hidden{display:none}.transform{transform:var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,)}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-6{gap:calc(var(--spacing) * 6)}.gap-8{gap:calc(var(--spacing) * 8)}.bg-paper{background-color:var(--color-paper)}.font-sans{font-family:var(--font-sans)}.text-ink{color:var(--color-ink)}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}}@property --tw-rotate-x{syntax:"*";inherits:false}@property --tw-rotate-y{syntax:"*";inherits:false}@property --tw-rotate-z{syntax:"*";inherits:false}@property --tw-skew-x{syntax:"*";inherits:false}@property --tw-skew-y{syntax:"*";inherits:false}
+</style>
+  <style>
+/* styles.css */
+:root{--paper:#faf8f5;--ink:#111;--graphite:#78756e;--muted:#625f59;--line:#dcd8d0;--intensity-color:#111;--spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.22,1,.36,1)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.55}button,input,textarea{font:inherit}button,a,input,textarea{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}button{color:inherit}a{color:inherit;text-decoration:none}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid #1d4ed8;outline-offset:5px}button:focus:not(:focus-visible){outline:0}button{border:0;background:none}fieldset{margin:0;padding:0;border:0;min-width:0}h1,h2,h3,p{margin:0}svg{max-width:100%}[hidden]{display:none!important}.shell{width:min(1184px,calc(100% - 96px));margin-inline:auto}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.skip-link{position:fixed;left:15px;top:-80px;background:#111;color:#fff;padding:10px 18px;z-index:100}.skip-link:focus{top:10px}
+.site-header{border-bottom:1px solid var(--line)}.site-header>.shell{min-height:94px}.wordmark{display:flex;align-items:center;gap:12px}.wordmark svg{stroke:#111;stroke-width:1.4;stroke-linecap:round}.wordmark strong{display:block;font:700 28px/1.1 Georgia,serif;letter-spacing:-1.5px}.wordmark-dot{font-weight:400}.wordmark small{display:block;font:8px/1.7 Consolas,monospace;letter-spacing:1.8px;margin-top:6px}.desktop-nav{font-size:12px;height:94px}.desktop-nav a,.desktop-nav button{height:100%;display:flex;align-items:center;gap:12px;position:relative}.desktop-nav .is-current:after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--ink)}.desktop-nav a:hover,.desktop-nav button:hover{color:var(--muted)}.prototype-badge{border:1px solid var(--line);padding:6px 10px;font:9px/1.5 Consolas,monospace;white-space:nowrap;letter-spacing:.2px}.prototype-badge>span{font-size:14px;margin-right:5px}.hero{display:grid;grid-template-columns:1.02fr 1fr;gap:50px;padding-block:58px 48px;align-items:center}.eyebrow{font:9px/1.6 Consolas,'Courier New',monospace;letter-spacing:1.5px;font-weight:500}.hero .eyebrow{display:flex;align-items:center;gap:12px}.fine-line{width:30px;height:1px;background:#111}.hero h1{font:normal clamp(48px,4.8vw,68px)/1.04 Georgia,'Times New Roman',serif;letter-spacing:-3.4px;margin-top:22px}.hero h1 em{font-weight:400}.hero-description{color:var(--muted);font-size:13px;line-height:1.8;margin-top:22px}.hero-meta{display:flex;gap:14px;align-items:center;margin-top:27px;font:8px Consolas,monospace;letter-spacing:1px;color:#625f59}.tiny-cross{font-size:16px}.hero-visual{align-self:center;position:relative;padding-block:18px 15px}.plate-top,.plate-bottom{display:flex;align-items:center;justify-content:space-between;font:8px/1.5 Consolas,monospace;letter-spacing:1.3px;color:var(--muted)}.plate-top{border-top:1px solid var(--line);padding-top:12px}.plate-bottom{border-bottom:1px solid var(--line);padding-bottom:12px;font-size:9px;letter-spacing:.5px}.plate-bottom>span:last-child{font:22px Georgia,serif}#hero-art{height:224px;display:flex;align-items:center;justify-content:center}#hero-art svg{width:100%;height:100%}#motes{position:absolute;inset:40px 0 46px;width:100%;height:224px;pointer-events:none;opacity:.7}.field-context{display:grid;grid-template-columns:1fr 1.2fr 1.1fr;border:1px solid var(--line);background:rgba(255,255,255,.38)}.context-cell{display:flex;gap:16px;padding:22px 24px;align-items:flex-start;min-height:119px}.context-cell+.context-cell{border-left:1px solid var(--line)}.context-symbol{width:25px;height:25px;flex-shrink:0;stroke:#111;stroke-width:1.1;font-size:27px;line-height:1}.context-cell .eyebrow{font-size:8px;letter-spacing:1px;color:var(--muted)}.context-value{margin-top:7px;font-size:13px;font-weight:500}.context-detail{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.6}.text-button{font-size:11px;text-decoration:underline;text-underline-offset:4px;padding:0;line-height:1.7}.text-button span{display:inline-block;margin-left:7px}.location-cell .text-button{font-size:10px;margin-top:5px}.weather-values{display:flex;gap:12px;white-space:nowrap}.weather-values>span+span{padding-left:12px;border-left:1px solid var(--line)}.weather-values>span:not(:first-child){font-size:11px}.registration-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:64px;padding-top:48px}.form-section{padding-block:0 34px;margin-bottom:34px;border-bottom:1px solid var(--line)}.section-heading{display:flex;align-items:flex-start;gap:16px;margin-bottom:25px}.section-number{flex-shrink:0;display:grid;place-content:center;width:32px;height:32px;border:1px solid #bfbab1;border-radius:50%;font:10px Consolas,monospace;margin-top:7px}.section-heading .eyebrow{color:var(--muted);font-size:8px;letter-spacing:1.4px;margin-bottom:4px}.section-heading h2{font:normal 29px/1.2 Georgia,serif;letter-spacing:-.7px}.section-heading p:not(.eyebrow){color:var(--muted);font-size:11px;margin-top:9px}.intensity-options{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px}.intensity-option{cursor:pointer;display:block;position:relative}.intensity-option input{position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer;margin:0}.intensity-key{display:flex;align-items:center;justify-content:center;flex-direction:column;border:1px solid var(--line);background:#fff;height:112px;border-radius:5px;transition:transform .5s var(--spring),border-color .4s var(--ease),background .4s var(--ease);position:relative}.intensity-option:hover .intensity-key{transform:translateY(-3px)}.intensity-option input:checked+.intensity-key{border-color:var(--level-color);background:color-mix(in srgb,var(--level-color) 6%,#fff);box-shadow:0 0 0 1px var(--level-color);transform:translateY(-3px)}.intensity-option input:focus-visible+.intensity-key{outline:2px solid #1d4ed8;outline-offset:4px}.slot-window{height:44px;overflow:hidden;display:block}.slot-track{display:flex;flex-direction:column;transition:transform .55s var(--spring)}.slot-track span{display:block;height:44px;font:normal 37px/44px Georgia,serif;text-align:center}.intensity-option input:checked+.intensity-key .slot-track{transform:translateY(-44px);color:var(--level-color)}.intensity-key .level-label{font-size:10px;color:var(--muted);margin-top:7px}.level-tick{width:15px;height:2px;background:var(--level-color);margin-top:10px;border-radius:3px}.intensity-option input:checked+.intensity-key .level-label{color:#111}.selected-mark{position:absolute;right:8px;top:6px;opacity:0;font-size:10px;color:var(--level-color)}.intensity-option input:checked+.intensity-key .selected-mark{opacity:1}.intensity-reading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px}.reading-caption{display:flex;align-items:center;gap:8px;font-size:11px}.reading-dot{width:6px;height:6px;border-radius:50%;background:var(--intensity-color)}.intensity-meter{display:flex;gap:4px;flex-shrink:0}.intensity-meter>span{display:block;width:23px;height:4px;background:#e7e3dc;transition:background .42s var(--ease)}.intensity-meter>span.is-active{background:var(--intensity-color)}.footnote{font-size:10px;line-height:1.6;color:var(--muted)}.intensity-section>.footnote{margin-top:8px}.inline-info{display:inline-grid;place-content:center;width:12px;height:12px;border:1px solid #78756e;border-radius:50%;font:9px Georgia,serif}.odor-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.odor-card{position:relative;border:1px solid var(--line);border-radius:5px;background:rgba(255,255,255,.72);min-height:185px;transition:transform .5s var(--spring),background .42s var(--ease),border-color .42s var(--ease)}.odor-card:hover{transform:translateY(-3px);border-color:#aaa397}.odor-card.is-selected{background:color-mix(in srgb,var(--intensity-color) 3%,#fff);border-color:var(--intensity-color);box-shadow:0 0 0 1px var(--intensity-color)}.odor-choice{display:flex;flex-direction:column;cursor:pointer;height:100%;padding:12px 12px 14px}.odor-choice input{position:absolute;opacity:0;width:1px;height:1px}.odor-card:has(.odor-choice input:focus-visible){outline:2px solid #1d4ed8;outline-offset:4px}.card-topline{display:flex;align-items:center;justify-content:space-between;height:16px}.card-index{font:9px Consolas,monospace;color:var(--muted);letter-spacing:1px}.card-checkbox{width:13px;height:13px;border:1px solid #bdb7ac;border-radius:2px;display:grid;place-content:center;font-size:9px;margin-right:24px;line-height:1}.card-checkbox:after{content:'✓';opacity:0}.is-selected .card-checkbox{background:var(--intensity-color);border-color:var(--intensity-color);color:#fff}.is-selected .card-checkbox:after{opacity:1}.card-art{display:flex;align-items:center;justify-content:center;height:104px;margin-top:4px}.card-art svg{height:100%;width:100%;overflow:visible}.card-label{font-size:11px;line-height:1.35;font-weight:500;margin-top:6px;max-width:130px}.card-sublabel{font-size:9px;color:var(--muted);margin-top:2px}.info-button{width:24px;height:24px;display:inline-grid;place-content:center;border-radius:50%;position:relative;flex-shrink:0;font:italic 12px Georgia,serif;min-width:24px}.info-button:before{content:'';position:absolute;inset:4px;border:1px solid #888176;border-radius:50%}.odor-card>.info-button{position:absolute;top:7px;right:7px}.info-button:hover{background:#e9e5de}.selection-count{font-size:10px;color:var(--muted);margin-top:13px}.other-field{margin-top:18px}.other-field label{display:block;font-size:12px;margin-bottom:7px}.other-field input{width:100%;padding:12px;border:1px solid var(--line);background:#fff;border-radius:3px}.other-field .footnote{margin-top:4px}.optional{font:8px Consolas,monospace;color:var(--muted);letter-spacing:.5px;margin-left:7px}.photo-area{position:relative;padding:22px 18px;background:#fff;border:1px dashed #bfb9ae;overflow:hidden}.photo-placeholder{display:flex;flex-direction:column;align-items:center;min-height:132px}.scanner-illustration{width:114px;height:90px;stroke:#222;stroke-width:1}.scanner-corners{stroke-width:1.4}.photo-placeholder p{font:16px Georgia,serif;margin-top:4px}.photo-placeholder>span{font:8px Consolas,monospace;color:var(--muted);margin-top:8px;letter-spacing:.5px}.photo-actions{display:flex;justify-content:center;gap:10px;margin-top:19px}.button{display:inline-flex;justify-content:center;align-items:center;gap:12px;padding:11px 17px;min-height:42px;font-size:11px;border:1px solid transparent;border-radius:3px;transition:transform .5s var(--spring),background .4s var(--ease),box-shadow .4s var(--ease)}.button:hover:not(:disabled){transform:translateY(-2px)}.button:active:not(:disabled){transform:translateY(1px) scale(.98)}.button-ink{background:#111;color:white;border-color:#111}.button-ink:hover{background:#30302d}.button-outline{border-color:#c8c2b8;background:transparent}.button-outline:hover:not(:disabled){background:#f0ece5}.button>span{font-size:17px;line-height:1}#photo-preview{position:relative}#preview-image{display:block;max-height:320px;width:100%;object-fit:contain;background:#f4f0e9}.remove-photo{position:absolute;top:8px;right:8px;background:#fff;padding:6px 10px;border:1px solid #bbb;font-size:10px}.preview-stamp{display:block;font:8px Consolas,monospace;letter-spacing:1px;margin-top:8px;color:var(--muted)}.invisible-odor{display:flex;gap:12px;align-items:center;padding:16px 0 10px}.wind-art{width:45px;flex-shrink:0}.wind-art svg{width:45px;height:37px}.checkbox-label{display:flex;align-items:flex-start;gap:9px;font-size:11px;cursor:pointer}.checkbox-label input{margin:2px 0 0;accent-color:#111;width:14px;height:14px;flex-shrink:0}.context-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}.tag{position:relative;cursor:pointer}.tag input{position:absolute;opacity:0;width:1px;height:1px}.tag>span{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:3px;background:#fff;font-size:10px;padding:7px 11px;transition:all .42s var(--ease)}.tag>span:before{content:'+';font:14px Consolas,monospace;color:#777}.tag input:checked+span{background:#111;border-color:#111;color:#fff}.tag input:checked+span:before{content:'✓';color:#fff;font-size:12px}.tag input:focus-visible+span{outline:2px solid #1d4ed8;outline-offset:3px}.observation-heading{display:flex;justify-content:space-between;margin-bottom:9px;font-size:11px}.observation-heading>span{font:9px Consolas,monospace;color:var(--muted)}textarea{border:1px solid var(--line);border-radius:3px;background:#fff;padding:13px 14px;width:100%;resize:vertical;min-height:92px;font-size:11px;line-height:1.8}textarea::placeholder,input::placeholder{color:#76716b}.form-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:22px}.form-bottom>p{font-size:10px;color:var(--muted)}.form-bottom>p>span{margin-right:6px}.review-button{min-width:185px}.local-note{text-align:right;margin-top:10px}.context-section{margin-bottom:0;padding-bottom:0;border-bottom:0}.field-notes-sticky{position:sticky;top:28px}.note-card{border:1px solid var(--line);padding:21px;background:#f4f1eb;position:relative}.note-card:after{content:'';position:absolute;inset:4px;pointer-events:none;border:1px solid rgba(17,17,17,.045)}.note-card-label{display:flex;justify-content:space-between;font-size:8px}.note-card-label>span{font-size:17px;line-height:.9}.note-art{height:131px;margin-block:12px;overflow:hidden}.note-art svg{width:100%;height:100%;stroke:#111}.note-card h3{font:normal 24px/1.22 Georgia,serif;letter-spacing:-.55px}.note-card>p:not(.eyebrow):not(.note-caption){font-size:11px;color:var(--muted);line-height:1.8;margin-top:15px}.note-rule{height:1px;background:var(--line);margin-block:21px 18px;width:32px}.note-caption{font:italic 13px/1.7 Georgia,serif}.note-card>.text-button{font-size:9px;margin-top:18px}.live-summary{padding:25px 0 20px;border-bottom:1px solid var(--line)}.live-summary>.eyebrow{font-size:8px;letter-spacing:1px;color:var(--muted)}.live-summary dl{margin:15px 0}.live-summary dl>div{display:flex;justify-content:space-between;gap:8px;font-size:10px;margin-bottom:11px}.live-summary dt{color:var(--muted)}.live-summary dd{margin:0;text-align:right}.progress-line{height:2px;background:#e3ded4;margin:20px 0 9px}.progress-line span{display:block;width:0;height:100%;background:#111;transition:width .5s var(--ease)}.live-summary .footnote{font-size:9px}.map-jump{display:flex;justify-content:space-between;align-items:center;font:16px/1.4 Georgia,serif;padding-top:20px}.map-jump>span:last-child{font-size:26px}.map-jump strong{font-weight:400}.territory-section{padding-top:68px;margin-top:60px;border-top:1px solid var(--ink)}.local-records{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;border-block:1px solid var(--line);padding-block:30px;margin-block:42px 55px}.local-records h2{font:normal 23px Georgia,serif;margin-top:7px}.local-records p:not(.eyebrow){font-size:11px;color:var(--muted);margin-top:8px}.local-records>.eyebrow{font-size:8px}.record-actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap}.local-count{font:normal 36px Georgia,serif}.record-actions .text-button{font-size:9px}#local-record-list{width:100%;display:flex;flex-direction:column;gap:8px}#local-record-list:empty{display:none}.record-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);font-size:11px;background:#fff}.record-row small{color:var(--muted);font-size:9px;display:block;margin-top:4px}.record-row>span{font:9px Consolas,monospace;text-align:right}.site-footer{border-top:1px solid var(--line);padding-block:28px;background:#f5f2ec}.site-footer>.shell{display:flex;justify-content:space-between;gap:20px;align-items:center}.site-footer strong{font:700 25px Georgia,serif;letter-spacing:-1.5px}.site-footer p{font-size:9px;color:var(--muted);margin-top:10px;line-height:1.8}.footer-right{display:flex;align-items:flex-end;flex-direction:column;gap:9px;font-size:9px}.footer-right>span{font:8px Consolas,monospace;letter-spacing:1px}.footer-right button{text-decoration:underline;text-underline-offset:3px}.editorial-dialog{padding:35px;border:1px solid #111;background:var(--paper);color:var(--ink);width:min(520px,calc(100% - 32px));max-height:calc(100% - 40px);overflow:auto;border-radius:5px;box-shadow:0 20px 90px #1112;margin:auto}.editorial-dialog::backdrop{background:rgba(25,22,17,.38);backdrop-filter:blur(3px)}.editorial-dialog[open]{animation:dialog-in .4s var(--ease)}.editorial-dialog h2{font:normal 30px/1.15 Georgia,serif;margin:14px 0 18px;letter-spacing:-.6px}.dialog-close{position:absolute;top:10px;right:12px;width:32px;height:32px;font-size:24px;color:var(--muted)}#info-body p{font-size:13px;line-height:1.8;margin-block:12px;color:#4b4740}#info-body ul{padding-left:20px;font-size:12px;line-height:1.8}#info-body a{text-decoration:underline;text-underline-offset:3px}#info-body+.button{margin-top:15px}.dialog-intro{font-size:12px;color:var(--muted)}.review-details{margin-block:24px}.review-details>div{display:grid;grid-template-columns:110px 1fr;gap:12px;border-top:1px solid var(--line);padding-block:11px;font-size:12px}.review-details dt{color:var(--muted);font-size:10px}.review-details dd{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}.review-disclaimer{font-size:11px;line-height:1.7;border-left:2px solid #111;padding-left:12px;color:#514d46}.dialog-actions{display:flex;justify-content:space-between;gap:10px;margin-top:24px}.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:14px 22px;background:#111;color:#fff;border:1px solid #333;box-shadow:0 5px 30px #1112;z-index:50;max-width:calc(100% - 32px);font-size:12px;text-align:center;border-radius:4px;animation:toast-in .4s var(--ease)}.field-error{color:#a91a1a;font-size:11px;margin-top:10px}.empty-illustration{width:100%;height:100%;fill:none;stroke:#111;stroke-linecap:round;stroke-linejoin:round}.motion-paused *,.motion-paused *:before,.motion-paused *:after{animation:none!important;transition:none!important}.motion-paused{scroll-behavior:auto}@keyframes dialog-in{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes toast-in{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+@media(min-width:1440px){.hero h1{font-size:74px}.hero{padding-block:65px 52px}.shell{width:min(1232px,calc(100% - 128px))}.registration-layout{grid-template-columns:minmax(0,1fr) 290px;gap:74px}.odor-card{min-height:195px}.card-art{height:114px}}
+@media(max-width:1100px){.shell{width:calc(100% - 56px)}.registration-layout{grid-template-columns:minmax(0,1fr) 235px;gap:35px}.hero{gap:28px}.hero h1{font-size:57px}.hero-meta{font-size:7px;gap:10px}.context-cell{padding:20px 16px;gap:11px}.weather-values{gap:8px}.weather-values>span+span{padding-left:8px}.desktop-nav{gap:20px;font-size:11px}.prototype-badge{font-size:8px}.odor-grid{gap:9px}.odor-choice{padding-inline:9px}.card-label{font-size:10px}.card-art{height:90px}.odor-card{min-height:173px}.note-card{padding:18px}.note-card h3{font-size:22px}.section-heading h2{font-size:27px}.intensity-key{height:106px}.intensity-key .level-label{font-size:9px}}
+@media(max-width:860px){.registration-layout{grid-template-columns:minmax(0,1fr);gap:0}.field-notes{display:none}.desktop-nav{gap:16px}.prototype-badge{display:none}.hero{gap:20px}.hero h1{font-size:49px;letter-spacing:-2.5px}.hero-meta{flex-wrap:wrap;gap:7px}.hero-meta>.tiny-cross{display:none}.hero-meta>span:last-child{width:100%}#hero-art{height:205px}.hero-description{font-size:12px}.context-cell{padding:18px 13px;gap:9px}.context-symbol{width:20px;height:20px}.context-value{font-size:11px}.context-detail{font-size:9px}.context-cell .eyebrow{font-size:7px}.weather-values{flex-wrap:wrap;gap:4px}.weather-values>span+span{padding-left:6px}.weather-values>span:not(:first-child){font-size:10px}.registration-layout{padding-top:38px}.odor-card{min-height:190px}.card-art{height:112px}.card-label{font-size:11px}.odor-choice{padding-inline:13px}.intensity-key{height:118px}.intensity-key .level-label{font-size:10px}.form-section{margin-bottom:31px}.territory-section{padding-top:40px;margin-top:35px}.local-note{text-align:right}}
+@media(max-width:600px){.shell{width:calc(100% - 36px)}.site-header>.shell{min-height:74px;gap:10px}.wordmark svg{width:30px;height:30px}.wordmark{gap:8px}.wordmark strong{font-size:25px}.wordmark small{font-size:6px;letter-spacing:1.3px}.desktop-nav{height:74px;font-size:10px}.desktop-nav>a:first-child,.desktop-nav>button{display:none}.desktop-nav>a{gap:7px}.hero{display:block;padding-block:32px 24px;position:relative}.hero h1{font-size:56px;letter-spacing:-2.7px;margin-top:18px}.hero>.hero-copy>.eyebrow{font-size:8px;letter-spacing:1px}.hero-description{font-size:12px;margin-top:18px}.hero-meta{margin-top:18px;flex-wrap:nowrap;font-size:6px;letter-spacing:.6px;gap:10px}.hero-meta>span:last-child{width:auto}.hero-meta>.tiny-cross{display:block}.hero-visual{margin-top:22px;padding-block:0}#hero-art{height:160px}.plate-top{padding-top:8px;font-size:6px}.plate-bottom{font-size:7px;padding-bottom:7px}#motes{height:160px;top:22px}.field-context{grid-template-columns:1fr 1fr}.context-cell{min-height:90px;padding:15px 12px;gap:9px}.context-cell .eyebrow{font-size:6.5px;letter-spacing:.7px}.context-value{font-size:10px}.context-detail{font-size:8px}.location-cell{grid-row:1/3;grid-column:2}.context-cell.weather-cell{grid-row:2;grid-column:1;border-left:none;border-top:1px solid var(--line);min-height:80px}.weather-values{gap:4px}.weather-values>span{font-size:11px}.weather-values>span:not(:first-child){font-size:8px}.weather-values>span+span{padding-left:4px}.context-symbol{width:17px;height:17px;font-size:22px}.location-cell .text-button{font-size:9px;margin-top:12px}.registration-layout{padding-top:33px}.section-heading{gap:12px;margin-bottom:20px}.section-heading h2{font-size:26px;letter-spacing:-.6px}.section-heading .eyebrow{font-size:6.5px;letter-spacing:.9px}.section-heading p:not(.eyebrow){font-size:10px;line-height:1.7;max-width:270px}.section-number{width:27px;height:27px;font-size:9px;margin-top:6px}.intensity-options{gap:7px}.intensity-key{height:103px}.slot-track span{font-size:33px}.intensity-key .level-label{font-size:8px;line-height:1.2;text-align:center;margin-top:4px;max-width:52px;min-height:20px;display:grid;place-content:center}.level-tick{margin-top:7px;width:12px}.selected-mark{top:4px;right:5px;font-size:8px}.intensity-reading{gap:8px;margin-top:17px}.reading-caption{font-size:9px}.intensity-meter{gap:3px}.intensity-meter>span{width:15px;height:3px}.footnote{font-size:9px}.odor-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.odor-card{min-height:185px}.card-art{height:113px}.card-label{font-size:12px}.card-sublabel{font-size:10px}.odor-choice{padding:12px 14px 14px}.info-button{width:32px;height:32px;min-width:32px;font-size:13px}.info-button:before{inset:7px}.odor-card>.info-button{top:3px;right:3px}.card-checkbox{margin-right:22px;width:14px;height:14px}.photo-actions{gap:8px}.photo-actions .button{font-size:10px;padding:10px 12px;gap:8px}.photo-placeholder p{font-size:15px}.photo-area{padding:20px 10px}.wind-art{display:none}.invisible-odor{gap:6px}.checkbox-label{font-size:10px;line-height:1.7}.optional{font-size:6.5px}.tag>span{font-size:9px;padding:8px 9px}.context-tags{gap:7px}.form-bottom{display:block;margin-top:18px}.form-bottom>p{margin-bottom:12px;text-align:center}.review-button{width:100%;font-size:12px;min-height:46px}.local-note{text-align:center}.local-records{margin-block:30px 35px;padding-block:25px;gap:15px}.local-records h2{font-size:22px}.record-actions{width:100%;gap:15px}.record-row{align-items:flex-start;font-size:10px}.record-row>span{font-size:8px;max-width:95px;flex-shrink:0}.site-footer>.shell{display:block}.site-footer p{font-size:8px}.footer-right{align-items:flex-start;margin-top:22px;gap:10px}.footer-right>span{font-size:7px}.editorial-dialog{padding:28px 23px}.editorial-dialog h2{font-size:27px}.dialog-actions{flex-direction:column-reverse}.review-details>div{grid-template-columns:90px 1fr;font-size:11px}.form-section{padding-bottom:28px;margin-bottom:28px}}
+.invisible-odor>.wind-art{width:45px;flex:0 0 45px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}#motes{display:none}}
+
+</style>
+  <style>
+/* illustrations.css */
+/* Engraved vector line language and short, tactile responses. */
+.odor-art,.odor-hero,.wind-art{display:block;width:100%;height:auto;color:#111;overflow:visible}
+.odor-art{max-height:132px}
+.odor-art .paper-fill,.odor-hero .paper-fill{fill:var(--art-paper,#fff)}
+.etch-lines{stroke-width:.65;opacity:.87}
+.secondary-line{stroke-width:.9}
+.ink-dots{stroke:none;fill:currentColor;opacity:.72}
+.odor-flow{color:var(--intensity-color,#111);stroke:currentColor;transition:color .42s cubic-bezier(.22,1,.36,1)}
+.odor-hero .etch-lines{stroke-width:.77;opacity:1}
+.odor-hero .paper-fill{fill:var(--paper,#faf8f5)}
+.odor-hero .hero-city{opacity:.75}
+.odor-hero .hero-compass{opacity:.75}
+.odor-hero .hero-little-volutes{stroke-width:.85}
+.bag-body,.bag-tie,.bin-lid,.compass-needle,.organic-body,.drop-main,.drop-small{transform-box:fill-box;transform-origin:center}
+.bag-body{transform-origin:50% 100%}
+.bag-tie{transform-origin:50% 85%}
+.bin-lid{transform-origin:97% 100%}
+.organic-body{transform-origin:50% 100%}
+.drop-main,.drop-small{transform-origin:50% 100%}
+.odor-card.is-animating .bag-body{animation:ink-bag-squish .7s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .bag-tie{animation:ink-tie .8s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .bag-air{animation:ink-plume .9s ease-out}
+.odor-card.is-animating .bin-lid{animation:ink-lid 1.1s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .bin-vapor{animation:ink-plume 1.1s ease-out}
+.odor-card.is-animating .sewer-vapor{animation:ink-vapor 1.15s cubic-bezier(.22,1,.36,1)}
+.odor-card.is-animating .ditch-flow{animation:ink-water .85s cubic-bezier(.22,1,.36,1)}
+.odor-card.is-animating .organic-body{animation:ink-organic .9s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .organic-vapor{animation:ink-vapor 1s ease-out}
+.odor-card.is-animating .drop-main{animation:ink-drop .8s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .drop-small{animation:ink-drop .8s .12s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .metabolic-ring{animation:ink-ring 1s ease-out}
+.odor-card.is-animating .chemical-bubbles{animation:ink-bubbles .95s ease-out}
+.odor-card.is-animating .chemical-liquid{animation:ink-liquid .95s cubic-bezier(.34,1.56,.64,1)}
+.odor-card.is-animating .compass-needle{animation:ink-compass 1.15s cubic-bezier(.34,1.56,.64,1)}
+@keyframes ink-bag-squish{0%,100%{transform:scale(1)}35%{transform:scale(1.075,.9)}65%{transform:scale(.97,1.045)}}
+@keyframes ink-tie{0%,100%{transform:scale(1) rotate(0)}35%{transform:scale(.67,1.1) rotate(-12deg)}66%{transform:scale(1.05,.98) rotate(4deg)}}
+@keyframes ink-lid{0%,100%{transform:rotate(0)}32%,48%{transform:rotate(31deg)}76%{transform:rotate(-3deg)}}
+@keyframes ink-plume{0%{opacity:.15;transform:translateY(9px)}45%{opacity:1;transform:translateY(-5px)}75%{opacity:.3;transform:translateY(-13px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes ink-vapor{0%,100%{transform:translateY(0)}45%{transform:translateY(-8px)}65%{transform:translateY(-5px)}}
+@keyframes ink-water{0%,100%{transform:translateX(0)}35%{transform:translateX(7px)}70%{transform:translateX(-2px)}}
+@keyframes ink-organic{0%,100%{transform:scale(1)}40%{transform:scale(1.055,.95)}70%{transform:scale(.985,1.02)}}
+@keyframes ink-drop{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-6px) scale(.95,1.05)}65%{transform:translateY(1px) scale(1.06,.94)}}
+@keyframes ink-ring{0%,100%{opacity:1}45%{opacity:.2}}
+@keyframes ink-bubbles{0%,100%{transform:translateY(0);opacity:1}60%{transform:translateY(-14px);opacity:.5}70%{opacity:0}71%{transform:translateY(10px);opacity:0}}
+@keyframes ink-liquid{0%,100%{transform:translateY(0)}35%{transform:translateY(-3px)}65%{transform:translateY(2px)}}
+@keyframes ink-compass{0%{transform:rotate(0)}65%{transform:rotate(405deg)}100%{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.odor-art *,.odor-hero *,.wind-art *{animation:none!important;transition:none!important}}
+
+</style>
+  <style>
+/* map.css */
+.cartography-section{color:#111;--map-paper:#faf8f5;--map-line:#dedbd4;--map-muted:#68655f;scroll-margin-top:90px}
+.map-section-top{display:flex;gap:32px;justify-content:space-between;align-items:end;margin-bottom:26px}
+.map-kicker{display:flex;align-items:center;gap:10px;font:10px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--map-muted);margin:0 0 14px}.map-kicker:before{content:"";width:24px;height:1px;background:#111}
+.map-section-title{font:normal clamp(30px,3.6vw,44px)/1.12 Georgia,'Times New Roman',serif;letter-spacing:-.045em;margin:0;max-width:560px}.map-section-title em{font-weight:normal}
+.map-section-description{max-width:310px;color:var(--map-muted);font:12px/1.8 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0}
+.map-frame{border:1px solid var(--map-line);border-radius:5px;background:#fff;overflow:hidden;position:relative}.map-frame:fullscreen{height:100vh;display:flex;flex-direction:column;border:0;border-radius:0}.map-frame:fullscreen .map-stage{flex:1;max-height:none;height:auto}
+.map-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 22px;border-bottom:1px solid var(--map-line);background:#fff;flex-wrap:wrap}
+.map-place{font:500 12px/1.5 system-ui,sans-serif;margin:0}.map-place span{display:block;font:10px/1.6 ui-monospace,Consolas,monospace;color:var(--map-muted);letter-spacing:.02em;margin-top:3px}
+.map-demo-label{display:inline-flex;align-items:center;gap:6px;font:9px/1.5 ui-monospace,Consolas,monospace;text-transform:uppercase;letter-spacing:.06em;color:#67625a;border:1px solid #e4dfd5;padding:5px 8px;border-radius:2px;background:#faf8f5}.map-demo-label:before{content:"";width:4px;height:4px;border-radius:50%;background:#78756e}
+.map-stage{position:relative;height:520px;max-height:65vh;min-height:350px;background:var(--map-paper);isolation:isolate;overflow:hidden}.map-svg{width:100%;height:100%;display:block;touch-action:none;cursor:grab;user-select:none}.map-svg.map-is-dragging{cursor:grabbing}.map-svg text{user-select:none}.map-street-label{font:9px ui-monospace,Consolas,monospace;letter-spacing:1.1px;fill:#79746a}.map-block-stroke{stroke:#b8b2a8;stroke-width:.65;fill:#f6f3ee}.map-university-label{font:600 11px system-ui,sans-serif;fill:#292723;letter-spacing:.2px}.map-university-sub{font:8px ui-monospace,Consolas,monospace;fill:#69645d;letter-spacing:.6px}.map-building{stroke:#c5beb2;stroke-width:.6;fill:url(#odor-map-building-hatch)}
+.map-point{cursor:pointer;outline:none}.map-point .map-point-halo{opacity:.8;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;transform-box:fill-box;transform-origin:center}.map-point:hover .map-point-halo,.map-point:focus .map-point-halo{transform:scale(1.55);opacity:1}.map-point:focus-visible .map-point-focus{opacity:1}.map-point-focus{opacity:0;stroke:#111;stroke-width:1.5;stroke-dasharray:2 3;fill:none}.map-point .map-point-center{stroke:#fff;stroke-width:2}.map-point.is-active .map-point-halo{transform:scale(1.7);opacity:1}.map-point.is-active .map-point-focus{opacity:1}.map-contours{transition:opacity .4s ease}.map-contours.is-hidden,.map-reports.is-hidden{display:none}
+.map-controls{position:absolute;right:18px;top:18px;display:flex;flex-direction:column;gap:0;border:1px solid #d5d0c6;border-radius:3px;background:#fff;box-shadow:0 3px 12px #11111105;overflow:hidden;z-index:2}.map-control{width:38px;height:38px;display:grid;place-items:center;border:0;border-bottom:1px solid #e6e1d8;color:#111;background:#fff;font:20px Georgia,serif;cursor:pointer;transition:background .2s}.map-control:last-child{border-bottom:0}.map-control:hover{background:#f0ede7}.map-control:focus-visible,.map-layer-button:focus-visible,.map-model-select:focus-visible,.map-popup-close:focus-visible{outline:2px solid #111;outline-offset:-4px}.map-control svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.2}.map-orientation{position:absolute;right:81px;top:24px;width:44px;height:55px;pointer-events:none;opacity:.8}.map-engraving-signature{position:absolute;left:20px;top:18px;color:#736c60;font:8px/1.7 ui-monospace,Consolas,monospace;letter-spacing:1.3px;pointer-events:none}
+.map-layer-panel{position:absolute;bottom:19px;right:18px;z-index:2;width:223px;padding:14px;background:rgba(255,255,255,.96);border:1px solid #ded8ce;border-radius:3px;box-shadow:0 4px 15px #11111103}.map-panel-title{display:flex;justify-content:space-between;margin:0 0 10px;font:9px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:#736d64}.map-layer-button{width:100%;display:flex;gap:8px;align-items:center;text-align:left;padding:8px 0;border:0;background:none;color:#45413b;font:11px/1.35 system-ui,sans-serif;cursor:pointer}.map-layer-check{width:13px;height:13px;border:1px solid #b0a99d;display:grid;place-items:center;border-radius:2px;flex:none;font-size:9px;color:transparent}.map-layer-button[aria-pressed=true] .map-layer-check{background:#111;color:white;border-color:#111}.map-layer-label{flex:1}.map-layer-count{font:9px ui-monospace,Consolas,monospace;color:#777165}.map-model-label{display:block;border-top:1px solid #e9e4da;padding-top:10px;margin-top:6px;color:#736d64;font:8px/1.5 ui-monospace,Consolas,monospace;text-transform:uppercase;letter-spacing:.06em}.map-model-select{display:block;width:100%;margin-top:5px;padding:6px 8px;border:1px solid #ddd6ca;border-radius:2px;background:#faf8f5;color:#444;font:10px system-ui,sans-serif}.map-model-select:disabled{opacity:.5}.map-model-note{font:8px/1.6 system-ui,sans-serif;color:#756e64;margin:7px 0 0}.map-inspection-hint{position:absolute;bottom:23px;left:20px;font:9px/1.6 ui-monospace,Consolas,monospace;letter-spacing:.02em;color:#686359;max-width:240px;pointer-events:none}.map-inspection-hint span{display:block;margin-top:5px;color:#736b5f;font-size:8px}
+.map-popup{position:absolute;left:20px;bottom:20px;width:265px;max-width:calc(100% - 40px);padding:18px 20px;background:#fff;border:1px solid #cfc8bb;box-shadow:0 5px 20px #11111107;z-index:3;border-radius:3px;animation:map-popup-in .35s cubic-bezier(.22,1,.36,1)}.map-popup[hidden]{display:none}.map-popup-eyebrow{font:8px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:#736d63;margin:0 0 8px}.map-popup-title{font:normal 21px/1.2 Georgia,serif;margin:0 0 9px}.map-popup-detail{font:11px/1.65 system-ui,sans-serif;margin:0 0 11px;color:#6b655c}.map-popup-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid #e0d9cd;padding:4px 7px;font:8px/1.5 ui-monospace,Consolas,monospace;color:#665e52;border-radius:2px;background:#faf8f5}.map-popup-close{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;background:none;color:#777;font-size:19px;cursor:pointer}.map-popup-intensity{color:var(--point-color);font:11px/1.5 ui-monospace,Consolas,monospace;margin-bottom:6px}
+.map-bottom{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;border-top:1px solid var(--map-line);padding:15px 22px}.map-legend{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.map-legend-label{font:9px/1.4 ui-monospace,Consolas,monospace;color:#797166;margin-right:5px}.map-legend-item{display:inline-flex;align-items:center;gap:4px;font:9px/1.3 ui-monospace,Consolas,monospace;color:#5c564c;margin-right:5px}.map-legend-dot{width:6px;height:6px;display:block;border-radius:50%;background:var(--level-color)}.map-cartographic-note{font:9px/1.6 ui-monospace,Consolas,monospace;color:#6d675e;max-width:285px;margin:0;text-align:right}.map-method-note{margin:13px 0 0;max-width:780px;color:#6d675e;font:10px/1.8 system-ui,sans-serif}.map-method-note strong{font-weight:500;color:#4c473f}.map-local-summary{margin-top:14px;padding:12px 15px;background:#fff;border:1px dashed #cfc8bc;font:11px/1.7 system-ui,sans-serif;color:#645c4f}.map-local-summary[hidden]{display:none}.map-live-status{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+@keyframes map-popup-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:720px){.map-section-top{display:block}.map-section-description{margin-top:16px;max-width:100%}.map-toolbar{padding:15px;gap:9px}.map-place{font-size:11px}.map-demo-label{font-size:8px}.map-stage{height:470px;max-height:none}.map-layer-panel{width:190px;right:12px;bottom:12px;padding:12px}.map-inspection-hint{left:13px;bottom:15px;max-width:115px;font-size:8px}.map-inspection-hint span{font-size:7px}.map-controls{top:12px;right:12px}.map-orientation{right:65px;top:17px}.map-bottom{padding:13px 15px;gap:10px}.map-cartographic-note{text-align:left;max-width:100%;font-size:8px}.map-legend-label{font-size:8px}.map-legend-item{font-size:8px;gap:3px;margin-right:1px}.map-engraving-signature{left:13px;top:12px;font-size:7px}.map-popup{left:12px;bottom:12px;width:245px;max-width:calc(100% - 24px)}.map-section-title{font-size:34px}}
+@media(prefers-reduced-motion:reduce){.map-popup,.map-point-halo,.map-contours{animation:none!important;transition:none!important}}
+
+
+</style>
+</head>
+<body class="bg-paper text-ink font-sans antialiased">
+  <a class="skip-link" href="#registro">Pular para o registro</a>
+  <header class="site-header">
+    <div class="shell flex items-center justify-between gap-6">
+      <a href="#inicio" class="wordmark" aria-label="Mau Odor, início">
+        <svg viewBox="0 0 48 48" width="38" height="38" fill="none" aria-hidden="true"><path d="M5 31C14 31 10 10 26 10C40 10 43 33 27 36C12 39 10 22 24 20C34 18 34 30 27 30C23 30 22 25 26 25"/><path d="M4 36C14 38 20 44 33 39C48 33 45 10 31 6C17 2 7 11 8 22M4 26C10 26 8 14 19 10M14 39C8 35 7 30 10 24"/></svg>
+        <span><strong>mau odor<span class="wordmark-dot">.</span></strong><small>CIÊNCIA CIDADÃ · UFN</small></span>
+      </a>
+      <nav class="desktop-nav flex items-center gap-8" aria-label="Navegação principal">
+        <a class="is-current" href="#registro">Registrar percepção</a>
+        <a href="#territorio">Explorar o mapa <span aria-hidden="true">↗</span></a>
+        <button type="button" data-about>O projeto</button>
+      </nav>
+      <span class="prototype-badge"><span aria-hidden="true">◌</span> Protótipo interativo</span>
+    </div>
+  </header>
+
+  <main id="inicio" class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="fine-line" aria-hidden="true"></span> CADERNO DE CAMPO URBANO / 01</p>
+        <h1 id="hero-title">O que o ar<br>conta <em>por aqui?</em></h1>
+        <p class="hero-description">Sua percepção ajuda a conhecer a cidade.<br>Registre o que você sente no entorno da UFN.</p>
+        <div class="hero-meta"><span>SANTA MARIA, RS</span><span class="tiny-cross" aria-hidden="true">+</span><span>UMA ESCUTA COLETIVA DO TERRITÓRIO</span></div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="plate-top"><span>FIG. 01</span><span>TORNAR VISÍVEL O INVISÍVEL</span></div>
+        <div id="hero-art"></div>
+        <canvas id="motes"></canvas>
+        <div class="plate-bottom"><span>perceber · registrar · compreender</span><span>↗</span></div>
+      </div>
+    </section>
+
+    <section class="field-context" aria-label="Contexto do registro">
+      <div class="context-cell">
+        <span class="context-symbol" aria-hidden="true">◷</span>
+        <div><p class="eyebrow">AGORA / HORÁRIO LOCAL</p><p class="context-value" id="datetime">Carregando horário…</p><p class="context-detail">America/São Paulo</p></div>
+      </div>
+      <div class="context-cell location-cell">
+        <svg class="context-symbol" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Z"/></svg>
+        <div><p class="eyebrow">ONDE VOCÊ ESTÁ</p><p class="context-value" id="location-value">Entorno da UFN</p><p class="context-detail" id="location-detail">Área de estudo · GPS ainda não capturado</p><button id="locate" class="text-button" type="button">Usar minha localização <span aria-hidden="true">↗</span></button></div>
+      </div>
+      <div class="context-cell weather-cell">
+        <svg class="context-symbol" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4.2 4.2l2.1 2.1m11.4 11.4 2.1 2.1M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+        <div><p class="eyebrow">CONDIÇÕES DO AR</p><p class="context-value weather-values"><span id="temperature">— °C</span><span id="humidity">— %</span><span id="wind">— km/h</span></p><p class="context-detail" id="weather-status">Consultando condições para a UFN…</p></div>
+      </div>
+    </section>
+
+    <div class="registration-layout" id="registro">
+      <form id="odor-form" novalidate>
+        <section class="form-section intensity-section" aria-labelledby="intensity-title">
+          <div class="section-heading"><span class="section-number">01</span><div><p class="eyebrow">COMECE PELA SUA PERCEPÇÃO</p><h2 id="intensity-title">Quão intenso está o odor?</h2><p>Escolha a intensidade que melhor descreve o que você sente.</p></div></div>
+          <fieldset class="intensity-fieldset" aria-describedby="intensity-help intensity-error">
+            <legend class="sr-only">Intensidade do odor, escolha um nível de 1 a 5</legend>
+            <div id="intensity-options" class="intensity-options"></div>
+            <p class="field-error" id="intensity-error" hidden>Escolha uma intensidade para continuar.</p>
+          </fieldset>
+          <div class="intensity-reading">
+            <div class="reading-caption"><span class="reading-dot" aria-hidden="true"></span><span id="intensity-readout" aria-live="polite">A intensidade começa na sua percepção.</span></div>
+            <div class="intensity-meter" role="meter" aria-label="Intensidade selecionada" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-valuetext="Ainda não selecionada"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <p id="intensity-help" class="footnote">Uma percepção pessoal. Não há resposta certa ou errada.</p>
+        </section>
+
+        <section class="form-section" aria-labelledby="odor-title">
+          <div class="section-heading"><span class="section-number">02</span><div><p class="eyebrow">DÊ FORMA AO QUE VOCÊ SENTE</p><h2 id="odor-title">Com o que o odor se parece?</h2><p>Selecione uma ou mais opções. Toque em <span class="inline-info">i</span> para conhecer cada uma.</p></div></div>
+          <fieldset aria-describedby="odor-error"><legend class="sr-only">Tipos de odor, múltipla escolha</legend><div class="odor-grid" id="odor-options"></div><p id="odor-error" class="field-error" hidden>Selecione pelo menos um tipo de odor.</p></fieldset>
+          <div id="other-field" class="other-field" hidden><label for="other-text">Como você descreveria esse outro odor? <span class="optional">opcional</span></label><input type="text" id="other-text" maxlength="120" placeholder="Ex.: cheiro de fumaça, borracha…"><p class="footnote">Até 120 caracteres.</p></div>
+          <p class="selection-count" id="selection-count" aria-live="polite">Nenhuma categoria selecionada</p>
+        </section>
+
+        <section class="form-section" aria-labelledby="photo-title">
+          <div class="section-heading"><span class="section-number">03</span><div><p class="eyebrow">UM OLHAR SOBRE O LOCAL <span class="optional">OPCIONAL</span></p><h2 id="photo-title">O que a câmera pode ver?</h2><p>Uma foto ajuda a contextualizar seu relato.</p></div></div>
+          <div class="photo-area" id="photo-area">
+            <div class="photo-placeholder" id="photo-placeholder">
+              <svg class="scanner-illustration" viewBox="0 0 130 100" fill="none" aria-hidden="true"><path class="scanner-corners" d="M15 28V12h20m60 0h20v16m0 44v16H95m-60 0H15V72"/><circle cx="65" cy="50" r="34" stroke-dasharray="2 5"/><circle cx="65" cy="50" r="25"/><circle cx="65" cy="50" r="7"/><path d="m35 70 18-18 12 10 16-23 16 31ZM65 8v16m0 52v16M23 50h16m52 0h16"/><path d="m47 72 8-9m1 10 7-8m11 8 8-17m-1 17 6-13" stroke-width=".65"/></svg>
+              <p>Um registro do que está ao redor.</p><span>JPG, PNG ou WebP · até 8 MB</span>
+            </div>
+            <div id="photo-preview" hidden><img id="preview-image" alt="Prévia da fotografia selecionada para o relato"><button type="button" id="remove-photo" class="remove-photo">Remover foto <span aria-hidden="true">×</span></button><span class="preview-stamp">FOTO LOCAL · SEM ANÁLISE AUTOMÁTICA</span></div>
+            <div class="photo-actions"><button type="button" id="camera-button" class="button button-ink"><span aria-hidden="true">◎</span> Tirar foto</button><button type="button" id="gallery-button" class="button button-outline"><span aria-hidden="true">↥</span> Escolher da galeria</button></div>
+            <input class="sr-only" type="file" id="camera-input" accept="image/jpeg,image/png,image/webp" capture="environment" tabindex="-1" aria-label="Tirar foto do local">
+            <input class="sr-only" type="file" id="gallery-input" accept="image/jpeg,image/png,image/webp" tabindex="-1" aria-label="Selecionar foto da galeria">
+          </div>
+          <p class="field-error" id="photo-error" role="alert" hidden></p>
+          <div class="invisible-odor"><span class="wind-art" id="wind-art" aria-hidden="true"></span><label class="checkbox-label"><input type="checkbox" id="invisible-source"><span>O cheiro está no ar, mas não há foco visível na foto.</span></label><button type="button" class="info-button" data-info="invisible" aria-label="Entenda a opção sem foco visível">i</button></div>
+          <p class="footnote">Evite rostos e placas. A foto permanece nesta sessão e não é enviada a uma IA.</p>
+        </section>
+
+        <section class="form-section context-section" aria-labelledby="context-title">
+          <div class="section-heading"><span class="section-number">04</span><div><p class="eyebrow">PEQUENOS DETALHES, MAIS CONTEXTO <span class="optional">OPCIONAL</span></p><h2 id="context-title">O que você vê por perto?</h2><p>Marque apenas o que você consegue observar no local.</p></div></div>
+          <fieldset><legend class="sr-only">Elementos visíveis próximos, múltipla escolha</legend><div id="context-tags" class="context-tags"></div></fieldset>
+          <div class="observation-heading"><label for="observation">Quer acrescentar algo?</label><span id="character-count">0 / 400</span></div>
+          <textarea id="observation" rows="3" maxlength="400" placeholder="Ex.: o cheiro fica mais forte ao passar pela esquina…"></textarea>
+          <div class="form-bottom"><p><span aria-hidden="true">↳</span> Toda percepção é um ponto de partida.</p><button class="button button-ink review-button" type="submit">Revisar meu relato <span aria-hidden="true">↗</span></button></div>
+          <p class="footnote local-note">Neste protótipo, os relatos são salvos apenas neste navegador.</p>
+        </section>
+      </form>
+
+      <aside class="field-notes" aria-label="Notas de campo e resumo">
+        <div class="field-notes-sticky">
+          <div class="note-card">
+            <p class="eyebrow note-card-label">NOTAS DE CAMPO <span aria-hidden="true">↙</span></p>
+            <div class="note-art" id="note-art" aria-hidden="true"></div>
+            <h3>O invisível também<br>faz parte da cidade.</h3>
+            <p>Um cheiro, uma rua, um instante. Seu relato ajuda a construir uma leitura coletiva do ambiente urbano.</p>
+            <div class="note-rule"></div>
+            <p class="note-caption">Sentir é perceber.<br>Identificar a fonte é investigar.</p>
+            <button class="text-button" type="button" data-info="method">Como usamos os relatos <span aria-hidden="true">↗</span></button>
+          </div>
+          <div class="live-summary">
+            <p class="eyebrow">SEU REGISTRO, ATÉ AQUI</p>
+            <dl><div><dt>Intensidade</dt><dd id="summary-intensity">A escolher</dd></div><div><dt>Percepções</dt><dd id="summary-types">Nenhuma</dd></div><div><dt>Fotografia</dt><dd id="summary-photo">Opcional</dd></div></dl>
+            <div class="progress-line"><span id="form-progress"></span></div><span id="progress-text" class="footnote">2 escolhas essenciais para registrar</span>
+          </div>
+          <a href="#territorio" class="map-jump"><span>Do seu olhar<br><strong>para o território.</strong></span><span aria-hidden="true">↓</span></a>
+        </div>
+      </aside>
+    </div>
+
+    <section id="territorio" class="territory-section" aria-label="Mapa do entorno da UFN"><div id="odor-map"></div></section>
+
+    <section class="local-records" aria-labelledby="records-title"><div><p class="eyebrow">CADERNO DESTE NAVEGADOR</p><h2 id="records-title">Seus relatos locais</h2><p id="records-description">Os registros que você salvar ficam disponíveis aqui.</p></div><div class="record-actions"><span id="local-count" class="local-count">00</span><button type="button" class="button button-outline" id="export-records" disabled>Exportar JSON <span aria-hidden="true">↗</span></button><button type="button" class="text-button" id="clear-records" hidden>Apagar relatos locais</button></div><div id="local-record-list"></div></section>
+  </main>
+
+  <footer class="site-footer"><div class="shell"><div><strong>mau odor.</strong><p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA<br>Entorno da Universidade Franciscana · Santa Maria, RS</p></div><div class="footer-right"><span>PERCEPÇÃO → CONTEXTO → CONHECIMENTO</span><button type="button" data-about>Sobre esta experiência ↗</button><button type="button" id="motion-toggle" aria-pressed="false">Pausar animações</button></div></div></footer>
+
+  <dialog id="info-dialog" class="editorial-dialog" aria-labelledby="info-title"><button class="dialog-close" data-close aria-label="Fechar informação">×</button><p class="eyebrow" id="info-eyebrow">NOTA DE CAMPO</p><h2 id="info-title"></h2><div id="info-body"></div><button type="button" class="button button-ink" data-close>Entendi</button></dialog>
+  <dialog id="review-dialog" class="editorial-dialog review-dialog" aria-labelledby="review-title"><button class="dialog-close" data-close aria-label="Fechar revisão">×</button><p class="eyebrow">UMA ÚLTIMA OLHADA</p><h2 id="review-title">Seu relato, do seu jeito.</h2><p class="dialog-intro">Confira a percepção que você está registrando.</p><dl id="review-details" class="review-details"></dl><p class="review-disclaimer">Este é um relato de percepção, com status <strong>isolado / não confirmado</strong>. Não comprova uma fonte de odor.</p><div class="dialog-actions"><button type="button" class="button button-outline" data-close>Voltar e editar</button><button type="button" class="button button-ink" id="save-report">Salvar neste navegador ↗</button></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script>
+/* illustrations.js */
+/* Original vector artwork for the Mau Odor field notebook. No external assets. */
+(function () {
+  'use strict';
+  const P = (d, extra = '') => `<path d="${d}" ${extra}/>`;
+  const C = (x, y, r, extra = '') => `<circle cx="${x}" cy="${y}" r="${r}" ${extra}/>`;
+  const fine = (content) => `<g class="etch-lines">${content}</g>`;
+  const dots = (points) => `<g class="ink-dots">${points.map(([x,y,r]) => C(x,y,r || .65)).join('')}</g>`;
+  const ground = () => fine(P('M27 111H133M41 115H62M98 115H120'));
+  const spiral = (x = 0, y = 0, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})">${P('M0 34C-6 20 14 17 14 7C14-2 2-4 0 3C-3 12 10 13 9 6C9 3 5 2 4 5')}${fine(P('M-5 32C-10 19 6 16 8 13'))}</g>`;
+  const drawings = {
+    waste() {
+      let hatches = '';
+      for (let i = 0; i < 9; i++) {
+        const x = 47 + i * 3.3;
+        hatches += P(`M${x} ${70-i*2}C${x-9} ${87-i} ${x-3} 101 ${75+i*1.7} 104`);
+      }
+      for (let i=0;i<7;i++) hatches += P(`M${103+i*.9} ${68+i*4.1}Q${112+i*.3} ${79+i*3} ${104-i*.9} ${92+i*1.3}`);
+      return `${ground()}<g class="bag-body">${P('M72 45C60 57 43 68 41 85C37 103 55 109 79 108C106 111 122 103 118 87C114 71 98 57 88 45Z','class="paper-fill"')}${fine(hatches)}${P('M61 62Q68 69 65 82M95 61Q90 71 96 85','class="secondary-line"')}${dots([[88,93],[92,98],[84,100],[100,94],[53,89]])}</g><g class="bag-tie">${P('M72 44C63 40 61 33 64 25C71 29 76 31 80 36C82 30 88 24 96 24C98 32 94 39 87 44M71 45Q81 40 90 45M72 48Q82 44 89 48','class="paper-fill"')}${fine(P('M67 30Q70 37 76 41M91 29Q88 36 84 40'))}${P('M77 47C64 46 59 49 62 53C66 57 73 49 79 47C88 47 100 45 100 50C100 55 90 53 82 48M79 49Q73 57 68 58M82 49Q85 55 92 56')}</g><g class="bag-air">${spiral(118,24,.62)}</g>`;
+    },
+    container() {
+      let h = '';
+      for(let i=0;i<6;i++) h += P(`M${53+i*5.5} 65L${56+i*5.2} 96`);
+      return `${ground()}<g class="bin-vapor odor-flow">${spiral(70,7,.72)}${spiral(95,8,.55)}</g>${P('M43 53L50 99Q78 105 111 99L119 53Z','class="paper-fill"')}${fine(h)}${P('M98 63L96 94M105 63L102 94','class="secondary-line"')}${P('M50 58Q80 63 113 58','class="secondary-line"')}<g class="bin-lid">${P('M39 49Q78 42 123 48L122 55Q78 50 39 56Z','class="paper-fill"')}${P('M69 45V40Q80 37 91 40V45')}${fine(P('M46 50Q79 46 115 50'))}</g>${C(58,106,4,'class="paper-fill"')}${C(102,106,4,'class="paper-fill"')}${C(58,106,1)}${C(102,106,1)}${dots([[108,80],[107,86],[103,90]])}`;
+    },
+    sewer() {
+      let grid = '';
+      for(let i=0;i<7;i++) {
+        const x=49+i*9;
+        const rise=Math.abs(3-i)*1.4;
+        grid+=P(`M${x} ${82+rise}L${x-7} ${101-rise}`);
+      }
+      return `${ground()}<g class="sewer-vapor odor-flow">${spiral(61,22,.87)}${spiral(86,8,1.12)}${spiral(113,30,.58)}</g>${P('M32 89C32 79 53 74 81 74C109 74 132 80 132 90L132 95C131 106 107 111 81 111C52 111 31 106 32 95Z','class="paper-fill"')}${P('M33 90C33 100 56 105 81 105C108 105 131 99 131 90M41 89C41 82 60 79 81 79C103 79 123 83 123 89C123 97 103 100 81 100C59 100 41 97 41 89')}${fine(grid+P('M46 88H120M45 93H118M39 98L39 103M45 101L45 106M52 103L52 108M59 105L59 109M66 106L66 110M74 107L74 111M88 107L88 111M96 106L96 110M104 105L104 109M113 102L113 107M121 99L121 104'))}`;
+    },
+    ditch() {
+      let stones='';
+      for(let i=0;i<6;i++) stones += P(`M${28+i*10} ${54+i*4}L${33+i*10} ${42+i*4}`);
+      let current='';
+      for(let i=0;i<6;i++) current+=P(`M${35+i*3} ${75+i*4}C${53+i*4} ${56+i*5} ${65+i*4} ${95+i*4} ${87+i*4} ${82+i*4}S${122+i*2} ${83+i*4} ${136-i*1.2} ${72+i*5}`);
+      return `${P('M18 47L39 30L90 49L79 69Z','class="paper-fill"')}${P('M18 47L18 65L77 90L79 69M18 65L39 56L92 77M95 111L141 89L141 72L113 83','class="paper-fill"')}${fine(stones+P('M24 51V62M34 55V68M44 59V72M54 63V76M64 66V80M74 70V84'))}<g class="ditch-flow odor-flow">${fine(current)}</g>${P('M101 53C105 47 114 48 114 54C114 59 106 59 107 54','class="secondary-line"')}${dots([[89,64],[94,69],[86,70],[120,65],[125,61],[129,67]])}${P('M26 97L35 93M30 102L40 97M121 107L137 100','class="secondary-line"')}`;
+    },
+    organic() {
+      let ribs='';
+      for(let i=0;i<6;i++) ribs+=P(`M${58+i*3} ${76-i*3}Q${67+i*2} ${85-i*2} ${80+i*2} ${88-i*.3}`);
+      let leaf='';
+      for(let i=0;i<5;i++) leaf+=P(`M${93+i*4} ${67-i*3}L${92+i*4} ${58-i*3}M${95+i*4} ${65-i*3}L${103+i*4} ${66-i*3}`);
+      return `${ground()}<g class="organic-vapor odor-flow">${spiral(39,28,.7)}${spiral(75,10,.7)}</g><g class="organic-body">${P('M50 80C44 58 55 47 68 52C75 55 78 55 86 52C103 45 112 65 104 82C98 98 84 105 72 101C60 100 53 93 50 80Z','class="paper-fill"')}${P('M76 55C77 43 83 38 88 37M77 52Q70 48 67 49')}${fine(ribs)}${P('M85 73C87 53 102 43 124 45C123 64 108 79 85 73Z','class="paper-fill"')}${P('M86 73Q107 55 120 48','class="secondary-line"')}${fine(leaf)}${P('M33 97C44 89 53 94 55 103C44 107 38 105 33 97Z','class="paper-fill"')}${fine(P('M36 98L50 102M38 96L42 101M42 95L47 102'))}${dots([[64,88],[67,93],[72,94],[57,81],[102,89],[106,94],[111,90]])}</g>`;
+    },
+    metabolic() {
+      let h='';
+      for(let i=0;i<6;i++) h+=P(`M${56+i*3} ${61-i*4}Q${48+i*2} ${83-i*2} ${66+i*3} ${94-i*.9}`);
+      return `${ground()}<g class="drop-main">${P('M77 25C76 39 48 61 48 78C48 95 60 103 77 103C95 103 107 94 107 78C107 60 81 39 77 25Z','class="paper-fill"')}${fine(h)}${P('M88 68C95 74 97 81 92 87','class="secondary-line"')}</g><g class="drop-small">${P('M118 48C117 55 108 63 108 70C108 82 128 82 128 70C128 63 120 55 118 48Z','class="paper-fill"')}${fine(P('M115 62Q109 72 117 75'))}</g><g class="metabolic-ring">${P('M33 91C19 79 22 61 34 52M127 91C140 81 141 65 133 57','stroke-dasharray="2 4" stroke-width=".8"')}${C(34,49,1.5)}${C(132,54,1.5)}</g>${dots([[42,105],[38,101],[125,99],[120,104]])}`;
+    },
+    chemical() {
+      let glass='';
+      for(let i=0;i<5;i++) glass+=P(`M${49+i*3} ${86+i*1.5}Q${45+i*3} ${103-i*.2} ${65+i*4} ${104-i*.4}`);
+      let waves='';
+      for(let i=0;i<4;i++) waves+=P(`M${51-i} ${87+i*4}C68 ${79+i*4} 84 ${95+i*3} ${110+i} ${86+i*4}`);
+      return `${ground()}${P('M69 27V59L43 94Q37 108 57 108H104Q123 108 117 95L91 59V27Z','class="paper-fill"')}${P('M66 25Q80 22 94 25V30Q80 33 66 30Z','class="paper-fill"')}${fine(P('M74 35V61L48 96M86 36V58M91 68L108 90')+glass)}<g class="chemical-liquid odor-flow">${fine(waves)}</g><g class="chemical-bubbles odor-flow">${C(67,86,3.6)}${C(89,75,2.6)}${C(78,64,1.8)}${C(84,49,1.3)}</g>${P('M99 43L107 35M102 48L113 46M95 39L98 31','class="secondary-line"')}${dots([[58,101],[64,98],[99,102],[104,99]])}`;
+    },
+    other() {
+      let ticks='';
+      for(let i=0;i<24;i++) {
+        const a=i*Math.PI/12, r=i%3===0?37:40;
+        ticks+=P(`M${80+Math.cos(a)*r} ${65+Math.sin(a)*r}L${80+Math.cos(a)*43} ${65+Math.sin(a)*43}`);
+      }
+      let h='';
+      for(let i=0;i<7;i++) h+=P(`M${80+i*1.2} ${35+i*4}L${81+i*1.4} ${48+i*2.8}`);
+      return `${C(80,65,45)}${C(80,65,33,'stroke-width=".75"')}${C(80,65,49,'stroke-width=".65" stroke-dasharray="1 5"')}${fine(ticks)}${P('M80 9V16M80 114V121M24 65H31M129 65H136','stroke-width=".8"')}<g class="compass-needle">${P('M80 28L91 65L80 101L69 65Z','class="paper-fill"')}${P('M80 28V101M69 65H91','class="secondary-line"')}${fine(h)}${C(80,65,3.5,'class="paper-fill"')}</g>${P('M113 26L119 20M116 22H121V27M40 109L44 105','class="secondary-line"')}${dots([[23,28],[28,23],[131,104],[136,109],[136,99]])}`;
+    }
+  };
+
+  function icon(kind) {
+    const key=Object.hasOwn(drawings,kind)?kind:'other';
+    return `<svg class="odor-art art-${key}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 130" preserveAspectRatio="xMidYMid meet" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${drawings[key]()}</svg>`;
+  }
+
+  function hero() {
+    let streams='', clouds='', arcs='', streets='', compass='';
+    for(let i=0;i<11;i++) {
+      streams+=P(`M${15+i*2} ${175+i*2.1}C${76+i} ${128+i*1.8} ${133+i*2} ${192+i*1.1} ${183+i*2} ${147+i*1.6}C${222+i*2} ${113+i*.6} ${204+i} ${85-i*.8} ${178-i*.5} ${96-i*.6}C${151-i*.2} ${108-i*.6} ${177+i*.4} ${144+i*.2} ${197+i*.3} ${122+i*.4}`);
+    }
+    for(let i=0;i<8;i++) {
+      clouds+=P(`M${138+i*1.4} ${189-i*2.7}C${201+i} ${198-i*3.3} ${219+i*1.2} ${159-i*3.1} ${260+i*2} ${152-i*2}C${310+i*1.1} ${147-i*3} ${326+i} ${191-i*2.3} ${371+i*.8} ${174-i*2}C${414+i*.7} ${157-i*1.8} ${397+i} ${111-i*2} ${366+i*.8} ${124-i*2}C${347+i*.9} ${133-i*2} ${366+i} ${154-i*2} ${379+i*.7} ${142-i*2}`);
+    }
+    for(let i=0;i<6;i++) {
+      arcs+=P(`M${285+i*2} ${158-i}C${289+i*2} ${99-i*3} ${347+i*2} ${103-i*3} ${346+i*2} ${61-i*2}C${345+i*2} ${28-i*2} ${316+i} ${30-i*1.5} ${316+i} ${48-i}C${316+i} ${62-i} ${336+i*.8} ${61-i} ${333+i*.9} ${47-i*.4}`);
+    }
+    for(let i=0;i<7;i++) streets+=P(`M${38+i*8} 138V153M${104+i*5} 126V141`);
+    for(let i=0;i<36;i++) {
+      const a=i*Math.PI/18, r=i%3===0?35:39;
+      compass+=P(`M${457+Math.cos(a)*r} ${77+Math.sin(a)*r}L${457+Math.cos(a)*42} ${77+Math.sin(a)*42}`);
+    }
+    return `<svg class="odor-hero" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 210" preserveAspectRatio="xMidYMid meet" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <g class="hero-city">${P('M22 170V133H33V118H53V133H73V120H94V149M37 133V101H59V107H70V124M104 147V117H138V145M116 117V106H127V117M129 144V96H153V143M134 97V89H148V97','class="paper-fill"')}${fine(streets+P('M43 110H47M43 116H47M43 122H47M55 112H60M112 123H118M112 130H118M125 123H131M137 104H145M137 111H145M137 118H145M137 125H145M137 132H145'))}</g>
+      <g class="odor-flow hero-streams">${fine(streams)}</g>
+      <g class="odor-flow hero-clouds">${fine(clouds)}</g>
+      <g class="odor-flow hero-rising">${fine(arcs)}</g>
+      <g class="hero-little-volutes">${spiral(245,39,.7)}${spiral(287,16,.49)}${spiral(410,162,.52)}${spiral(497,131,.55)}${spiral(149,43,.43)}</g>
+      <g class="hero-compass">${C(457,77,47,'stroke-width=".6"')}${C(457,77,29,'stroke-width=".6"')}${C(457,77,52,'stroke-width=".5" stroke-dasharray="2 5"')}${fine(compass)}${P('M457 8V142M393 77H523','stroke-width=".55" stroke-dasharray="4 5"')}${P('M457 43L465 77L457 110L449 77Z','class="paper-fill"')}${P('M457 43V110M449 77H465','stroke-width=".6"')}${C(457,77,3,'class="paper-fill"')}${P('M416 36L498 118M416 118L498 36','stroke-width=".4" stroke-dasharray="2 6"')}</g>
+      ${dots([[157,169],[151,173],[162,176],[248,103],[253,99],[258,105],[272,89],[276,94],[282,87],[220,39],[224,45],[215,47],[403,49],[410,44],[404,39],[461,167],[469,172],[471,164],[70,66],[75,71],[79,65],[235,182],[242,186],[251,180]])}
+      ${fine(P('M18 198H90M104 198H140M414 190H455M469 190H519M30 203H67M437 195H486'))}
+    </svg>`;
+  }
+
+  function wind() {
+    return `<svg class="wind-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 60" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true" focusable="false">${P('M5 33C24 22 36 43 54 31C66 23 60 8 49 11C38 13 43 26 51 22C55 20 53 16 50 17M9 38C27 28 38 49 58 35M4 44C28 34 38 55 61 41C77 31 78 16 90 21C102 27 90 40 85 33C83 30 86 27 89 29')}${fine(P('M9 49C31 40 41 60 65 45M18 20C28 17 34 21 38 20'))}${dots([[75,10],[80,14],[76,47],[82,44]])}</svg>`;
+  }
+
+  window.OdorArt=Object.freeze({icon,hero,wind});
+})();
+
+</script>
+  <script>
+/* map.js */
+/* Atlas ilustrativo. Nenhuma coordenada cartográfica ou predição real é produzida aqui. */
+(() => {
+  'use strict';
+  const colors=['#0D9488','#65A30D','#D97706','#EA580C','#DC2626'];
+  const names=['Muito fraco','Fraco','Intermediário','Forte','Muito forte'];
+  const points=[
+    {id:'01',x:242,y:259,level:4,type:'Contentor de lixo',place:'Próximo à UFN · conjunto III'},
+    {id:'02',x:296,y:254,level:3,type:'Resíduos',place:'Rua dos Andradas · posição ilustrativa'},
+    {id:'03',x:332,y:285,level:5,type:'Esgoto',place:'Entorno da UFN · posição ilustrativa'},
+    {id:'04',x:372,y:252,level:3,type:'Resíduos orgânicos',place:'Rua dos Andradas · posição ilustrativa'},
+    {id:'05',x:562,y:386,level:2,type:'Valas a céu aberto',place:'Rua Silva Jardim · posição ilustrativa'},
+    {id:'06',x:608,y:393,level:1,type:'Outros',place:'Rua Silva Jardim · posição ilustrativa'},
+    {id:'07',x:659,y:361,level:2,type:'Resíduos',place:'Entorno da UFN · posição ilustrativa'},
+    {id:'08',x:174,y:127,level:1,type:'Resíduos químicos',place:'Registro isolado · posição ilustrativa'}
+  ];
+  const sketchIcons={
+    plus:'<path d="M8 2v12M2 8h12"/>',minus:'<path d="M2 8h12"/>',reset:'<path d="M3 5a5 5 0 1 1-.2 5M3 1v4h4"/>',expand:'<path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/>'
+  };
+  let host=null,localCount=0;
+  function building(x,y,w,h){return `<rect class="map-building" x="${x}" y="${y}" width="${w}" height="${h}" rx="1"/><path d="M${x+3} ${y+3}h${w-6}v${h-6}h-${w-6}z" fill="none" stroke="#c9c0b3" stroke-width=".35"/>`;}
+  function blocks(){
+    let result='';
+    const cols=[[-40,148],[182,143],[359,150],[543,144],[721,190]];
+    const rows=[[-25,130],[141,91],[277,89],[409,94],[546,65]];
+    cols.forEach(([x,w],ci)=>rows.forEach(([y,h],ri)=>{
+      result+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" class="map-block-stroke"/>`;
+      if((ci===2&&ri===1)||(ci===1&&ri===2)||(ci===4&&ri===3))return;
+      const bw=(w-27)/3;
+      for(let i=0;i<3;i++){
+        result+=building(x+8+i*(bw+5),y+9,bw,h*.32);
+        result+=building(x+8+i*(bw+5),y+h*.56,bw-3,h*.3);
+      }
+      result+=`<path d="M${x+7} ${y+h*.47}h${w-14}" fill="none" stroke="#ddd6ca" stroke-width=".5" stroke-dasharray="2 3"/>`;
+    }));
+    return result;
+  }
+  function contours(cx,cy,scale,levels,variant){
+    let result='';
+    const shape='M-113-13C-111-55-64-63-26-70C14-78 24-47 67-44C115-43 131-8 101 26C77 53 38 39 11 58C-18 77-69 64-73 34C-77 12-116 18-113-13Z';
+    for(let i=0;i<levels.length;i++){
+      const s=scale*(1-i*.17),col=colors[levels[i]-1];
+      result+=`<path d="${shape}" transform="translate(${cx+i*(variant?6:2)},${cy-i*3}) rotate(${variant?-19:12}) scale(${s})" fill="${col}" fill-opacity="${i===0?'.045':'.055'}" stroke="${col}" stroke-width="${i===levels.length-1?'1.4':'.9'}" stroke-opacity=".75"/>`;
+      result+=`<path d="${shape}" transform="translate(${cx+i*(variant?6:2)},${cy-i*3}) rotate(${variant?-19:12}) scale(${s*.94})" fill="none" stroke="${col}" stroke-width=".45" stroke-opacity=".25"/>`;
+    }
+    return result;
+  }
+  function citySvg(){
+    return `<svg class="map-svg" viewBox="0 0 900 570" preserveAspectRatio="xMidYMid slice" tabindex="0" aria-label="Mapa esquemático do centro de Santa Maria. Oito relatos simulados podem ser inspecionados. Use os controles para ampliar e arraste para explorar." role="group" xmlns="http://www.w3.org/2000/svg">
+      <title>Mapa esquemático do entorno da UFN, com oito relatos simulados</title>
+      <defs>
+        <pattern id="odor-map-building-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(-22)"><path d="M0 0v5" stroke="#b9b0a2" stroke-width=".45"/><rect width="5" height="5" fill="#c7bca8" opacity=".035"/></pattern>
+        <pattern id="odor-map-campus-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(31)"><path d="M0 0v4" stroke="#888174" stroke-width=".5"/></pattern>
+      </defs>
+      <g class="map-world"><rect x="-1000" y="-1000" width="3000" height="2600" fill="#faf8f5"/>
+        <g transform="rotate(-7 450 285)">
+          ${blocks()}
+          <g stroke="#dbd4c9" stroke-width=".6" fill="none">
+            <path d="M-100 116H1000M-100 131H1000M-100 243H1000M-100 266H1000M-100 379H1000M-100 399H1000M-100 517H1000M-100 536H1000"/>
+            <path d="M157-100V750M174-100V750M337-100V750M350-100V750M521-100V750M534-100V750M699-100V750M713-100V750"/>
+          </g>
+          <g class="map-street-label"><text x="326" y="126">R. VENÂNCIO AIRES</text><text x="91" y="258">R. DOS ANDRADAS</text><text x="494" y="258">R. DOS ANDRADAS</text><text x="190" y="393">R. SILVA JARDIM</text><text x="550" y="530">R. DR. BOZANO</text><text x="97" y="530">R. DR. BOZANO</text><text transform="translate(168 486) rotate(-90)">R. DUQUE DE CAXIAS</text><text transform="translate(347 192) rotate(-90)">R. CONDE DE PORTO ALEGRE</text><text transform="translate(531 498) rotate(-90)">R. SERAFIM VALANDRO</text></g>
+          <g class="map-campus"><rect x="374" y="153" width="120" height="66" rx="2" fill="#eee9de" stroke="#6e675b" stroke-width=".8"/><rect x="382" y="162" width="104" height="49" fill="url(#odor-map-campus-hatch)" stroke="#aca18e" stroke-width=".5"/><rect x="392" y="170" width="84" height="33" fill="#faf8f5" stroke="#c6bbaa" stroke-width=".5"/><text x="434" y="184" text-anchor="middle" class="map-university-label">UFN</text><text x="434" y="196" text-anchor="middle" class="map-university-sub">CONJUNTO I</text></g>
+          <g class="map-campus"><path d="M192 287h121v68H192z" fill="#eee9de" stroke="#6e675b" stroke-width=".8"/><path d="M199 294h107v53H199z" fill="url(#odor-map-campus-hatch)" stroke="#aca18e" stroke-width=".5"/><rect x="211" y="303" width="83" height="34" fill="#faf8f5" stroke="#c6bbaa" stroke-width=".5"/><text x="252" y="317" text-anchor="middle" class="map-university-label">UFN</text><text x="252" y="330" text-anchor="middle" class="map-university-sub">CONJUNTO III</text></g>
+          <g fill="none" stroke="#b9b19f" stroke-width=".55"><path d="M736 423h159v66H736zM738 425l155 62M893 425l-155 62"/><ellipse cx="815" cy="456" rx="43" ry="24"/><ellipse cx="815" cy="456" rx="37" ry="19"/>${[744,764,786,845,867,886].map((x,i)=>`<circle cx="${x}" cy="${i%2?477:434}" r="5"/><circle cx="${x}" cy="${i%2?477:434}" r="3" stroke-dasharray="1 2"/>`).join('')}</g><rect x="760" y="442" width="112" height="27" fill="#faf8f5"/><text x="815" y="453" text-anchor="middle" class="map-university-sub">PRAÇA SALDANHA</text><text x="815" y="464" text-anchor="middle" class="map-university-sub">MARINHO</text>
+          <g class="map-contours">${contours(306,268,1,[3,4,4,5],false)}${contours(619,380,.68,[1,1,2],true)}</g>
+          <g class="map-reports">${points.map(p=>`<g class="map-point" tabindex="0" role="button" data-point="${p.id}" aria-label="Inspecionar relato simulado ${p.id}: ${p.type}, intensidade ${p.level}, ${names[p.level-1]}" transform="translate(${p.x} ${p.y})"><circle class="map-point-halo" r="10" fill="${colors[p.level-1]}" fill-opacity=".1"/><circle class="map-point-focus" r="13"/><circle class="map-point-center" r="4.5" fill="${colors[p.level-1]}"/></g>`).join('')}</g>
+        </g>
+      </g>
+    </svg>`;
+  }
+  function mount(element){
+    host=typeof element==='string'?document.querySelector(element):element;
+    if(!host)return;
+    localCount=0;
+    host.innerHTML=`<section class="cartography-section" aria-labelledby="map-heading">
+      <div class="map-section-top"><div><p class="map-kicker">05 / Uma leitura coletiva</p><h2 id="map-heading" class="map-section-title">O ar também conta<br><em>uma história.</em></h2></div><p class="map-section-description">Cada percepção ajuda a desenhar o que os olhos não veem. Explore as linhas, os lugares e os relatos de uma cidade compartilhada.</p></div>
+      <div class="map-frame"><div class="map-toolbar"><p class="map-place">Entorno da UFN · Santa Maria, RS<span>ATLAS DE PERCEPÇÕES / EDIÇÃO EXPERIMENTAL</span></p><span class="map-demo-label">Mapa ilustrativo · dados simulados</span></div>
+        <div class="map-stage">${citySvg()}
+          <div class="map-engraving-signature">SANTA MARIA / RS<br>ESTUDO DE TERRITÓRIO Nº 01</div>
+          <svg class="map-orientation" viewBox="0 0 44 55" aria-hidden="true"><circle cx="22" cy="29" r="16" fill="none" stroke="#797267" stroke-width=".6" stroke-dasharray="2 3"/><circle cx="22" cy="29" r="12" fill="none" stroke="#797267" stroke-width=".5"/><path d="M22 11v36M4 29h36M22 15l4 14h-8z" fill="none" stroke="#39352e" stroke-width=".7"/><path d="M22 15v14h4z" fill="#39352e"/><text x="22" y="7" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#39352e">N*</text></svg>
+          <div class="map-controls" aria-label="Controles do mapa">${[['plus','Aproximar'],['minus','Afastar'],['reset','Restaurar visão'],['expand','Tela inteira']].map(([action,label])=>`<button type="button" class="map-control" data-map-action="${action}" title="${label}" aria-label="${label}"><svg viewBox="0 0 16 16" aria-hidden="true">${sketchIcons[action]}</svg></button>`).join('')}</div>
+          <div class="map-layer-panel"><p class="map-panel-title"><span>Camadas</span><span>02</span></p><button type="button" class="map-layer-button" data-layer="reports" aria-pressed="true"><span class="map-layer-check" aria-hidden="true">✓</span><span class="map-layer-label">Relatos simulados</span><span class="map-layer-count">08</span></button><button type="button" class="map-layer-button" data-layer="contours" aria-pressed="true"><span class="map-layer-check" aria-hidden="true">✓</span><span class="map-layer-label">Hipóteses · demonstração</span></button><label class="map-model-label">Visualizar cenário de modelo<select class="map-model-select" aria-label="Cenário ilustrativo do modelo"><option value="rf">Random Forest</option><option value="dt">Decision Tree</option></select></label><p class="map-model-note">Isolinhas desenhadas para demonstrar a interface. Nenhum modelo foi executado.</p></div>
+          <div class="map-inspection-hint">Toque em um ponto<br>para ler sua percepção.<span>Arraste para explorar · + / − para zoom</span></div>
+          <aside class="map-popup" hidden aria-label="Detalhes do relato simulado"><button type="button" class="map-popup-close" aria-label="Fechar detalhes">×</button><p class="map-popup-eyebrow"></p><h3 class="map-popup-title"></h3><div class="map-popup-intensity"></div><p class="map-popup-detail"></p><span class="map-popup-badge">Percepção · causa não comprovada</span></aside>
+        </div>
+        <div class="map-bottom"><div class="map-legend" aria-label="Legenda da intensidade"><span class="map-legend-label">INTENSIDADE</span>${names.map((n,i)=>`<span class="map-legend-item" title="${i+1}. ${n}"><i class="map-legend-dot" style="--level-color:${colors[i]}" aria-hidden="true"></i>${i+1}<span class="map-legend-word"> ${n}</span></span>`).join('')}</div><p class="map-cartographic-note">Traçado esquemático, sem precisão cartográfica.<br>*Orientação ilustrativa · sem escala geográfica.</p></div>
+      </div>
+      <p class="map-method-note"><strong>Percepção não é comprovação.</strong> As cores representam intensidades declaradas no cenário de exemplo. Uma hipótese de fonte exige investigação; relatos isolados permanecem como “isolado / não confirmado”.</p>
+      <div class="map-local-summary" hidden></div><p class="map-live-status" role="status" aria-live="polite"></p>
+    </section>`;
+    // The map deliberately uses schematic positions, never user's GPS as display coordinates.
+    const svg=host.querySelector('.map-svg'),world=host.querySelector('.map-world'),popup=host.querySelector('.map-popup'),frame=host.querySelector('.map-frame'),live=host.querySelector('.map-live-status');
+    let zoom=1,panX=0,panY=0,drag=null,lastPoint=null;
+    function transform(){world.setAttribute('transform',`translate(${450+panX} ${285+panY}) scale(${zoom}) translate(-450 -285)`);}
+    function closePopup(focus=false){popup.hidden=true;host.querySelectorAll('.map-point.is-active').forEach(p=>p.classList.remove('is-active'));if(focus&&lastPoint)lastPoint.focus();}
+    function showPoint(node){
+      const p=points.find(item=>item.id===node.dataset.point);if(!p)return;
+      host.querySelectorAll('.map-point.is-active').forEach(p=>p.classList.remove('is-active'));node.classList.add('is-active');lastPoint=node;
+      popup.style.setProperty('--point-color',colors[p.level-1]);popup.querySelector('.map-popup-eyebrow').textContent=`RELATO ${p.id} / SIMULAÇÃO`;
+      popup.querySelector('.map-popup-title').textContent=p.type;popup.querySelector('.map-popup-intensity').textContent=`${p.level} / 5 — ${names[p.level-1]}`;
+      popup.querySelector('.map-popup-detail').textContent=p.place;popup.querySelector('.map-popup-badge').textContent=p.id==='08'?'Isolado / não confirmado':'Percepção · causa não comprovada';popup.hidden=false;
+      live.textContent=`Relato simulado ${p.id}, ${p.type}, intensidade ${p.level}. ${p.id==='08'?'Isolado, não confirmado.':'Causa não comprovada.'}`;
+    }
+    host.querySelectorAll('.map-point').forEach(node=>{
+      node.addEventListener('click',()=>showPoint(node));
+      node.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showPoint(node);}if(e.key==='Escape')closePopup();});
+    });
+    popup.querySelector('.map-popup-close').addEventListener('click',()=>closePopup(true));
+    host.addEventListener('keydown',e=>{if(e.key==='Escape')closePopup(true);});
+    host.querySelectorAll('[data-layer]').forEach(btn=>btn.addEventListener('click',()=>{
+      const enabled=btn.getAttribute('aria-pressed')!=='true';btn.setAttribute('aria-pressed',String(enabled));host.querySelector(`.map-${btn.dataset.layer}`).classList.toggle('is-hidden',!enabled);
+      if(btn.dataset.layer==='reports'&&!enabled)closePopup();if(btn.dataset.layer==='contours')host.querySelector('.map-model-select').disabled=!enabled;
+    }));
+    host.querySelector('.map-model-select').addEventListener('change',e=>{
+      host.querySelector('.map-contours').innerHTML=e.target.value==='dt'?contours(325,275,.93,[3,4,5],true)+contours(600,377,.8,[1,2],false):contours(306,268,1,[3,4,4,5],false)+contours(619,380,.68,[1,1,2],true);
+      live.textContent=`Cenário visual ${e.target.value==='dt'?'Decision Tree':'Random Forest'}. Demonstração sem execução de modelo.`;
+    });
+    host.querySelectorAll('[data-map-action]').forEach(btn=>btn.addEventListener('click',async()=>{
+      const a=btn.dataset.mapAction;
+      if(a==='plus')zoom=Math.min(3,zoom+.25);if(a==='minus')zoom=Math.max(.75,zoom-.25);if(a==='reset'){zoom=1;panX=0;panY=0;closePopup();}
+      if(a==='expand'){
+        try{if(document.fullscreenElement)await document.exitFullscreen();else if(frame.requestFullscreen)await frame.requestFullscreen();else live.textContent='Tela inteira não está disponível neste navegador.';}catch{live.textContent='O navegador não permitiu tela inteira. O mapa permanece disponível nesta página.';}
+      }
+      transform();if(a!=='expand')live.textContent=`Zoom ${Math.round(zoom*100)} por cento.`;
+    }));
+    svg.addEventListener('pointerdown',e=>{if(e.target.closest('.map-point'))return;drag={x:e.clientX,y:e.clientY,px:panX,py:panY};svg.setPointerCapture(e.pointerId);svg.classList.add('map-is-dragging');});
+    svg.addEventListener('pointermove',e=>{if(!drag)return;const rect=svg.getBoundingClientRect(),scale=Math.min(900/rect.width,570/rect.height);panX=Math.max(-600,Math.min(600,drag.px+(e.clientX-drag.x)*scale));panY=Math.max(-400,Math.min(400,drag.py+(e.clientY-drag.y)*scale));transform();});
+    function stopDrag(){drag=null;svg.classList.remove('map-is-dragging');}svg.addEventListener('pointerup',stopDrag);svg.addEventListener('pointercancel',stopDrag);
+    host.addEventListener('keydown',e=>{if(e.target===svg&&(e.key==='+'||e.key==='-')){e.preventDefault();zoom=Math.max(.75,Math.min(3,zoom+(e.key==='+'?.25:-.25)));transform();}});
+  }
+  function addReport(){
+    if(!host)return;localCount++;const el=host.querySelector('.map-local-summary');el.hidden=false;
+    el.textContent=`${localCount} ${localCount===1?'relato salvo':'relatos salvos'} nesta sessão. O mapa acima continua demonstrativo; seus registros não foram posicionados neste traçado esquemático.`;
+  }
+  window.OdorMap={mount,addReport};
+})();
+
+</script>
+  <script>
+/* app.js */
+(() => {
+  'use strict';
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const levels = [
+    {name:'Muito fraco',color:'#0D9488'}, {name:'Fraco',color:'#65A30D'},
+    {name:'Intermediário',color:'#D97706'}, {name:'Forte',color:'#EA580C'},
+    {name:'Muito forte',color:'#DC2626'}
+  ];
+  const types = [
+    {id:'waste',label:'Resíduos',description:'Odor que lembra lixo ou resíduos acumulados, espalhados ou ensacados. Se você vê um contentor, pode selecionar essa categoria também. A escolha descreve sua percepção; não confirma a origem do cheiro.'},
+    {id:'container',label:'Contentor de lixo',sub:'Containers',description:'Odor percebido próximo a um recipiente coletivo de armazenamento de lixo. Selecione quando houver essa associação na sua percepção. A proximidade do recipiente, por si só, não comprova que ele seja a fonte.'},
+    {id:'sewer',label:'Esgoto',description:'Odor que você associa a esgoto, bueiros, ralos ou águas residuais. Descreva o cheiro percebido, mesmo que não consiga enxergar uma fonte. Não é necessário identificar uma substância.'},
+    {id:'ditch',label:'Valas a céu aberto',description:'Odor associado, na sua percepção, a valas, canais ou sarjetas abertas. As tags do próximo passo ajudam a registrar se há água parada ou outros elementos visíveis.'},
+    {id:'organic',label:'Resíduos orgânicos alimentares',description:'Odor que lembra restos de comida, cascas, frutas ou outros alimentos em decomposição. Marque apenas se essa descrição corresponde ao que você percebe.'},
+    {id:'metabolic',label:'Resíduos metabólicos',description:'Odor que lembra urina, fezes ou outros resíduos de origem humana ou animal. Não é preciso atribuí-lo a uma pessoa ou animal específico.'},
+    {id:'chemical',label:'Resíduos químicos',description:'Odor que lembra produtos químicos, solventes, combustíveis ou produtos de limpeza. Essa percepção não identifica a substância nem a sua concentração. Faça o registro a partir de um local seguro, sem se aproximar para investigar.'},
+    {id:'other',label:'Outros',description:'Use quando nenhuma opção descreve bem o odor ou quando você não consegue classificá-lo. Um campo curto opcional permite descrevê-lo com suas próprias palavras.'}
+  ];
+  const tags = ['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'];
+  const state = {intensity:null, types:new Set(), tags:new Set(), location:null, weather:null, photo:null, photoLoading:false, pending:null};
+  const STORE_KEY = 'ufn-mau-odor-nanquim-v1';
+  let records = [], toastTimer, photoURL = null, photoGeneration = 0, weatherGeneration = 0;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let motionPaused = reducedMotion.matches;
+  let lastFocused = null;
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+    if (Array.isArray(stored)) records = stored.filter(r => r && typeof r.id === 'string' && Number.isInteger(r.intensity) && r.intensity >= 1 && r.intensity <= 5 && Array.isArray(r.categories)).slice(-100);
+  } catch { /* Browsers may disable storage; a save will explain that state. */ }
+
+  $('#hero-art').innerHTML = OdorArt.hero();
+  $('#wind-art').innerHTML = OdorArt.wind();
+  $('#note-art').innerHTML = `<svg class="empty-illustration" viewBox="0 0 220 140" aria-hidden="true"><g stroke-width=".8"><ellipse cx="110" cy="76" rx="67" ry="50" stroke-dasharray="2 5"/><circle cx="110" cy="76" r="38"/><circle cx="110" cy="76" r="31"/><path d="M20 76h44m92 0h44M110 8v28m0 81v19M61 28l17 17m64 63 17 17M163 25l-17 18M57 122l19-18" stroke-dasharray="3 5"/><path d="M32 98C65 98 64 46 111 46c43 0 61 52 21 64-33 10-56-30-28-42 21-9 37 17 18 23-11 4-18-9-9-12" stroke-width="1.3"/><path d="M28 103C65 106 63 40 112 40c52 0 69 63 22 76-41 12-66-35-32-54 28-15 52 22 24 35M28 108C65 114 66 35 113 35c58 0 76 72 23 87M29 113C56 118 67 101 75 84M32 119c20 4 32-8 38-19"/><path d="m110 11-4 13h8Z" fill="#111"/><circle cx="34" cy="77" r="2"/><circle cx="183" cy="76" r="2"/><circle cx="64" cy="31" r="1"/><circle cx="169" cy="120" r="1"/><path d="m173 33 4 4m0-4-4 4M50 120l3 3m0-3-3 3"/></g></svg>`;
+  $('#intensity-options').innerHTML = levels.map((level,i) => `<label class="intensity-option" style="--level-color:${level.color}"><input type="radio" name="intensity" value="${i+1}" aria-label="${i+1}. ${level.name}" required><span class="intensity-key"><span class="selected-mark" aria-hidden="true">✓</span><span class="slot-window" aria-hidden="true"><span class="slot-track"><span>${i+1}</span><span>${i+1}</span></span></span><span class="level-label">${level.name}</span><span class="level-tick" aria-hidden="true"></span></span></label>`).join('');
+  $('#odor-options').innerHTML = types.map((type,i) => `<div class="odor-card" data-kind="${type.id}"><label class="odor-choice"><input type="checkbox" name="odor" value="${type.id}"><span class="card-topline"><span class="card-index" aria-hidden="true">0${i+1}</span><span class="card-checkbox" aria-hidden="true"></span></span><span class="card-art" aria-hidden="true">${OdorArt.icon(type.id)}</span><span class="card-label">${type.label}</span>${type.sub?`<span class="card-sublabel">${type.sub}</span>`:''}</label><button type="button" class="info-button" data-info="${type.id}" aria-label="Informações sobre ${type.label}">i</button></div>`).join('');
+  $('#context-tags').innerHTML = tags.map((tag,i) => `<label class="tag"><input type="checkbox" name="tag" value="${i}"><span>${tag}</span></label>`).join('');
+  OdorMap.mount($('#odor-map'));
+
+  const infoContent = {
+    invisible:{title:'Sentir não é o mesmo que enxergar.',body:'<p>O odor pode estar no ar mesmo quando a foto mostra um lugar aparentemente limpo. Marcar esta opção evita tratar a imagem como evidência visual de uma fonte de mau odor.</p><p>No futuro, essa informação poderá ajudar a interpretar as imagens usadas na pesquisa. Neste protótipo, nenhuma foto é analisada por IA.</p>'},
+    method:{title:'Uma percepção. Muitas possibilidades.',body:'<p><strong>Relato:</strong> o que alguém sentiu em um lugar e momento.</p><p><strong>Hipótese:</strong> uma possível fonte, sugerida por observação ou por um modelo, que ainda exige investigação.</p><p><strong>Causa comprovada:</strong> exige evidências próprias e não é estabelecida por este formulário. Relatos isolados são preservados como “isolado / não confirmado”.</p>'},
+    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA no entorno da UFN — Santa Maria/RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design. O mapa é esquemático, seus oito relatos são simulados e os cenários de Decision Tree e Random Forest não executam modelos treinados.</p><p>Seus relatos ficam neste navegador. A foto é temporária e não acompanha a exportação JSON. Quando disponível, o clima é consultado na <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>; essa consulta usa as coordenadas da área de estudo ou as coordenadas arredondadas do GPS autorizado.</p>'}
+  };
+  function showToast(text) {
+    clearTimeout(toastTimer); $('#toast').textContent = text; $('#toast').hidden = false;
+    toastTimer = setTimeout(() => { $('#toast').hidden = true; }, 5200);
+  }
+  function openDialog(dialog) {
+    lastFocused = document.activeElement;
+    dialog.showModal();
+  }
+  $$('dialog').forEach(dialog => {
+    $$('[data-close]',dialog).forEach(button => button.addEventListener('click', () => dialog.close()));
+    dialog.addEventListener('close', () => { if(lastFocused?.isConnected) lastFocused.focus({preventScroll:true}); });
+    dialog.addEventListener('click', event => {
+      if(event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      if(event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+    });
+  });
+  function showInfo(key) {
+    const type = types.find(t => t.id === key);
+    const content = type ? {title:type.label,body:`<p>${escape(type.description)}</p>`} : infoContent[key];
+    if(!content) return;
+    $('#info-title').textContent = content.title; $('#info-body').innerHTML = content.body;
+    openDialog($('#info-dialog'));
+  }
+  $$('[data-info]').forEach(button => button.addEventListener('click', () => showInfo(button.dataset.info)));
+  $$('[data-about]').forEach(button => button.addEventListener('click', () => showInfo('about')));
+
+  function updateSummary() {
+    $('#summary-intensity').textContent = state.intensity ? `${state.intensity} · ${levels[state.intensity-1].name}` : 'A escolher';
+    $('#summary-types').textContent = state.types.size ? `${state.types.size} ${state.types.size===1?'categoria':'categorias'}` : 'Nenhuma';
+    $('#summary-photo').textContent = state.photo ? 'Adicionada' : 'Opcional';
+    const done = Number(!!state.intensity) + Number(state.types.size > 0);
+    $('#form-progress').style.width = `${done*50}%`;
+    $('#progress-text').textContent = done === 2 ? 'Pronto para revisar. Os detalhes são opcionais.' : `${2-done} ${done?'escolha essencial':'escolhas essenciais'} para registrar`;
+  }
+  $$('input[name="intensity"]').forEach(input => input.addEventListener('change', () => {
+    state.intensity = Number(input.value); const level = levels[state.intensity-1];
+    document.documentElement.style.setProperty('--intensity-color', level.color);
+    $('#intensity-readout').textContent = `${state.intensity} / 5 — ${level.name}`;
+    $('.intensity-meter').setAttribute('aria-valuenow', String(state.intensity));
+    $('.intensity-meter').setAttribute('aria-valuetext', level.name);
+    $$('.intensity-meter>span').forEach((span,i) => span.classList.toggle('is-active',i<state.intensity));
+    $('#intensity-error').hidden = true; updateSummary();
+  }));
+  $$('input[name="odor"]').forEach(input => input.addEventListener('change', () => {
+    if(input.checked) state.types.add(input.value); else state.types.delete(input.value);
+    const card = input.closest('.odor-card'); card.classList.toggle('is-selected',input.checked);
+    if(input.checked && !motionPaused) {
+      card.classList.remove('is-animating'); void card.offsetWidth; card.classList.add('is-animating');
+      setTimeout(() => card.classList.remove('is-animating'),1300);
+    }
+    $('#other-field').hidden = !state.types.has('other');
+    $('#selection-count').textContent = state.types.size ? `${String(state.types.size).padStart(2,'0')} ${state.types.size===1?'categoria selecionada':'categorias selecionadas'}` : 'Nenhuma categoria selecionada';
+    if(state.types.size) $('#odor-error').hidden = true;
+    updateSummary();
+  }));
+  $$('input[name="tag"]').forEach(input => input.addEventListener('change', () => {
+    const value = Number(input.value);
+    if(input.checked){
+      if(value===7){state.tags.clear(); $$('input[name="tag"]').forEach(other => { if(other!==input) other.checked=false; });}
+      else {state.tags.delete(7); $('input[name="tag"][value="7"]').checked=false;}
+      state.tags.add(value);
+    } else state.tags.delete(value);
+  }));
+  $('#observation').addEventListener('input', () => { $('#character-count').textContent = `${$('#observation').value.length} / 400`; });
+
+  function updateTime() {
+    const now = new Date();
+    const date = new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'short',year:'numeric'}).format(now).replace(' de ',' ').replace(' de ',' ');
+    const time = new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}).format(now);
+    $('#datetime').textContent = `${date} · ${time}`;
+  }
+  updateTime(); setInterval(updateTime,30000);
+  async function fetchWeather(latitude,longitude,basis) {
+    const generation = ++weatherGeneration;
+    state.weather = null; $('#temperature').textContent='— °C'; $('#humidity').textContent='— %'; $('#wind').textContent='— km/h';
+    $('#weather-status').textContent = 'Consultando condições do ar…';
+    const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(),9000);
+    try {
+      const lat = Number(latitude.toFixed(2)), lon = Number(longitude.toFixed(2));
+      const query = new URLSearchParams({latitude:String(lat),longitude:String(lon),current:'temperature_2m,relative_humidity_2m,wind_speed_10m',timezone:'America/Sao_Paulo',forecast_days:'1'});
+      const response = await fetch(`https://api.open-meteo.com/v1/forecast?${query}`,{signal:controller.signal});
+      if(!response.ok) throw new Error('Weather unavailable');
+      const data = await response.json(); const current = data.current;
+      if(!current || ![current.temperature_2m,current.relative_humidity_2m,current.wind_speed_10m].every(Number.isFinite)) throw new Error('Incomplete weather');
+      if(generation!==weatherGeneration) return;
+      state.weather = {source:'Open-Meteo',basis,latitude:lat,longitude:lon,observedAt:current.time,timezone:'America/Sao_Paulo',temperatureC:current.temperature_2m,relativeHumidityPercent:current.relative_humidity_2m,windSpeedKmh:current.wind_speed_10m};
+      $('#temperature').textContent = `${Math.round(current.temperature_2m)} °C`;
+      $('#humidity').textContent = `${Math.round(current.relative_humidity_2m)} %`;
+      $('#wind').textContent = `${Math.round(current.wind_speed_10m)} km/h`;
+      $('#weather-status').textContent = `Open-Meteo · ${basis==='study-area'?'área da UFN':'região do GPS'} · ${current.time.slice(11,16)}`;
+    } catch {
+      if(generation!==weatherGeneration) return;
+      state.weather = null; $('#weather-status').textContent = 'Clima indisponível · você pode continuar';
+    } finally {clearTimeout(timeout);}
+  }
+  fetchWeather(-29.6838,-53.8105,'study-area');
+  $('#locate').addEventListener('click', () => {
+    if(!navigator.geolocation){showToast('Este navegador não disponibiliza geolocalização. Você pode continuar sem GPS.');return;}
+    $('#locate').disabled = true; $('#locate').textContent='Localizando…';
+    navigator.geolocation.getCurrentPosition(position => {
+      const {latitude,longitude,accuracy}=position.coords;
+      state.location={latitude,longitude,accuracyMeters:Math.round(accuracy),capturedAt:new Date(position.timestamp).toISOString(),source:'device-gps'};
+      const distance=Math.hypot((latitude+29.6838)*111,(longitude+53.8105)*96);
+      $('#location-value').textContent=`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+      $('#location-detail').textContent=`GPS capturado · precisão ±${Math.round(accuracy)} m${distance>3?' · fora da área de estudo':''}`;
+      $('#locate').disabled=false; $('#locate').textContent='Atualizar localização ↗';
+      fetchWeather(latitude,longitude,'device-region');
+    }, error => {
+      $('#locate').disabled=false; $('#locate').textContent='Tentar localização novamente ↗';
+      if(state.location){
+        $('#location-detail').textContent='Última localização capturada · atualização falhou';
+        showToast('Não foi possível atualizar. A localização anterior foi mantida e será identificada pela data de captura.');
+        return;
+      }
+      $('#location-detail').textContent=error.code===1?'GPS não autorizado · você pode continuar':'GPS indisponível · você pode continuar';
+      showToast(error.code===1?'Localização não autorizada. Nenhuma coordenada foi capturada.':'Não foi possível capturar o GPS agora. Tente novamente ou continue.');
+    },{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+  });
+
+  $('#camera-button').addEventListener('click',()=>$('#camera-input').click());
+  $('#gallery-button').addEventListener('click',()=>$('#gallery-input').click());
+  function removePhoto() {
+    ++photoGeneration;
+    state.photoLoading=false; $('.review-button').disabled=false;
+    if(photoURL) URL.revokeObjectURL(photoURL); photoURL=null; state.photo=null;
+    $('#preview-image').removeAttribute('src'); $('#photo-preview').hidden=true; $('#photo-placeholder').hidden=false;
+    $('#camera-input').value=''; $('#gallery-input').value=''; $('#photo-error').hidden=true; updateSummary();
+  }
+  $('#remove-photo').addEventListener('click',removePhoto);
+  async function choosePhoto(input) {
+    const file=input.files?.[0]; if(!file) return;
+    $('#photo-error').hidden=true;
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size>8*1024*1024){
+      $('#photo-error').textContent=file.size>8*1024*1024?'A foto ultrapassa 8 MB. Escolha uma imagem menor.':'Escolha uma foto JPG, PNG ou WebP.';$('#photo-error').hidden=false;input.value='';return;
+    }
+    const candidate=URL.createObjectURL(file), generation=++photoGeneration;
+    state.photoLoading=true; $('.review-button').disabled=true; $('#summary-photo').textContent='Carregando…';
+    const preview=new Image(); preview.src=candidate;
+    try {
+      await preview.decode();
+      if(generation!==photoGeneration){URL.revokeObjectURL(candidate);return;}
+      if(photoURL) URL.revokeObjectURL(photoURL); photoURL=candidate;
+      state.photo={name:file.name,type:file.type,sizeBytes:file.size,width:preview.naturalWidth,height:preview.naturalHeight,retention:'session-only',visionAnalysis:null};
+      $('#preview-image').src=photoURL; $('#photo-preview').hidden=false; $('#photo-placeholder').hidden=true; updateSummary();
+    } catch {URL.revokeObjectURL(candidate);if(generation===photoGeneration){$('#photo-error').textContent='Não foi possível abrir essa imagem. Escolha outra foto.';$('#photo-error').hidden=false;}}
+    finally {if(generation===photoGeneration){state.photoLoading=false;$('.review-button').disabled=false;updateSummary();}}
+    input.value='';
+  }
+  $('#camera-input').addEventListener('change',event=>choosePhoto(event.target));
+  $('#gallery-input').addEventListener('change',event=>choosePhoto(event.target));
+
+  function localDate(iso){return new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(iso));}
+  function createReport(){return {
+    schemaVersion:1,id:window.crypto?.randomUUID?crypto.randomUUID():`local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+    recordedAt:new Date().toISOString(),timezone:'America/Sao_Paulo',intensity:state.intensity,
+    categories:types.filter(t=>state.types.has(t.id)).map(t=>t.id),
+    multiHot:Object.fromEntries(types.map(t=>[t.id,Number(state.types.has(t.id))])),
+    otherDescription:state.types.has('other')?$('#other-text').value.trim():'',
+    location:state.location?{...state.location}:null,weather:state.weather?{...state.weather}:null,
+    studyArea:{name:'Entorno da UFN, Santa Maria/RS',referenceLatitude:-29.6838,referenceLongitude:-53.8105,isUserLocation:false},
+    photo:state.photo?{...state.photo}:null,noVisibleSource:$('#invisible-source').checked,
+    visibleTags:[...state.tags].map(i=>tags[i]),observation:$('#observation').value.trim(),
+    evidenceType:'citizen-perception',verificationStatus:'isolated-unconfirmed',causeProven:false,
+    ai:{computerVisionExecuted:false,predictionExecuted:false},storage:'browser-local',prototype:true
+  };}
+  $('#odor-form').addEventListener('submit',event=>{
+    event.preventDefault();
+    if(state.photoLoading){showToast('Aguarde a foto terminar de carregar para revisar.');return;}
+    $('#intensity-error').hidden=!!state.intensity; $('#odor-error').hidden=state.types.size>0;
+    if(!state.intensity){$('input[name="intensity"]').focus();return;}
+    if(!state.types.size){$('input[name="odor"]').focus();return;}
+    state.pending=createReport(); const report=state.pending;
+    const rows=[['Intensidade',`${report.intensity} / 5 — ${levels[report.intensity-1].name}`],['Percepções',report.categories.map(id=>types.find(t=>t.id===id).label).join(', ')],
+      ['Localização',report.location?`${report.location.latitude.toFixed(5)}, ${report.location.longitude.toFixed(5)} (±${report.location.accuracyMeters} m)`:'Sem GPS capturado'],
+      ['Clima',report.weather?`${Math.round(report.weather.temperatureC)} °C · ${report.weather.relativeHumidityPercent}% · ${Math.round(report.weather.windSpeedKmh)} km/h (${report.weather.basis==='study-area'?'área de estudo':'região do GPS'})`:'Indisponível'],
+      ['Fotografia',report.photo?'Adicionada · só nesta sessão; arquivo não será salvo':'Sem foto'],
+      ['Foco visível',report.noVisibleSource?'Não há foco visível informado':'Não especificado'],
+      ['Por perto',report.visibleTags.join(', ')||'Não informado'],['Observação',report.observation||'Sem observação']];
+    if(report.otherDescription)rows.splice(2,0,['Outro odor',report.otherDescription]);
+    $('#review-details').innerHTML=rows.map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('');
+    openDialog($('#review-dialog'));
+  });
+  $('#save-report').addEventListener('click',()=>{
+    if(!state.pending)return;
+    const report={...state.pending,recordedAt:new Date().toISOString()};
+    if(records.length>=100){showToast('Este caderno chegou a 100 relatos. Exporte os registros antes de limpar espaço.');return;}
+    const next=[...records,report];
+    try{localStorage.setItem(STORE_KEY,JSON.stringify(next));}
+    catch{showToast('Não foi possível salvar no navegador. Verifique as permissões de armazenamento e tente novamente.');return;}
+    records=next;state.pending=null;
+    $('#review-dialog').close(); OdorMap.addReport(report); renderRecords();
+    $('#odor-form').reset();state.intensity=null;state.types.clear();state.tags.clear();removePhoto();
+    $$('.odor-card').forEach(card=>card.classList.remove('is-selected','is-animating'));
+    document.documentElement.style.setProperty('--intensity-color','#111');
+    $('#intensity-readout').textContent='A intensidade começa na sua percepção.';
+    $('.intensity-meter').setAttribute('aria-valuenow','0');$('.intensity-meter').setAttribute('aria-valuetext','Ainda não selecionada');
+    $$('.intensity-meter>span').forEach(span=>span.classList.remove('is-active'));
+    $('#other-field').hidden=true;$('#selection-count').textContent='Nenhuma categoria selecionada';$('#character-count').textContent='0 / 400';updateSummary();
+    showToast('Relato salvo neste navegador. Obrigado por compartilhar sua percepção.');
+  });
+  function renderRecords(){
+    $('#local-count').textContent=String(records.length).padStart(2,'0');$('#export-records').disabled=!records.length;$('#clear-records').hidden=!records.length;
+    $('#records-description').textContent=records.length?'Relatos locais de percepção · fotos não armazenadas · exportação disponível.':'Os registros que você salvar ficam disponíveis aqui.';
+    $('#local-record-list').innerHTML=records.slice(-3).reverse().map(report=>{
+      let date;try{date=localDate(report.recordedAt);}catch{date='Data não disponível';}
+      const labels=report.categories.map(id=>types.find(t=>t.id===id)?.label||id).join(', ');
+      return `<div class="record-row"><div>${escape(labels)}<small>${escape(date)} · intensidade ${report.intensity} / 5</small></div><span>ISOLADO /<br>NÃO CONFIRMADO</span></div>`;
+    }).join('');
+  }
+  $('#export-records').addEventListener('click',()=>{
+    if(!records.length)return;
+    const payload={project:'Mau Odor — UFN / Santa Maria',exportedAt:new Date().toISOString(),schemaVersion:1,notice:'Relatos locais de percepção. Sem comprovação de causa. Fotografias não incluídas; apenas metadados.',records};
+    const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
+    const link=document.createElement('a');link.href=url;link.download=`mau-odor-relatos-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+  });
+  $('#clear-records').addEventListener('click',()=>{
+    $('#info-title').textContent='Apagar os relatos deste navegador?';
+    $('#info-body').innerHTML='<p>Você pode exportar o caderno antes de apagá-lo. Essa ação remove os relatos locais deste protótipo.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar relatos locais</button>';
+    openDialog($('#info-dialog'));
+    $('#confirm-clear').addEventListener('click',()=>{
+      try{localStorage.removeItem(STORE_KEY);}catch{showToast('Não foi possível limpar o armazenamento.');return;}
+      records=[];renderRecords();OdorMap.mount($('#odor-map'));$('#info-dialog').close();showToast('Relatos locais apagados.');
+    });
+  });
+  renderRecords(); updateSummary();
+
+  const canvas=$('#motes'),ctx=canvas.getContext('2d');
+  let frame=0, phase=0, lastFrame=0, canvasWidth=500, canvasHeight=224, pointer={x:.5,y:.5};
+  function resizeCanvas(){const bounds=canvas.getBoundingClientRect();canvasWidth=bounds.width;canvasHeight=bounds.height;const dpr=Math.min(devicePixelRatio||1,2);canvas.width=canvasWidth*dpr;canvas.height=canvasHeight*dpr;ctx?.setTransform(dpr,0,0,dpr,0,0);}
+  const particles=Array.from({length:36},(_,i)=>({x:(i*.618033)%1,y:(i*.4142)%1,r:i%4===0?.9:.55,offset:i*1.9}));
+  function drawMotes(time){
+    if(!ctx)return;
+    const delta=Math.min((time-lastFrame)||16,50);lastFrame=time;phase+=delta*.00015*(state.intensity||1);
+    ctx.clearRect(0,0,canvasWidth,canvasHeight);ctx.fillStyle=state.intensity?levels[state.intensity-1].color:'#111111';
+    const count=8+(state.intensity||0)*5;
+    for(const p of particles.slice(0,count)){
+      const x=((p.x+phase*.05)%1)*canvasWidth;
+      const y=(.17+p.y*.64)*canvasHeight+Math.sin(phase+p.offset)*7+(pointer.y-.5)*p.r*6;
+      ctx.globalAlpha=.18+p.r*.24;ctx.beginPath();ctx.arc(x+(pointer.x-.5)*p.r*7,y,p.r,0,Math.PI*2);ctx.fill();
+    }
+    frame=requestAnimationFrame(drawMotes);
+  }
+  function syncMotion(){
+    document.documentElement.classList.toggle('motion-paused',motionPaused);
+    $('#motion-toggle').setAttribute('aria-pressed',String(motionPaused));$('#motion-toggle').textContent=motionPaused?'Ativar animações':'Pausar animações';
+    cancelAnimationFrame(frame);lastFrame=0;
+    if(motionPaused||document.hidden){ctx?.clearRect(0,0,canvasWidth,canvasHeight);}else frame=requestAnimationFrame(drawMotes);
+  }
+  $('.hero-visual').addEventListener('pointermove',event=>{const bounds=event.currentTarget.getBoundingClientRect();pointer={x:(event.clientX-bounds.left)/bounds.width,y:(event.clientY-bounds.top)/bounds.height};});
+  $('#motion-toggle').addEventListener('click',()=>{motionPaused=!motionPaused;syncMotion();});
+  reducedMotion.addEventListener('change',event=>{motionPaused=event.matches;syncMotion();});
+  document.addEventListener('visibilitychange',syncMotion);window.addEventListener('resize',resizeCanvas);resizeCanvas();syncMotion();
+})();
+
+</script>
+</body>
+</html>

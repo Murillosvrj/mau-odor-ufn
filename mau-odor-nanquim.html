@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#FAF8F5">
+  <meta name="description" content="Uma experiência de ciência cidadã para registrar percepções de mau odor no entorno da UFN, Santa Maria. Protótipo interativo em papel e nanquim.">
+  <title>Mau Odor — Caderno de campo urbano</title>
+  <link rel="stylesheet" href="tailwind.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="illustrations.css">
+  <link rel="stylesheet" href="map.css">
+</head>
+<body class="bg-paper text-ink font-sans antialiased">
+  <a class="skip-link" href="#registro">Pular para o registro</a>
+  <header class="site-header">
+    <div class="shell flex items-center justify-between gap-6">
+      <a href="#inicio" class="wordmark" aria-label="Mau Odor, início">
+        <svg viewBox="0 0 48 48" width="38" height="38" fill="none" aria-hidden="true"><path d="M5 31C14 31 10 10 26 10C40 10 43 33 27 36C12 39 10 22 24 20C34 18 34 30 27 30C23 30 22 25 26 25"/><path d="M4 36C14 38 20 44 33 39C48 33 45 10 31 6C17 2 7 11 8 22M4 26C10 26 8 14 19 10M14 39C8 35 7 30 10 24"/></svg>
+        <span><strong>mau odor<span class="wordmark-dot">.</span></strong><small>CIÊNCIA CIDADÃ · UFN</small></span>
+      </a>
+      <nav class="desktop-nav flex items-center gap-8" aria-label="Navegação principal">
+        <a class="is-current" href="#registro">Registrar percepção</a>
+        <a href="#territorio">Explorar o mapa <span aria-hidden="true">↗</span></a>
+        <button type="button" data-about>O projeto</button>
+      </nav>
+      <span class="prototype-badge"><span aria-hidden="true">◌</span> Protótipo interativo</span>
+    </div>
+  </header>
+
+  <main id="inicio" class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="fine-line" aria-hidden="true"></span> CADERNO DE CAMPO URBANO / 01</p>
+        <h1 id="hero-title">O que o ar<br>conta <em>por aqui?</em></h1>
+        <p class="hero-description">Sua percepção ajuda a conhecer a cidade.<br>Registre o que você sente no entorno da UFN.</p>
+        <div class="hero-meta"><span>SANTA MARIA, RS</span><span class="tiny-cross" aria-hidden="true">+</span><span>UMA ESCUTA COLETIVA DO TERRITÓRIO</span></div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="plate-top"><span>FIG. 01</span><span>TORNAR VISÍVEL O INVISÍVEL</span></div>
+        <div id="hero-art"></div>
+        <canvas id="motes"></canvas>
+        <div class="plate-bottom"><span>perceber · registrar · compreender</span><span>↗</span></div>
+      </div>
+    </section>
+
+    <section class="field-context" aria-label="Contexto do registro">
+      <div class="context-cell">
+        <span class="context-symbol" aria-hidden="true">◷</span>
+        <div><p class="eyebrow">AGORA / HORÁRIO LOCAL</p><p class="context-value" id="datetime">Carregando horário…</p><p class="context-detail">America/São Paulo</p></div>
+      </div>
+      <div class="context-cell location-cell">
+        <svg class="context-symbol" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="10" r="3"/><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Z"/></svg>
+        <div><p class="eyebrow">ONDE VOCÊ ESTÁ</p><p class="context-value" id="location-value">Entorno da UFN</p><p class="context-detail" id="location-detail">Área de estudo · GPS ainda não capturado</p><button id="locate" class="text-button" type="button">Usar minha localização <span aria-hidden="true">↗</span></button></div>
+      </div>
+      <div class="context-cell weather-cell">
+        <svg class="context-symbol" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4.2 4.2l2.1 2.1m11.4 11.4 2.1 2.1M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+        <div><p class="eyebrow">CONDIÇÕES DO AR</p><p class="context-value weather-values"><span id="temperature">— °C</span><span id="humidity">— %</span><span id="wind">— km/h</span></p><p class="context-detail" id="weather-status">Consultando condições para a UFN…</p></div>
+      </div>
+    </section>
+
+    <div class="registration-layout" id="registro">
+      <form id="odor-form" novalidate>
+        <section class="form-section intensity-section" aria-labelledby="intensity-title">
+          <div class="section-heading"><span class="section-number">01</span><div><p class="eyebrow">COMECE PELA SUA PERCEPÇÃO</p><h2 id="intensity-title">Quão intenso está o odor?</h2><p>Escolha a intensidade que melhor descreve o que você sente.</p></div></div>
+          <fieldset class="intensity-fieldset" aria-describedby="intensity-help intensity-error">
+            <legend class="sr-only">Intensidade do odor, escolha um nível de 1 a 5</legend>
+            <div id="intensity-options" class="intensity-options"></div>
+            <p class="field-error" id="intensity-error" hidden>Escolha uma intensidade para continuar.</p>
+          </fieldset>
+          <div class="intensity-reading">
+            <div class="reading-caption"><span class="reading-dot" aria-hidden="true"></span><span id="intensity-readout" aria-live="polite">A intensidade começa na sua percepção.</span></div>
+            <div class="intensity-meter" role="meter" aria-label="Intensidade selecionada" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-valuetext="Ainda não selecionada"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <p id="intensity-help" class="footnote">Uma percepção pessoal. Não há resposta certa ou errada.</p>
+        </section>
+
+        <section class="form-section" aria-labelledby="odor-title">
+          <div class="section-heading"><span class="section-number">02</span><div><p class="eyebrow">DÊ FORMA AO QUE VOCÊ SENTE</p><h2 id="odor-title">Com o que o odor se parece?</h2><p>Selecione uma ou mais opções. Toque em <span class="inline-info">i</span> para conhecer cada uma.</p></div></div>
+          <fieldset aria-describedby="odor-error"><legend class="sr-only">Tipos de odor, múltipla escolha</legend><div class="odor-grid" id="odor-options"></div><p id="odor-error" class="field-error" hidden>Selecione pelo menos um tipo de odor.</p></fieldset>
+          <div id="other-field" class="other-field" hidden><label for="other-text">Como você descreveria esse outro odor? <span class="optional">opcional</span></label><input type="text" id="other-text" maxlength="120" placeholder="Ex.: cheiro de fumaça, borracha…"><p class="footnote">Até 120 caracteres.</p></div>
+          <p class="selection-count" id="selection-count" aria-live="polite">Nenhuma categoria selecionada</p>
+        </section>
+
+        <section class="form-section" aria-labelledby="photo-title">
+          <div class="section-heading"><span class="section-number">03</span><div><p class="eyebrow">UM OLHAR SOBRE O LOCAL <span class="optional">OPCIONAL</span></p><h2 id="photo-title">O que a câmera pode ver?</h2><p>Uma foto ajuda a contextualizar seu relato.</p></div></div>
+          <div class="photo-area" id="photo-area">
+            <div class="photo-placeholder" id="photo-placeholder">
+              <svg class="scanner-illustration" viewBox="0 0 130 100" fill="none" aria-hidden="true"><path class="scanner-corners" d="M15 28V12h20m60 0h20v16m0 44v16H95m-60 0H15V72"/><circle cx="65" cy="50" r="34" stroke-dasharray="2 5"/><circle cx="65" cy="50" r="25"/><circle cx="65" cy="50" r="7"/><path d="m35 70 18-18 12 10 16-23 16 31ZM65 8v16m0 52v16M23 50h16m52 0h16"/><path d="m47 72 8-9m1 10 7-8m11 8 8-17m-1 17 6-13" stroke-width=".65"/></svg>
+              <p>Um registro do que está ao redor.</p><span>JPG, PNG ou WebP · até 8 MB</span>
+            </div>
+            <div id="photo-preview" hidden><img id="preview-image" alt="Prévia da fotografia selecionada para o relato"><button type="button" id="remove-photo" class="remove-photo">Remover foto <span aria-hidden="true">×</span></button><span class="preview-stamp">FOTO LOCAL · SEM ANÁLISE AUTOMÁTICA</span></div>
+            <div class="photo-actions"><button type="button" id="camera-button" class="button button-ink"><span aria-hidden="true">◎</span> Tirar foto</button><button type="button" id="gallery-button" class="button button-outline"><span aria-hidden="true">↥</span> Escolher da galeria</button></div>
+            <input class="sr-only" type="file" id="camera-input" accept="image/jpeg,image/png,image/webp" capture="environment" tabindex="-1" aria-label="Tirar foto do local">
+            <input class="sr-only" type="file" id="gallery-input" accept="image/jpeg,image/png,image/webp" tabindex="-1" aria-label="Selecionar foto da galeria">
+          </div>
+          <p class="field-error" id="photo-error" role="alert" hidden></p>
+          <div class="invisible-odor"><span class="wind-art" id="wind-art" aria-hidden="true"></span><label class="checkbox-label"><input type="checkbox" id="invisible-source"><span>O cheiro está no ar, mas não há foco visível na foto.</span></label><button type="button" class="info-button" data-info="invisible" aria-label="Entenda a opção sem foco visível">i</button></div>
+          <p class="footnote">Evite rostos e placas. A foto permanece nesta sessão e não é enviada a uma IA.</p>
+        </section>
+
+        <section class="form-section context-section" aria-labelledby="context-title">
+          <div class="section-heading"><span class="section-number">04</span><div><p class="eyebrow">PEQUENOS DETALHES, MAIS CONTEXTO <span class="optional">OPCIONAL</span></p><h2 id="context-title">O que você vê por perto?</h2><p>Marque apenas o que você consegue observar no local.</p></div></div>
+          <fieldset><legend class="sr-only">Elementos visíveis próximos, múltipla escolha</legend><div id="context-tags" class="context-tags"></div></fieldset>
+          <div class="observation-heading"><label for="observation">Quer acrescentar algo?</label><span id="character-count">0 / 400</span></div>
+          <textarea id="observation" rows="3" maxlength="400" placeholder="Ex.: o cheiro fica mais forte ao passar pela esquina…"></textarea>
+          <div class="form-bottom"><p><span aria-hidden="true">↳</span> Toda percepção é um ponto de partida.</p><button class="button button-ink review-button" type="submit">Revisar meu relato <span aria-hidden="true">↗</span></button></div>
+          <p class="footnote local-note">Neste protótipo, os relatos são salvos apenas neste navegador.</p>
+        </section>
+      </form>
+
+      <aside class="field-notes" aria-label="Notas de campo e resumo">
+        <div class="field-notes-sticky">
+          <div class="note-card">
+            <p class="eyebrow note-card-label">NOTAS DE CAMPO <span aria-hidden="true">↙</span></p>
+            <div class="note-art" id="note-art" aria-hidden="true"></div>
+            <h3>O invisível também<br>faz parte da cidade.</h3>
+            <p>Um cheiro, uma rua, um instante. Seu relato ajuda a construir uma leitura coletiva do ambiente urbano.</p>
+            <div class="note-rule"></div>
+            <p class="note-caption">Sentir é perceber.<br>Identificar a fonte é investigar.</p>
+            <button class="text-button" type="button" data-info="method">Como usamos os relatos <span aria-hidden="true">↗</span></button>
+          </div>
+          <div class="live-summary">
+            <p class="eyebrow">SEU REGISTRO, ATÉ AQUI</p>
+            <dl><div><dt>Intensidade</dt><dd id="summary-intensity">A escolher</dd></div><div><dt>Percepções</dt><dd id="summary-types">Nenhuma</dd></div><div><dt>Fotografia</dt><dd id="summary-photo">Opcional</dd></div></dl>
+            <div class="progress-line"><span id="form-progress"></span></div><span id="progress-text" class="footnote">2 escolhas essenciais para registrar</span>
+          </div>
+          <a href="#territorio" class="map-jump"><span>Do seu olhar<br><strong>para o território.</strong></span><span aria-hidden="true">↓</span></a>
+        </div>
+      </aside>
+    </div>
+
+    <section id="territorio" class="territory-section" aria-label="Mapa do entorno da UFN"><div id="odor-map"></div></section>
+
+    <section class="local-records" aria-labelledby="records-title"><div><p class="eyebrow">CADERNO DESTE NAVEGADOR</p><h2 id="records-title">Seus relatos locais</h2><p id="records-description">Os registros que você salvar ficam disponíveis aqui.</p></div><div class="record-actions"><span id="local-count" class="local-count">00</span><button type="button" class="button button-outline" id="export-records" disabled>Exportar JSON <span aria-hidden="true">↗</span></button><button type="button" class="text-button" id="clear-records" hidden>Apagar relatos locais</button></div><div id="local-record-list"></div></section>
+  </main>
+
+  <footer class="site-footer"><div class="shell"><div><strong>mau odor.</strong><p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA<br>Entorno da Universidade Franciscana · Santa Maria, RS</p></div><div class="footer-right"><span>PERCEPÇÃO → CONTEXTO → CONHECIMENTO</span><button type="button" data-about>Sobre esta experiência ↗</button><button type="button" id="motion-toggle" aria-pressed="false">Pausar animações</button></div></div></footer>
+
+  <dialog id="info-dialog" class="editorial-dialog" aria-labelledby="info-title"><button class="dialog-close" data-close aria-label="Fechar informação">×</button><p class="eyebrow" id="info-eyebrow">NOTA DE CAMPO</p><h2 id="info-title"></h2><div id="info-body"></div><button type="button" class="button button-ink" data-close>Entendi</button></dialog>
+  <dialog id="review-dialog" class="editorial-dialog review-dialog" aria-labelledby="review-title"><button class="dialog-close" data-close aria-label="Fechar revisão">×</button><p class="eyebrow">UMA ÚLTIMA OLHADA</p><h2 id="review-title">Seu relato, do seu jeito.</h2><p class="dialog-intro">Confira a percepção que você está registrando.</p><dl id="review-details" class="review-details"></dl><p class="review-disclaimer">Este é um relato de percepção, com status <strong>isolado / não confirmado</strong>. Não comprova uma fonte de odor.</p><div class="dialog-actions"><button type="button" class="button button-outline" data-close>Voltar e editar</button><button type="button" class="button button-ink" id="save-report">Salvar neste navegador ↗</button></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="illustrations.js"></script>
+  <script src="map.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

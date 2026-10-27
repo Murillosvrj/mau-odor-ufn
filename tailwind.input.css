@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@source "./mau-odor-nanquim.html";
+@source "./app.js";
+@theme {
+  --color-paper: #faf8f5;
+  --color-ink: #111111;
+  --color-graphite: #78756e;
+  --font-sans: "Segoe UI", Arial, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-mono: "Cascadia Mono", Consolas, monospace;
+}
