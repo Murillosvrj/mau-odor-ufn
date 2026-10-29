@@ -71,7 +71,7 @@
 
   function icon(kind) {
     const key=Object.hasOwn(drawings,kind)?kind:'other';
-    return `<svg class="odor-art art-${key}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 130" preserveAspectRatio="xMidYMid meet" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${drawings[key]()}</svg>`;
+    return `<svg class="odor-art art-${key}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 130" preserveAspectRatio="xMidYMid meet" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g class="art-idle">${drawings[key]()}</g></svg>`;
   }
 
   function hero() {
@@ -103,7 +103,7 @@
   }
 
   function wind() {
-    return `<svg class="wind-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 60" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true" focusable="false">${P('M5 33C24 22 36 43 54 31C66 23 60 8 49 11C38 13 43 26 51 22C55 20 53 16 50 17M9 38C27 28 38 49 58 35M4 44C28 34 38 55 61 41C77 31 78 16 90 21C102 27 90 40 85 33C83 30 86 27 89 29')}${fine(P('M9 49C31 40 41 60 65 45M18 20C28 17 34 21 38 20'))}${dots([[75,10],[80,14],[76,47],[82,44]])}</svg>`;
+    return `<svg class="wind-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 60" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true" focusable="false"><g class="wind-idle">${P('M5 33C24 22 36 43 54 31C66 23 60 8 49 11C38 13 43 26 51 22C55 20 53 16 50 17M9 38C27 28 38 49 58 35M4 44C28 34 38 55 61 41C77 31 78 16 90 21C102 27 90 40 85 33C83 30 86 27 89 29')}${fine(P('M9 49C31 40 41 60 65 45M18 20C28 17 34 21 38 20'))}${dots([[75,10],[80,14],[76,47],[82,44]])}</g></svg>`;
   }
 
   window.OdorArt=Object.freeze({icon,hero,wind});

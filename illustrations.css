@@ -45,3 +45,64 @@
 @keyframes ink-liquid{0%,100%{transform:translateY(0)}35%{transform:translateY(-3px)}65%{transform:translateY(2px)}}
 @keyframes ink-compass{0%{transform:rotate(0)}65%{transform:rotate(405deg)}100%{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.odor-art *,.odor-hero *,.wind-art *{animation:none!important;transition:none!important}}
+
+/* Ambient air never reports an inference; it only brings the drawings to life. */
+.odor-art .art-idle,.hero-streams,.hero-clouds,.hero-rising,.hero-little-volutes,.hero-compass,.wind-art .wind-idle{transform-box:fill-box;transform-origin:center}
+.odor-art .art-idle{animation:art-idle-air 7s ease-in-out infinite}
+.art-container .art-idle,.art-organic .art-idle{animation-delay:-2.3s}
+.art-sewer .art-idle,.art-other .art-idle{animation-delay:-4.1s}
+.odor-art .bag-body{animation:bag-idle-air 5.8s ease-in-out infinite}
+.odor-art .bag-air,.odor-art .bin-vapor,.odor-art .sewer-vapor,.odor-art .organic-vapor{animation:vapor-idle-air 4.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.odor-art .sewer-vapor{animation-duration:5.6s;animation-delay:-1.2s}
+.odor-art .organic-vapor{animation-delay:-2.6s}
+.odor-art .ditch-flow{animation:water-idle-air 5.5s ease-in-out infinite}
+.odor-art .ditch-flow path{stroke-dasharray:70 7 30 5;animation:ink-current-air 10s linear infinite}
+.odor-art .organic-body{animation:bag-idle-air 6.8s ease-in-out infinite}
+.odor-art .drop-main,.odor-art .drop-small{animation:drop-idle-air 5.6s ease-in-out infinite}
+.odor-art .drop-small{animation-delay:-1.3s}
+.odor-art .metabolic-ring{animation:ring-idle-air 5s ease-in-out infinite}
+.odor-art .chemical-bubbles{animation:bubbles-idle-air 5s ease-in-out infinite}
+.odor-art .chemical-liquid{animation:water-idle-air 6s ease-in-out infinite}
+.odor-art .compass-needle{animation:needle-idle-air 7s ease-in-out infinite}
+.hero-streams{animation:hero-current-air 8s ease-in-out infinite}
+.hero-clouds{animation:hero-current-air 9s -3s ease-in-out infinite}
+.hero-rising{animation:hero-current-air 7.8s -1.7s ease-in-out infinite}
+.hero-streams path,.hero-clouds path,.hero-rising path{stroke-dasharray:260 12 100 8;animation:ink-current-air 13s linear infinite}
+.hero-little-volutes{animation:volutes-idle-air 6s ease-in-out infinite}
+.hero-compass{animation:hero-compass-air 12s ease-in-out infinite}
+.wind-art .wind-idle{animation:hero-current-air 6.8s ease-in-out infinite}
+.wind-art .wind-idle>path{stroke-dasharray:120 5 50 4;animation:ink-current-air 12s linear infinite}
+.odor-hero .ink-dots,.wind-art .ink-dots{animation:volutes-idle-air 7.5s -2s ease-in-out infinite}
+@keyframes art-idle-air{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.4px)}}
+@keyframes bag-idle-air{0%,100%{transform:scale(1)}50%{transform:scale(1.012,.987)}}
+@keyframes vapor-idle-air{0%,100%{transform:translate(0,0);opacity:.78}50%{transform:translate(2px,-4px);opacity:1}}
+@keyframes water-idle-air{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+@keyframes drop-idle-air{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(.988,1.015)}}
+@keyframes ring-idle-air{0%,100%{opacity:.65}50%{opacity:1}}
+@keyframes bubbles-idle-air{0%,100%{transform:translateY(3px);opacity:.45}50%{transform:translateY(-5px);opacity:1}}
+@keyframes needle-idle-air{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(7deg)}}
+@keyframes hero-current-air{0%,100%{transform:translate(0,0)}50%{transform:translate(5px,-2px)}}
+@keyframes ink-current-air{to{stroke-dashoffset:-380}}
+@keyframes volutes-idle-air{0%,100%{transform:translate(0,0);opacity:.72}50%{transform:translate(3px,-4px);opacity:1}}
+@keyframes hero-compass-air{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+@media(hover:hover) and (pointer:fine){
+  .odor-card:hover .bag-body{animation:ink-bag-squish .7s cubic-bezier(.34,1.56,.64,1)}
+  .odor-card:hover .bag-tie{animation:ink-tie .8s cubic-bezier(.34,1.56,.64,1)}
+  .odor-card:hover .bag-air{animation:ink-plume .9s ease-out}
+  .odor-card:hover .bin-lid{animation:ink-lid 1.1s cubic-bezier(.34,1.56,.64,1)}
+  .odor-card:hover .bin-vapor{animation:ink-plume 1.1s ease-out}
+  .odor-card:hover .sewer-vapor{animation:ink-vapor 1.15s cubic-bezier(.22,1,.36,1)}
+  .odor-card:hover .ditch-flow{animation:ink-water .85s cubic-bezier(.22,1,.36,1)}
+  .odor-card:hover .organic-body{animation:ink-organic .9s cubic-bezier(.34,1.56,.64,1)}
+  .odor-card:hover .organic-vapor{animation:ink-vapor 1s ease-out}
+  .odor-card:hover .drop-main{animation:ink-drop .8s cubic-bezier(.34,1.56,.64,1)}
+  .odor-card:hover .drop-small{animation:ink-drop .8s .12s cubic-bezier(.34,1.56,.64,1)}
+  .odor-card:hover .metabolic-ring{animation:ink-ring 1s ease-out}
+  .odor-card:hover .chemical-bubbles{animation:ink-bubbles .95s ease-out}
+  .odor-card:hover .chemical-liquid{animation:ink-liquid .95s cubic-bezier(.34,1.56,.64,1)}
+  .odor-card:hover .compass-needle{animation:ink-compass 1.15s cubic-bezier(.34,1.56,.64,1)}
+  #hero-art:hover .hero-streams{animation-duration:3.8s}
+  #hero-art:hover .hero-clouds{animation-duration:4.5s}
+}
+.motion-paused .odor-art *,.motion-paused .odor-hero *,.motion-paused .wind-art *{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){.odor-art *,.odor-hero *,.wind-art *{animation:none!important;transition:none!important}}

@@ -1,77 +1,52 @@
-# Mau Odor — Caderno de campo urbano
+# WAIND — Caderno de campo urbano
 
-Protótipo visual e interativo do Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA no entorno da UFN — Santa Maria/RS.
+Protótipo de um sistema participativo de monitoramento e análise de mau odor urbano no entorno da Universidade Franciscana, em Santa Maria/RS. Esta publicação permite avaliar o fluxo, o texto, a direção visual e as interações no computador e no celular.
 
-## Avaliação do protótipo
+[Abrir WAIND](https://murillosvrj.github.io/mau-odor-ufn/)
 
-Esta publicação permite avaliar o fluxo, a clareza dos textos, a direção visual e as interações no computador e no celular. O mapa e os cenários de IA são demonstrativos. Os relatos ficam somente no navegador de quem testa; não são enviados ao pesquisador.
+## O que funciona
 
-## Abrir
+- Capa WAIND com emblema vetorial em nanquim; sete etapas com navegação inferior e progresso.
+- Abertura coreografada, transições de vento da esquerda para a direita, ilustrações com movimento ambiente e reações ao mouse. Pausa e preferência de movimento reduzido respeitadas.
+- Identificação, confirmação de contexto e GPS opcional.
+- Triagem da percepção atual. Quem não sente odor pode registrar uma ocorrência anterior com data/hora aproximadas ou explorar o mapa sem criar relato.
+- Escala de intensidade de 1 a 5, oito categorias ilustradas e animadas, explicações e descrição de Outros.
+- Fotografia opcional por câmera ou galeria, prévia, indicação de ausência de foco visível, tags e observação livre.
+- Mapa geográfico real em preto e branco, com clique/toque, teclado, mira, zoom, coordenadas manuais e resumo no pin.
+- Revisão, edição, salvamento neste navegador e exportação JSON.
 
-Abra **index.html** no navegador. É um HTML único com Tailwind compilado, CSS, JavaScript, ilustrações SVG e mapa incorporados. Não exige instalação para visualizar. Somente a consulta meteorológica precisa de rede.
+## Dados e limites desta avaliação
 
-Para usar o contexto local de desenvolvimento e recursos que dependem do navegador:
+**“Enviar Relato” salva apenas neste navegador. Os dados não são enviados à UFN.** Não existe backend de coleta compartilhada, reconhecimento automático da foto ou modelo de IA em execução. Nome, e-mail e informações do relato ficam no localStorage da origem do site, na chave `waind-relatos-local-v2`. A exportação JSON inclui esses dados; evite compartilhar o arquivo com informações pessoais sem intenção.
+
+A fotografia fica somente na sessão e não é enviada para análise. O registro salvo e o JSON contêm apenas seus metadados, não a imagem. Fechar/recarregar a página remove a foto da sessão e reinicia o rascunho; os relatos já salvos continuam no caderno local. Os botões Voltar e Continuar preservam o preenchimento durante a sessão.
+
+GPS depende da permissão do navegador. Um pin manual indica a escolha da pessoa e não tem precisão medida por sensor. A câmera depende do aparelho e das permissões; a galeria permite escolher um arquivo local.
+
+O mapa usa [OpenStreetMap](https://www.openstreetmap.org/copyright), com atribuição visível, e requer internet. O clima usa [Open-Meteo](https://open-meteo.com/) com coordenadas arredondadas. Esses serviços recebem as requisições normais de rede. Nos relatos anteriores, o clima é identificado como atual, sem representar as condições históricas da ocorrência.
+
+## Executar e editar
+
+O arquivo `index.html` reúne HTML, CSS, JavaScript e SVGs. Para testar mapa, clima e permissões, recomenda-se um servidor local com Node.js:
 
 ```sh
 node serve.mjs
 ```
 
-Acesse `http://127.0.0.1:4173`. O servidor se restringe à máquina local. GPS depende da autorização e suporte do navegador; a opção de câmera usa `capture="environment"`, que pode abrir a galeria em computadores. Nenhuma permissão é solicitada antes de tocar no controle correspondente.
+Abra http://127.0.0.1:4174. Não é necessário instalar dependências. Os estilos Tailwind utilizados já estão compilados em `tailwind.css`.
 
-## Conteúdo
-
-- `CONCEITO-VISUAL.md`: direção de arte, componentes, interações e relação com requisitos conhecidos.
-- `mau-odor-nanquim.html`: estrutura editável, usando os arquivos separados.
-- `styles.css`: tokens, composição, componentes e responsividade.
-- `illustrations.js` / `illustrations.css`: oito ilustrações e animações autorais, panorama do ar e volutas.
-- `map.js` / `map.css`: cartografia ilustrativa interativa e isolinhas demonstrativas.
-- `app.js`: formulário, revisão, foto, GPS, clima, armazenamento e exportação.
-- `tailwind.input.css` / `tailwind.css`: fonte e saída compilada do Tailwind 4.
-- `build.mjs`: gera o HTML autocontido em `entrega/` e atualiza `index.html`, publicado pelo GitHub Pages.
-
-## Recompilar
-
-Node.js e pnpm instalados:
+Edite `waind.html`, `app.js`, `wizard.js`, `brand.js`, `pin-map.js` e os respectivos CSS. As ilustrações estão em `illustrations.js` e `illustrations.css`. Para gerar novamente o HTML autocontido:
 
 ```sh
-pnpm install
-pnpm run build
+node build.mjs
 ```
 
-Se alterar somente CSS personalizado, HTML ou JavaScript, `node build.mjs` atualiza o HTML único. Alterações em classes Tailwind exigem também `pnpm run build:css`.
+O build grava `entrega/index.html` e atualiza `index.html` na raiz. Também pode ser executado por `npm run build` ou `pnpm run build`.
 
-## Comportamentos implementados
+## Publicação
 
-- Intensidade 1–5 por radios nativos, com teclas táteis e números rolantes.
-- Oito tipos em seleção múltipla com SVGs, microanimações e informação independente.
-- Campo condicional para “Outros”, tags rápidas, exclusividade de “Nada aparente” e limite de 400 caracteres.
-- Foto JPG/PNG/WebP até 8 MB, validação, prévia e remoção; revisão aguarda o carregamento.
-- Opção de ausência de foco visível, separando evidência visual da percepção.
-- Horário de São Paulo, GPS após permissão e clima via Open-Meteo com estado de indisponibilidade.
-- Revisão, armazenamento local de até 100 relatos, persistência, exportação JSON e confirmação para apagar.
-- Mapa com pontos inspecionáveis, zoom, arraste, tela inteira, camadas e cenários visuais de modelos.
-- Foco visível, diálogos nativos, estados textuais, suporte a redução de movimento e controle de pausa.
+O GitHub Pages usa a branch `main`, pasta raiz. Depois de validar uma mudança, envie o código e o `index.html` recompilado para essa branch e aguarde a implantação. O endereço público permanece o mesmo. Editar arquivos somente no computador não atualiza o repositório ou o site.
 
-## Limites explícitos
+## Versão anterior
 
-O mapa é **esquemático, sem precisão cartográfica**. Os oito pontos e as isolinhas são demonstrações. Os seletores Decision Tree/Random Forest mudam o cenário gráfico; **nenhum modelo é executado**. Não há inferência de visão computacional, causa comprovada nem envio a banco compartilhado.
-
-Os relatos são gravados no `localStorage` deste navegador e origem. Não se transferem automaticamente entre arquivo local, localhost, outro endereço ou outro dispositivo. **As fotos ficam apenas na memória da sessão**; o JSON inclui metadados, sem a imagem. A revisão informa isso antes de salvar. Os campos `multiHot`, `verificationStatus`, `causeProven` e `ai` tornam essa distinção explícita na exportação.
-
-A consulta de clima usa a área de estudo enquanto não houver GPS. Depois da autorização, usa a região do GPS com coordenadas arredondadas a duas casas decimais, transmitidas à Open-Meteo. O GPS exato fica no relato local. O clima retornado pelo serviço é contexto meteorológico, não uma medição química ou sensor instalado no local.
-
-A meta de preenchimento em 30 segundos ainda exige avaliação com participantes. Cartografia validada, backend, política de retenção de fotos e modelos científicos são etapas de integração posteriores.
-
-## Verificação desta entrega
-
-Verificado em navegador desktop e viewport móvel: seleção única/múltipla, botão informativo independente, validação obrigatória, “Outros”, exclusividade das tags, prévia/remoção de imagem, revisão, salvamento, persistência e download JSON. O clima retornou dados no teste. Zoom, camadas e alternância dos cenários também foram verificados.
-
-GPS real e abertura da câmera física dependem do equipamento/permissão e não foram exercitados no teste. Não há afirmação de conformidade integral com WCAG ou de validação científica.
-
-## Referências
-
-Direção visual baseada nas oito imagens fornecidas pelo usuário, traduzida em desenhos SVG originais. Referências de interação: [Hairline](https://hairline.lucasmarkes.com/docs), [Motes](https://motes.lucasmarkes.com), [input-otp](https://input-otp.rodz.dev). A escala implementa seleção única, não autenticação por OTP. Clima: [documentação Open-Meteo](https://open-meteo.com/en/docs).
-
-## Atualizar a publicação
-
-Edite os arquivos-fonte, execute `pnpm run build` e envie as alterações para a mesma branch configurada no GitHub Pages. O arquivo `index.html` precisa acompanhar o envio. O Pages publica a nova versão mantendo o mesmo endereço. Alterar arquivos apenas no computador não atualiza o repositório.
+`mau-odor-nanquim.html` preserva a versão anterior autocontida. `map.js` e `CONCEITO-VISUAL.md` documentam a direção anterior e não são executados pelo WAIND. Referências originais, backups, manifesto do Drive, histórico privado e dados reais de participantes não fazem parte deste pacote público.

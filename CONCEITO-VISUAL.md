@@ -1,3 +1,5 @@
+> Registro da direção visual original. A interface atual é o WAIND, descrito no README: fluxo por etapas e mapa geográfico real para marcar o local. O mapa esquemático e os cenários de IA mencionados abaixo pertencem à versão anterior preservada em `mau-odor-nanquim.html`.
+
 # Mau Odor · Caderno de campo em nanquim
 
 Conceito visual para o **Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA no entorno da UFN — Santa Maria/RS**.

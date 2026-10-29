@@ -1,15 +1,10 @@
 {
-  "name": "mau-odor-nanquim",
-  "version": "1.0.0",
+  "name": "waind-ufn",
+  "version": "2.0.0",
   "private": true,
-  "description": "Protótipo interativo do monitoramento participativo de mau odor no entorno da UFN",
+  "description": "WAIND — protótipo participativo de percepção de mau odor no entorno da UFN",
   "scripts": {
-    "build:css": "tailwindcss -i ./tailwind.input.css -o ./tailwind.css --minify",
-    "build": "pnpm run build:css && node build.mjs",
+    "build": "node build.mjs",
     "start": "node serve.mjs"
-  },
-  "devDependencies": {
-    "@tailwindcss/cli": "^4.1.0",
-    "tailwindcss": "^4.1.0"
   }
 }

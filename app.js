@@ -20,7 +20,7 @@
   ];
   const tags = ['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'];
   const state = {intensity:null, types:new Set(), tags:new Set(), location:null, weather:null, photo:null, photoLoading:false, pending:null};
-  const STORE_KEY = 'ufn-mau-odor-nanquim-v1';
+  const STORE_KEY = 'waind-relatos-local-v2';
   let records = [], toastTimer, photoURL = null, photoGeneration = 0, weatherGeneration = 0;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let motionPaused = reducedMotion.matches;
@@ -36,7 +36,7 @@
   $('#intensity-options').innerHTML = levels.map((level,i) => `<label class="intensity-option" style="--level-color:${level.color}"><input type="radio" name="intensity" value="${i+1}" aria-label="${i+1}. ${level.name}" required><span class="intensity-key"><span class="selected-mark" aria-hidden="true">✓</span><span class="slot-window" aria-hidden="true"><span class="slot-track"><span>${i+1}</span><span>${i+1}</span></span></span><span class="level-label">${level.name}</span><span class="level-tick" aria-hidden="true"></span></span></label>`).join('');
   $('#odor-options').innerHTML = types.map((type,i) => `<div class="odor-card" data-kind="${type.id}"><label class="odor-choice"><input type="checkbox" name="odor" value="${type.id}"><span class="card-topline"><span class="card-index" aria-hidden="true">0${i+1}</span><span class="card-checkbox" aria-hidden="true"></span></span><span class="card-art" aria-hidden="true">${OdorArt.icon(type.id)}</span><span class="card-label">${type.label}</span>${type.sub?`<span class="card-sublabel">${type.sub}</span>`:''}</label><button type="button" class="info-button" data-info="${type.id}" aria-label="Informações sobre ${type.label}">i</button></div>`).join('');
   $('#context-tags').innerHTML = tags.map((tag,i) => `<label class="tag"><input type="checkbox" name="tag" value="${i}"><span>${tag}</span></label>`).join('');
-  OdorMap.mount($('#odor-map'));
+
 
   const infoContent = {
     invisible:{title:'Sentir não é o mesmo que enxergar.',body:'<p>O odor pode estar no ar mesmo quando a foto mostra um lugar aparentemente limpo. Marcar esta opção evita tratar a imagem como evidência visual de uma fonte de mau odor.</p><p>No futuro, essa informação poderá ajudar a interpretar as imagens usadas na pesquisa. Neste protótipo, nenhuma foto é analisada por IA.</p>'},
@@ -76,7 +76,8 @@
     $('#summary-photo').textContent = state.photo ? 'Adicionada' : 'Opcional';
     const done = Number(!!state.intensity) + Number(state.types.size > 0);
     $('#form-progress').style.width = `${done*50}%`;
-    $('#progress-text').textContent = done === 2 ? 'Pronto para revisar. Os detalhes são opcionais.' : `${2-done} ${done?'escolha essencial':'escolhas essenciais'} para registrar`;
+    $('#progress-text').textContent = done === 2 ? 'Pronto para revisar. Os detalhes são opcionais.' : `${2-done} escolhas essenciais para registrar`;
+    window.dispatchEvent(new Event('waind:change'));
   }
   $$('input[name="intensity"]').forEach(input => input.addEventListener('change', () => {
     state.intensity = Number(input.value); const level = levels[state.intensity-1];
@@ -116,7 +117,11 @@
     $('#datetime').textContent = `${date} · ${time}`;
   }
   updateTime(); setInterval(updateTime,30000);
+  let weatherRequest=null;
   async function fetchWeather(latitude,longitude,basis) {
+    const key=`${latitude.toFixed(2)},${longitude.toFixed(2)},${basis}`;
+    if(weatherRequest?.key===key&&(weatherRequest.loading||(state.weather&&Date.now()-weatherRequest.startedAt<300000)))return;
+    weatherRequest={key,loading:true,startedAt:Date.now()};
     const generation = ++weatherGeneration;
     state.weather = null; $('#temperature').textContent='— °C'; $('#humidity').textContent='— %'; $('#wind').textContent='— km/h';
     $('#weather-status').textContent = 'Consultando condições do ar…';
@@ -133,11 +138,11 @@
       $('#temperature').textContent = `${Math.round(current.temperature_2m)} °C`;
       $('#humidity').textContent = `${Math.round(current.relative_humidity_2m)} %`;
       $('#wind').textContent = `${Math.round(current.wind_speed_10m)} km/h`;
-      $('#weather-status').textContent = `Open-Meteo · ${basis==='study-area'?'área da UFN':'região do GPS'} · ${current.time.slice(11,16)}`;
+      $('#weather-status').textContent = `Open-Meteo · ${basis==='study-area'?'área da UFN':basis==='manual-region'?'região do pin':'região do GPS'} · ${current.time.slice(11,16)}`;
     } catch {
       if(generation!==weatherGeneration) return;
       state.weather = null; $('#weather-status').textContent = 'Clima indisponível · você pode continuar';
-    } finally {clearTimeout(timeout);}
+    } finally {clearTimeout(timeout);if(generation===weatherGeneration)weatherRequest.loading=false;window.dispatchEvent(new Event('waind:change'));}
   }
   fetchWeather(-29.6838,-53.8105,'study-area');
   $('#locate').addEventListener('click', () => {
@@ -145,15 +150,16 @@
     $('#locate').disabled = true; $('#locate').textContent='Localizando…';
     navigator.geolocation.getCurrentPosition(position => {
       const {latitude,longitude,accuracy}=position.coords;
-      state.location={latitude,longitude,accuracyMeters:Math.round(accuracy),capturedAt:new Date(position.timestamp).toISOString(),source:'device-gps'};
+      state.gpsLocation={latitude,longitude,accuracyMeters:Math.round(accuracy),capturedAt:new Date(position.timestamp).toISOString(),source:'device-gps',isGeographic:true};
       const distance=Math.hypot((latitude+29.6838)*111,(longitude+53.8105)*96);
       $('#location-value').textContent=`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
       $('#location-detail').textContent=`GPS capturado · precisão ±${Math.round(accuracy)} m${distance>3?' · fora da área de estudo':''}`;
       $('#locate').disabled=false; $('#locate').textContent='Atualizar localização ↗';
       fetchWeather(latitude,longitude,'device-region');
+      window.dispatchEvent(new Event('waind:gps'));
     }, error => {
       $('#locate').disabled=false; $('#locate').textContent='Tentar localização novamente ↗';
-      if(state.location){
+      if(state.gpsLocation){
         $('#location-detail').textContent='Última localização capturada · atualização falhou';
         showToast('Não foi possível atualizar. A localização anterior foi mantida e será identificada pela data de captura.');
         return;
@@ -180,7 +186,7 @@
       $('#photo-error').textContent=file.size>8*1024*1024?'A foto ultrapassa 8 MB. Escolha uma imagem menor.':'Escolha uma foto JPG, PNG ou WebP.';$('#photo-error').hidden=false;input.value='';return;
     }
     const candidate=URL.createObjectURL(file), generation=++photoGeneration;
-    state.photoLoading=true; $('.review-button').disabled=true; $('#summary-photo').textContent='Carregando…';
+    state.photoLoading=true; $('.review-button').disabled=true; $('#summary-photo').textContent='Carregando…';window.dispatchEvent(new Event('waind:change'));
     const preview=new Image(); preview.src=candidate;
     try {
       await preview.decode();
@@ -209,55 +215,20 @@
     evidenceType:'citizen-perception',verificationStatus:'isolated-unconfirmed',causeProven:false,
     ai:{computerVisionExecuted:false,predictionExecuted:false},storage:'browser-local',prototype:true
   };}
-  $('#odor-form').addEventListener('submit',event=>{
-    event.preventDefault();
-    if(state.photoLoading){showToast('Aguarde a foto terminar de carregar para revisar.');return;}
-    $('#intensity-error').hidden=!!state.intensity; $('#odor-error').hidden=state.types.size>0;
-    if(!state.intensity){$('input[name="intensity"]').focus();return;}
-    if(!state.types.size){$('input[name="odor"]').focus();return;}
-    state.pending=createReport(); const report=state.pending;
-    const rows=[['Intensidade',`${report.intensity} / 5 — ${levels[report.intensity-1].name}`],['Percepções',report.categories.map(id=>types.find(t=>t.id===id).label).join(', ')],
-      ['Localização',report.location?`${report.location.latitude.toFixed(5)}, ${report.location.longitude.toFixed(5)} (±${report.location.accuracyMeters} m)`:'Sem GPS capturado'],
-      ['Clima',report.weather?`${Math.round(report.weather.temperatureC)} °C · ${report.weather.relativeHumidityPercent}% · ${Math.round(report.weather.windSpeedKmh)} km/h (${report.weather.basis==='study-area'?'área de estudo':'região do GPS'})`:'Indisponível'],
-      ['Fotografia',report.photo?'Adicionada · só nesta sessão; arquivo não será salvo':'Sem foto'],
-      ['Foco visível',report.noVisibleSource?'Não há foco visível informado':'Não especificado'],
-      ['Por perto',report.visibleTags.join(', ')||'Não informado'],['Observação',report.observation||'Sem observação']];
-    if(report.otherDescription)rows.splice(2,0,['Outro odor',report.otherDescription]);
-    $('#review-details').innerHTML=rows.map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('');
-    openDialog($('#review-dialog'));
-  });
-  $('#save-report').addEventListener('click',()=>{
-    if(!state.pending)return;
-    const report={...state.pending,recordedAt:new Date().toISOString()};
-    if(records.length>=100){showToast('Este caderno chegou a 100 relatos. Exporte os registros antes de limpar espaço.');return;}
-    const next=[...records,report];
-    try{localStorage.setItem(STORE_KEY,JSON.stringify(next));}
-    catch{showToast('Não foi possível salvar no navegador. Verifique as permissões de armazenamento e tente novamente.');return;}
-    records=next;state.pending=null;
-    $('#review-dialog').close(); OdorMap.addReport(report); renderRecords();
-    $('#odor-form').reset();state.intensity=null;state.types.clear();state.tags.clear();removePhoto();
-    $$('.odor-card').forEach(card=>card.classList.remove('is-selected','is-animating'));
-    document.documentElement.style.setProperty('--intensity-color','#111');
-    $('#intensity-readout').textContent='A intensidade começa na sua percepção.';
-    $('.intensity-meter').setAttribute('aria-valuenow','0');$('.intensity-meter').setAttribute('aria-valuetext','Ainda não selecionada');
-    $$('.intensity-meter>span').forEach(span=>span.classList.remove('is-active'));
-    $('#other-field').hidden=true;$('#selection-count').textContent='Nenhuma categoria selecionada';$('#character-count').textContent='0 / 400';updateSummary();
-    showToast('Relato salvo neste navegador. Obrigado por compartilhar sua percepção.');
-  });
   function renderRecords(){
     $('#local-count').textContent=String(records.length).padStart(2,'0');$('#export-records').disabled=!records.length;$('#clear-records').hidden=!records.length;
     $('#records-description').textContent=records.length?'Relatos locais de percepção · fotos não armazenadas · exportação disponível.':'Os registros que você salvar ficam disponíveis aqui.';
     $('#local-record-list').innerHTML=records.slice(-3).reverse().map(report=>{
-      let date;try{date=localDate(report.recordedAt);}catch{date='Data não disponível';}
+      let date;try{date=report.occurrence?.kind==='past'?`Ocorrência ${localDate(report.occurrence.occurredAt)} · registrado ${localDate(report.recordedAt)}`:localDate(report.recordedAt);}catch{date='Data não disponível';}
       const labels=report.categories.map(id=>types.find(t=>t.id===id)?.label||id).join(', ');
       return `<div class="record-row"><div>${escape(labels)}<small>${escape(date)} · intensidade ${report.intensity} / 5</small></div><span>ISOLADO /<br>NÃO CONFIRMADO</span></div>`;
     }).join('');
   }
   $('#export-records').addEventListener('click',()=>{
     if(!records.length)return;
-    const payload={project:'Mau Odor — UFN / Santa Maria',exportedAt:new Date().toISOString(),schemaVersion:1,notice:'Relatos locais de percepção. Sem comprovação de causa. Fotografias não incluídas; apenas metadados.',records};
+    const payload={project:'WAIND — UFN / Santa Maria',exportedAt:new Date().toISOString(),schemaVersion:2,notice:'Relatos locais de percepção. Sem comprovação de causa. Fotografias não incluídas; apenas metadados.',records};
     const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
-    const link=document.createElement('a');link.href=url;link.download=`mau-odor-relatos-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+    const link=document.createElement('a');link.href=url;link.download=`waind-relatos-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
   });
   $('#clear-records').addEventListener('click',()=>{
     $('#info-title').textContent='Apagar os relatos deste navegador?';
@@ -265,23 +236,52 @@
     openDialog($('#info-dialog'));
     $('#confirm-clear').addEventListener('click',()=>{
       try{localStorage.removeItem(STORE_KEY);}catch{showToast('Não foi possível limpar o armazenamento.');return;}
-      records=[];renderRecords();OdorMap.mount($('#odor-map'));$('#info-dialog').close();showToast('Relatos locais apagados.');
+      records=[];renderRecords();$('#info-dialog').close();showToast('Relatos locais apagados.');
     });
   });
   renderRecords(); updateSummary();
 
+
+  window.WaindApp = {
+    state, levels, types, showToast, showInfo, createReport, fetchWeather,
+    getPhotoURL:()=>photoURL,
+    save(report){
+      if(records.length>=100){showToast('Este caderno chegou a 100 relatos. Exporte os registros antes de limpar espaço.');return false;}
+      const next=[...records,report];
+      try{localStorage.setItem(STORE_KEY,JSON.stringify(next));}
+      catch{showToast('Não foi possível salvar no navegador. Seu relato continua aberto para tentar novamente.');return false;}
+      records=next;renderRecords();return true;
+    },
+    reset(){
+      $('#odor-form').reset(); state.intensity=null;state.types.clear();state.tags.clear();state.location=null;state.pending=null;state.gpsLocation=null;removePhoto();
+      $$('.odor-card').forEach(card=>card.classList.remove('is-selected','is-animating'));
+      document.documentElement.style.setProperty('--intensity-color','#111');
+      $('#intensity-readout').textContent='A intensidade começa na sua percepção.';
+      $('.intensity-meter').setAttribute('aria-valuenow','0');$('.intensity-meter').setAttribute('aria-valuetext','Ainda não selecionada');
+      $$('.intensity-meter>span').forEach(span=>span.classList.remove('is-active'));
+      $('#other-field').hidden=true;$('#selection-count').textContent='Nenhuma categoria selecionada';$('#character-count').textContent='0 / 400';
+      $('#location-value').textContent='Entorno da UFN';$('#location-detail').textContent='GPS ainda não capturado';
+      updateSummary();fetchWeather(-29.6838,-53.8105,'study-area');
+    }
+  };
+
   const canvas=$('#motes'),ctx=canvas.getContext('2d');
+  let gustUntil=0;
+  const heroInView=()=>{const r=canvas.getBoundingClientRect();return r.width>0&&r.height>0&&r.bottom>0&&r.top<innerHeight;};
+  window.addEventListener('waind:gust',event=>{gustUntil=performance.now()+(event.detail?.duration||800);});
   let frame=0, phase=0, lastFrame=0, canvasWidth=500, canvasHeight=224, pointer={x:.5,y:.5};
   function resizeCanvas(){const bounds=canvas.getBoundingClientRect();canvasWidth=bounds.width;canvasHeight=bounds.height;const dpr=Math.min(devicePixelRatio||1,2);canvas.width=canvasWidth*dpr;canvas.height=canvasHeight*dpr;ctx?.setTransform(dpr,0,0,dpr,0,0);}
   const particles=Array.from({length:36},(_,i)=>({x:(i*.618033)%1,y:(i*.4142)%1,r:i%4===0?.9:.55,offset:i*1.9}));
   function drawMotes(time){
     if(!ctx)return;
-    const delta=Math.min((time-lastFrame)||16,50);lastFrame=time;phase+=delta*.00015*(state.intensity||1);
+    const delta=Math.min((time-lastFrame)||16,50);lastFrame=time;
+    const gust=Math.max(0,(gustUntil-time)/800);
+    phase+=delta*.000055*(1+(state.intensity||0)*.1)*(1+gust*4.5);
     ctx.clearRect(0,0,canvasWidth,canvasHeight);ctx.fillStyle=state.intensity?levels[state.intensity-1].color:'#111111';
-    const count=8+(state.intensity||0)*5;
+    const count=18+(state.intensity||0)*3;
     for(const p of particles.slice(0,count)){
-      const x=((p.x+phase*.05)%1)*canvasWidth;
-      const y=(.17+p.y*.64)*canvasHeight+Math.sin(phase+p.offset)*7+(pointer.y-.5)*p.r*6;
+      const x=((p.x+phase)%1)*canvasWidth;
+      const y=(.17+p.y*.64)*canvasHeight+Math.sin(phase*5+p.offset)*4+(pointer.y-.5)*p.r*6;
       ctx.globalAlpha=.18+p.r*.24;ctx.beginPath();ctx.arc(x+(pointer.x-.5)*p.r*7,y,p.r,0,Math.PI*2);ctx.fill();
     }
     frame=requestAnimationFrame(drawMotes);
@@ -290,10 +290,13 @@
     document.documentElement.classList.toggle('motion-paused',motionPaused);
     $('#motion-toggle').setAttribute('aria-pressed',String(motionPaused));$('#motion-toggle').textContent=motionPaused?'Ativar animações':'Pausar animações';
     cancelAnimationFrame(frame);lastFrame=0;
-    if(motionPaused||document.hidden){ctx?.clearRect(0,0,canvasWidth,canvasHeight);}else frame=requestAnimationFrame(drawMotes);
+    window.dispatchEvent(new CustomEvent('waind:motion',{detail:{paused:motionPaused}}));
+    if(motionPaused||document.hidden||!heroInView()){ctx?.clearRect(0,0,canvasWidth,canvasHeight);}else frame=requestAnimationFrame(drawMotes);
   }
   $('.hero-visual').addEventListener('pointermove',event=>{const bounds=event.currentTarget.getBoundingClientRect();pointer={x:(event.clientX-bounds.left)/bounds.width,y:(event.clientY-bounds.top)/bounds.height};});
   $('#motion-toggle').addEventListener('click',()=>{motionPaused=!motionPaused;syncMotion();});
   reducedMotion.addEventListener('change',event=>{motionPaused=event.matches;syncMotion();});
-  document.addEventListener('visibilitychange',syncMotion);window.addEventListener('resize',resizeCanvas);resizeCanvas();syncMotion();
+  const heroObserver=new IntersectionObserver(()=>{resizeCanvas();syncMotion();});heroObserver.observe(canvas);
+  window.addEventListener('waind:screen-settled',()=>{resizeCanvas();syncMotion();});
+  document.addEventListener('visibilitychange',syncMotion);window.addEventListener('resize',()=>{resizeCanvas();syncMotion();});resizeCanvas();syncMotion();
 })();
