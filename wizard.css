@@ -89,3 +89,15 @@ html{overflow-x:clip}
 }
 .motion-paused #wind-gust-overlay,.motion-paused .wind-exit-snapshot{display:none!important}
 .motion-paused .brand-char,.motion-paused .brand-glyph,.motion-paused .brand-parallax{transform:none!important;filter:none!important;opacity:1!important}
+
+/* Step 1: quiet notebook annotations, readable at narrow mobile widths. */
+.location-cell > div { min-width:0; }
+.location-address { border-top:1px solid #d8d5cd; margin-top:12px; padding-top:10px; }
+.location-address p { margin:4px 0; font-size:12px; line-height:1.65; overflow-wrap:anywhere; }
+.location-address .location-coordinates { font:11px/1.7 var(--mono,monospace); color:#54514a; }
+.location-address .address-attribution { font-size:10px; color:#78756e; }
+.address-attribution a { text-decoration:underline; text-underline-offset:2px; }
+.permission-help { border-left:1px solid #78756e; padding-left:10px; margin-top:12px; max-width:48ch; }
+.permission-actions { margin:12px 0; }
+.permission-actions .text-button { text-align:left; }
+.camera-status { font-size:13px; line-height:1.7; margin-top:16px; }

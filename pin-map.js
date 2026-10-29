@@ -6,7 +6,7 @@
   let serial = 0;
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const radians = Math.PI / 180;
-  const home = {latitude:-29.6838, longitude:-53.8105};
+  const home = {latitude:-29.6868, longitude:-53.8149};
   function project(latitude, longitude, zoom) {
     const size = 256 * 2 ** zoom, sin = Math.sin(clamp(latitude,-85.05112878,85.05112878) * radians);
     return {x:(longitude + 180) / 360 * size, y:(.5 - Math.log((1 + sin)/(1 - sin)) / (4 * Math.PI)) * size};
@@ -22,12 +22,12 @@
     const uid = `waind-pin-${++serial}`;
     const host = document.createElement('section'); host.className = 'waind-pin';
     host.setAttribute('aria-label','Escolher o local da ocorrência no mapa');
-    host.innerHTML = `<div class="pin-heading"><strong>Um ponto no território.</strong><span>ENTORNO DA UFN<br>SANTA MARIA / RS</span></div>
+    host.innerHTML = `<div class="pin-heading"><strong>Um ponto no território.</strong><span>SANTA MARIA E REGIÃO / RS</span></div>
       <div class="pin-viewport" role="region" tabindex="0" aria-label="Mapa geográfico para posicionar o pin" aria-describedby="${uid}-help">
         <div class="pin-base pin-tiles" aria-hidden="true"></div>
         <div class="pin-crosshair" aria-hidden="true"></div>
         <div class="pin-north" aria-hidden="true"><svg viewBox="0 0 38 55"><circle cx="19" cy="30" r="15" stroke-dasharray="2 3"/><circle cx="19" cy="30" r="11"/><path d="M19 13v34M2 30h34M19 16l4 14h-8z"/><path d="M19 16v14h4z" fill="#49443c"/><text x="19" y="8" text-anchor="middle">N</text></svg></div>
-        <div class="pin-controls" aria-label="Controles do mapa"><button type="button" data-pin-action="plus" aria-label="Ampliar mapa">+</button><button type="button" data-pin-action="minus" aria-label="Reduzir mapa">−</button><button type="button" data-pin-action="home" aria-label="Voltar à área da UFN">⌂</button></div>
+        <div class="pin-controls" aria-label="Controles do mapa"><button type="button" data-pin-action="plus" aria-label="Ampliar mapa">+</button><button type="button" data-pin-action="minus" aria-label="Reduzir mapa">−</button><button type="button" data-pin-action="home" aria-label="Visão geral de Santa Maria">⌂</button></div>
         <button type="button" class="pin-marker" aria-label="Abrir resumo no pin da ocorrência" aria-expanded="false" aria-controls="${uid}-popup" hidden><svg viewBox="0 0 48 55" aria-hidden="true"><ellipse class="pin-ring" cx="24" cy="49" rx="16" ry="4"/><path d="M24 49C19 40 9 31 9 21a15 15 0 0 1 30 0c0 10-10 19-15 28Z" fill="#fff" stroke="currentColor" stroke-width="1.6"/><path d="M13 22c1 8 7 16 11 23M16 23c1 6 5 13 8 18M19 24c1 5 3 9 5 13" fill="none" stroke="currentColor" stroke-width=".65"/><circle cx="24" cy="20" r="5" fill="currentColor"/><circle cx="24" cy="20" r="9" fill="none" stroke="currentColor" stroke-width=".6"/></svg></button>
         <aside class="pin-popup" id="${uid}-popup" aria-label="Resumo da ocorrência neste pin" hidden><button type="button" class="pin-popup-close" aria-label="Fechar resumo do pin">×</button><p class="pin-caption">SEU RELATO / NESTE PONTO</p><h3>O que você percebeu.</h3><dl></dl><img alt="Foto selecionada para esta ocorrência" hidden></aside>
         <p class="pin-error" hidden></p>
@@ -41,7 +41,8 @@
     const find = q => host.querySelector(q);
     const viewport=find('.pin-viewport'), tiles=find('.pin-tiles'), marker=find('.pin-marker'), popup=find('.pin-popup'), status=find('.pin-map-status'), error=find('.pin-error');
     const latitudeInput=find(`#${uid}-lat`), longitudeInput=find(`#${uid}-lon`);
-    let zoom=16, center=project(home.latitude,home.longitude,zoom), width=0, height=0, location=null, drag=null, frame=0, destroyed=false;
+    const initial=options.initialCenter||home;
+    let zoom=options.initialCenter?15:12, center=project(initial.latitude,initial.longitude,zoom), width=0, height=0, location=null, drag=null, frame=0, destroyed=false;
     const tileCache=new Map();
     function visible() {return !destroyed && host.isConnected && host.getClientRects().length>0 && !document.hidden;}
     function tileHealth() {
@@ -97,7 +98,7 @@
       const rect=viewport.getBoundingClientRect();width=rect.width;height=rect.height;
       if(!width||!height)return;
       updateTiles(load);markerPosition();
-      find('[data-pin-action="plus"]').disabled=zoom>=19;find('[data-pin-action="minus"]').disabled=zoom<=12;
+      find('[data-pin-action="plus"]').disabled=zoom>=19;find('[data-pin-action="minus"]').disabled=zoom<=10;
     }
     function queueRender(load=true){cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>render(load));}
     function closePopup(focus=false){popup.hidden=true;marker.setAttribute('aria-expanded','false');if(focus&&!marker.hidden)marker.focus({preventScroll:true});}
@@ -112,7 +113,7 @@
     }
     function atScreen(x,y){return unproject(center.x+x-width/2,center.y+y-height/2,zoom);}
     function placeCenter(){const p=unproject(center.x,center.y,zoom);selectAt(p.latitude,p.longitude);}
-    function changeZoom(change){const next=clamp(zoom+change,12,19);if(next===zoom)return;const ratio=2**(next-zoom);center={x:center.x*ratio,y:center.y*ratio};zoom=next;render();status.textContent=`Ampliação ${zoom}.`;}
+    function changeZoom(change){const next=clamp(zoom+change,10,19);if(next===zoom)return;const ratio=2**(next-zoom);center={x:center.x*ratio,y:center.y*ratio};zoom=next;render();status.textContent=`Ampliação ${zoom}.`;}
     viewport.addEventListener('pointerdown',event=>{
       if(event.target.closest('button,a,.pin-popup,.pin-controls')||event.button!==0||!event.isPrimary)return;
       drag={x:event.clientX,y:event.clientY,startX:center.x,startY:center.y,moved:false,pointerId:event.pointerId};
@@ -149,7 +150,7 @@
     host.querySelectorAll('[data-pin-action]').forEach(button=>button.addEventListener('click',()=>{
       const action=button.dataset.pinAction;
       if(action==='plus')changeZoom(1);if(action==='minus')changeZoom(-1);
-      if(action==='home'){zoom=16;center=project(home.latitude,home.longitude,zoom);closePopup();render();status.textContent='Mapa centralizado no entorno da UFN. Seu pin foi preservado.';}
+      if(action==='home'){zoom=12;center=project(home.latitude,home.longitude,zoom);closePopup();render();status.textContent='Visão geral de Santa Maria e região. Seu pin foi preservado.';}
       if(action==='place')placeCenter();
       if(action==='coordinates'){
         const lat=latitudeInput.valueAsNumber,lon=longitudeInput.valueAsNumber;
@@ -163,6 +164,10 @@
     render();
     return {
       refresh(){if(!popup.hidden)fillPopup();queueRender();},
+      centerOn(value){
+        if(!value||!Number.isFinite(value.latitude)||!Number.isFinite(value.longitude)||Math.abs(value.latitude)>85.05112878||Math.abs(value.longitude)>180)return false;
+        zoom=15;center=project(value.latitude,value.longitude,zoom);closePopup();queueRender();return true;
+      },
       setLocation(value){
         if(!value){location=null;showCoordinates();closePopup();queueRender();return true;}
         if(!Number.isFinite(value.latitude)||!Number.isFinite(value.longitude)||Math.abs(value.latitude)>85.05112878||Math.abs(value.longitude)>180)return false;
@@ -174,3 +179,4 @@
   }
   window.WaindPin={mount};
 })();
+

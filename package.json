@@ -2,9 +2,10 @@
   "name": "waind-ufn",
   "version": "2.0.0",
   "private": true,
-  "description": "WAIND — protótipo participativo de percepção de mau odor no entorno da UFN",
+  "description": "WAIND — protótipo participativo de percepção de mau odor em Santa Maria e região/RS",
   "scripts": {
     "build": "node build.mjs",
     "start": "node serve.mjs"
   }
 }
+

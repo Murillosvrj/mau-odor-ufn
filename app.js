@@ -20,6 +20,9 @@
   ];
   const tags = ['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'];
   const state = {intensity:null, types:new Set(), tags:new Set(), location:null, weather:null, photo:null, photoLoading:false, pending:null};
+  const region = {latitude:-29.6868,longitude:-53.8149,radiusKm:45};
+  let gpsGeneration=0, cameraGeneration=0, cameraPending=false, addressController=null, lastAddressRequest=0;
+  const addressCache=new Map();
   const STORE_KEY = 'waind-relatos-local-v2';
   let records = [], toastTimer, photoURL = null, photoGeneration = 0, weatherGeneration = 0;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -41,7 +44,7 @@
   const infoContent = {
     invisible:{title:'Sentir não é o mesmo que enxergar.',body:'<p>O odor pode estar no ar mesmo quando a foto mostra um lugar aparentemente limpo. Marcar esta opção evita tratar a imagem como evidência visual de uma fonte de mau odor.</p><p>No futuro, essa informação poderá ajudar a interpretar as imagens usadas na pesquisa. Neste protótipo, nenhuma foto é analisada por IA.</p>'},
     method:{title:'Uma percepção. Muitas possibilidades.',body:'<p><strong>Relato:</strong> o que alguém sentiu em um lugar e momento.</p><p><strong>Hipótese:</strong> uma possível fonte, sugerida por observação ou por um modelo, que ainda exige investigação.</p><p><strong>Causa comprovada:</strong> exige evidências próprias e não é estabelecida por este formulário. Relatos isolados são preservados como “isolado / não confirmado”.</p>'},
-    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA no entorno da UFN — Santa Maria/RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design. O mapa é esquemático, seus oito relatos são simulados e os cenários de Decision Tree e Random Forest não executam modelos treinados.</p><p>Seus relatos ficam neste navegador. A foto é temporária e não acompanha a exportação JSON. Quando disponível, o clima é consultado na <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>; essa consulta usa as coordenadas da área de estudo ou as coordenadas arredondadas do GPS autorizado.</p>'}
+    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Seus relatos ficam neste navegador. A foto é temporária e não acompanha a exportação JSON. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
   };
   function showToast(text) {
     clearTimeout(toastTimer); $('#toast').textContent = text; $('#toast').hidden = false;
@@ -124,7 +127,7 @@
     weatherRequest={key,loading:true,startedAt:Date.now()};
     const generation = ++weatherGeneration;
     state.weather = null; $('#temperature').textContent='— °C'; $('#humidity').textContent='— %'; $('#wind').textContent='— km/h';
-    $('#weather-status').textContent = 'Consultando condições do ar…';
+    $('#weather-status').textContent = basis==='study-area'?'Consultando condições para Santa Maria…':'Consultando condições para sua localização…';
     const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(),9000);
     try {
       const lat = Number(latitude.toFixed(2)), lon = Number(longitude.toFixed(2));
@@ -138,36 +141,127 @@
       $('#temperature').textContent = `${Math.round(current.temperature_2m)} °C`;
       $('#humidity').textContent = `${Math.round(current.relative_humidity_2m)} %`;
       $('#wind').textContent = `${Math.round(current.wind_speed_10m)} km/h`;
-      $('#weather-status').textContent = `Open-Meteo · ${basis==='study-area'?'área da UFN':basis==='manual-region'?'região do pin':'região do GPS'} · ${current.time.slice(11,16)}`;
+      $('#weather-status').textContent = `Open-Meteo · ${basis==='study-area'?'Santa Maria':basis==='manual-region'?'região do pin':'região do GPS'} · ${current.time.slice(11,16)} · Horário de Brasília`;
     } catch {
       if(generation!==weatherGeneration) return;
       state.weather = null; $('#weather-status').textContent = 'Clima indisponível · você pode continuar';
     } finally {clearTimeout(timeout);if(generation===weatherGeneration)weatherRequest.loading=false;window.dispatchEvent(new Event('waind:change'));}
   }
-  fetchWeather(-29.6838,-53.8105,'study-area');
+  fetchWeather(region.latitude,region.longitude,'study-area');
+  function regionalDistance(latitude,longitude){
+    const rad=Math.PI/180, dlat=(latitude-region.latitude)*rad, dlon=(longitude-region.longitude)*rad;
+    const a=Math.sin(dlat/2)**2+Math.cos(latitude*rad)*Math.cos(region.latitude*rad)*Math.sin(dlon/2)**2;
+    return 6371*2*Math.asin(Math.min(1,Math.sqrt(a)));
+  }
+  // User-triggered only, cached and spaced by at least 1.1 s in this browser.
+  // A shared proxy/rate limiter is required before broad public use (see README).
+  const configController=new AbortController(),configTimeout=setTimeout(()=>configController.abort(),3000);
+  const geocodingConfig=fetch('geocoding-config.json',{signal:configController.signal})
+    .then(r=>r.ok?r.json():null).catch(()=>null).finally(()=>clearTimeout(configTimeout));
+  async function reverseAddress(location,generation){
+    const {latitude,longitude}=location;
+    const key=`${latitude.toFixed(5)},${longitude.toFixed(5)}`;
+    addressController?.abort();addressController=new AbortController();
+    const controller=addressController;
+    const timeout=setTimeout(()=>controller.abort(),9000);
+    try{
+      let address=addressCache.get(key);
+      if(!address){
+        const config=await geocodingConfig;
+        if(generation!==gpsGeneration)return;
+        if(config?.enabled===false)throw new Error('Address lookup disabled');
+        const endpoint=config?.reverseUrl||'https://nominatim.openstreetmap.org/reverse';
+        await new Promise(resolve=>setTimeout(resolve,Math.max(0,1100-(Date.now()-lastAddressRequest))));
+        if(generation!==gpsGeneration)return;
+        lastAddressRequest=Date.now();
+        const query=new URLSearchParams({format:'jsonv2',lat:String(latitude),lon:String(longitude),'accept-language':'pt-BR',addressdetails:'1'});
+        const response=await fetch(`${endpoint}?${query}`,{signal:controller.signal,referrerPolicy:'strict-origin-when-cross-origin'});
+        if(!response.ok)throw new Error('Address unavailable');
+        const data=await response.json();if(!data.address||data.error)throw new Error('Address not found');
+        address=data.address;addressCache.set(key,address);
+      }
+      if(generation!==gpsGeneration)return;
+      const road=address.road||address.pedestrian||address.residential||address.footway||address.path||'Logradouro não informado neste ponto';
+      const city=address.city||address.town||address.municipality||address.village||'';
+      const district=address.suburb||address.neighbourhood||address.quarter||'';
+      const uf=address['ISO3166-2-lvl4']?.split('-').pop()||(address.state==='Rio Grande do Sul'?'RS':address.state||'');
+      const place=[district,[city,uf].filter(Boolean).join(' - ')].filter(Boolean).join(', ');
+      $('#location-street').textContent=`Rua / Logradouro: ${road}${place?' · '+place:''}`;
+      $('#location-postcode').textContent=address.postcode?`CEP: ${address.postcode}`:'CEP não informado neste ponto';
+      if(city)$('#location-value').textContent=[city,uf].filter(Boolean).join(', ');
+      location.address={street:road,district,city,state:uf,postcode:address.postcode||null,source:'OpenStreetMap / Nominatim',approximate:true};
+      window.dispatchEvent(new Event('waind:change'));
+    }catch{
+      if(generation!==gpsGeneration)return;
+      $('#location-street').textContent='Endereço indisponível agora · coordenadas preservadas.';
+      $('#location-postcode').textContent='CEP não informado neste ponto';
+    }finally{clearTimeout(timeout);}
+  }
+  function gpsError(error){
+    $('#locate').disabled=false;$('#locate').textContent='Tentar localização novamente ↗';
+    $('#location-detail').textContent=state.gpsLocation?'Última localização capturada · atualização falhou':error.code===1?'GPS não autorizado · você pode continuar':'GPS indisponível · você pode continuar';
+    $('#location-help').hidden=false;
+    $('#location-help').textContent=error.code===1?'Localização bloqueada. Toque no cadeado ou nos ajustes ao lado do endereço do site, abra Permissões e permita Localização. Depois, tente novamente. Se necessário, libere também a localização nas configurações do aparelho.':error.code===3?'O GPS demorou a responder. Tente novamente em um local com melhor sinal ou indique o local no mapa.':'Não foi possível acessar o GPS. Confira as configurações de localização ou indique o local no mapa.';
+    window.dispatchEvent(new Event('waind:gps-error'));
+  }
   $('#locate').addEventListener('click', () => {
-    if(!navigator.geolocation){showToast('Este navegador não disponibiliza geolocalização. Você pode continuar sem GPS.');return;}
+    if(!navigator.geolocation){gpsError({code:2});return;}
+    const generation=++gpsGeneration;
     $('#locate').disabled = true; $('#locate').textContent='Localizando…';
-    navigator.geolocation.getCurrentPosition(position => {
+    $('#location-help').hidden=true;
+    // Keep this native request synchronous within the original click gesture.
+    try{navigator.geolocation.getCurrentPosition(position => {
+      if(generation!==gpsGeneration)return;
       const {latitude,longitude,accuracy}=position.coords;
       state.gpsLocation={latitude,longitude,accuracyMeters:Math.round(accuracy),capturedAt:new Date(position.timestamp).toISOString(),source:'device-gps',isGeographic:true};
-      const distance=Math.hypot((latitude+29.6838)*111,(longitude+53.8105)*96);
-      $('#location-value').textContent=`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-      $('#location-detail').textContent=`GPS capturado · precisão ±${Math.round(accuracy)} m${distance>3?' · fora da área de estudo':''}`;
+      const distance=regionalDistance(latitude,longitude);
+      state.gpsLocation.withinStudyRegion=distance<=region.radiusKm;
+      $('#location-value').textContent=distance<=region.radiusKm?'Santa Maria e região, RS':'Localização capturada';
+      $('#location-detail').textContent=`GPS capturado${distance>region.radiusKm?' · além da referência regional de ~45 km':''}`;
+      $('#location-address').hidden=false;$('#location-street').textContent='Consultando rua e bairro…';$('#location-postcode').textContent='Consultando CEP…';
+      $('#location-coordinates').textContent=`Lat: ${latitude.toFixed(5)} · Long: ${longitude.toFixed(5)} (±${Math.round(accuracy)} m)`;
       $('#locate').disabled=false; $('#locate').textContent='Atualizar localização ↗';
       fetchWeather(latitude,longitude,'device-region');
       window.dispatchEvent(new Event('waind:gps'));
-    }, error => {
-      $('#locate').disabled=false; $('#locate').textContent='Tentar localização novamente ↗';
-      if(state.gpsLocation){
-        $('#location-detail').textContent='Última localização capturada · atualização falhou';
-        showToast('Não foi possível atualizar. A localização anterior foi mantida e será identificada pela data de captura.');
-        return;
-      }
-      $('#location-detail').textContent=error.code===1?'GPS não autorizado · você pode continuar':'GPS indisponível · você pode continuar';
-      showToast(error.code===1?'Localização não autorizada. Nenhuma coordenada foi capturada.':'Não foi possível capturar o GPS agora. Tente novamente ou continue.');
-    },{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+      reverseAddress(state.gpsLocation,generation);
+    }, error => {if(generation===gpsGeneration)gpsError(error);},{enableHighAccuracy:true,timeout:15000,maximumAge:0});}catch{gpsError({code:1});}
   });
+
+  function requestCamera(){
+    if(cameraPending)return;
+    $('#photo-consent').checked=true;
+    const generation=++cameraGeneration;
+    const failed=error=>{
+      if(generation!==cameraGeneration)return;
+      cameraPending=false;$('#test-camera').disabled=false;
+      const reason=error?.name==='NotFoundError'?'Câmera ausente neste aparelho':error?.name==='NotReadableError'?'Câmera indisponível ou em uso':'Permissão de câmera não concedida';
+      $('#camera-status').textContent=`${reason} — você ainda poderá selecionar imagens da galeria na etapa 05 ou continuar sem foto.`;
+      $('#camera-footnote').textContent='Para liberar a câmera, use o cadeado/ajustes do site e as permissões do aparelho. O acesso à galeria é solicitado pelo seletor de arquivos na etapa de fotografia.';
+      $('#test-camera').textContent='Tentar autorizar câmera ↗';
+    };
+    if(!navigator.mediaDevices?.getUserMedia){failed();return;}
+    cameraPending=true;$('#test-camera').disabled=true;
+    $('#camera-status').textContent='Aguardando sua autorização no navegador… Você pode continuar sem foto.';
+    $('#camera-footnote').textContent='O teste encerra a câmera assim que a permissão for concedida. Nenhuma foto é capturada agora.';
+    try{
+      // No await or permissions.query before the native permission request.
+      navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false}).then(stream=>{
+        stream.getTracks().forEach(track=>track.stop());
+        if(generation!==cameraGeneration)return;
+        cameraPending=false;$('#test-camera').disabled=false;
+        $('#camera-status').textContent='Câmera autorizada ✓ · Acesso à galeria habilitado para a etapa de fotografia';
+        $('#camera-footnote').textContent='Permissão de câmera solicitada. A câmera de teste já foi encerrada. Na galeria, você autoriza apenas a imagem escolhida no seletor do aparelho.';
+        $('#test-camera').textContent='Testar câmera novamente ↗';
+      }).catch(failed);
+    }catch(error){failed(error);}
+  }
+  $('#photo-consent').addEventListener('change',()=>{
+    if($('#photo-consent').checked){requestCamera();return;}
+    ++cameraGeneration;cameraPending=false;$('#test-camera').disabled=false;
+    $('#camera-status').textContent='Fotografia opcional · você pode continuar sem foto.';
+    $('#camera-footnote').textContent='Desmarcar não revoga permissões do navegador. Na etapa de fotografia, você ainda pode escolher uma imagem pelo seletor do aparelho.';
+  });
+  $('#test-camera').addEventListener('click',requestCamera);
 
   $('#camera-button').addEventListener('click',()=>$('#camera-input').click());
   $('#gallery-button').addEventListener('click',()=>$('#gallery-input').click());
@@ -209,7 +303,7 @@
     multiHot:Object.fromEntries(types.map(t=>[t.id,Number(state.types.has(t.id))])),
     otherDescription:state.types.has('other')?$('#other-text').value.trim():'',
     location:state.location?{...state.location}:null,weather:state.weather?{...state.weather}:null,
-    studyArea:{name:'Entorno da UFN, Santa Maria/RS',referenceLatitude:-29.6838,referenceLongitude:-53.8105,isUserLocation:false},
+    studyArea:{name:'Santa Maria e região, RS',referenceLatitude:region.latitude,referenceLongitude:region.longitude,referenceRadiusKm:region.radiusKm,isUserLocation:false},
     photo:state.photo?{...state.photo}:null,noVisibleSource:$('#invisible-source').checked,
     visibleTags:[...state.tags].map(i=>tags[i]),observation:$('#observation').value.trim(),
     evidenceType:'citizen-perception',verificationStatus:'isolated-unconfirmed',causeProven:false,
@@ -253,6 +347,7 @@
       records=next;renderRecords();return true;
     },
     reset(){
+      ++gpsGeneration;++cameraGeneration;cameraPending=false;addressController?.abort();
       $('#odor-form').reset(); state.intensity=null;state.types.clear();state.tags.clear();state.location=null;state.pending=null;state.gpsLocation=null;removePhoto();
       $$('.odor-card').forEach(card=>card.classList.remove('is-selected','is-animating'));
       document.documentElement.style.setProperty('--intensity-color','#111');
@@ -260,8 +355,11 @@
       $('.intensity-meter').setAttribute('aria-valuenow','0');$('.intensity-meter').setAttribute('aria-valuetext','Ainda não selecionada');
       $$('.intensity-meter>span').forEach(span=>span.classList.remove('is-active'));
       $('#other-field').hidden=true;$('#selection-count').textContent='Nenhuma categoria selecionada';$('#character-count').textContent='0 / 400';
-      $('#location-value').textContent='Entorno da UFN';$('#location-detail').textContent='GPS ainda não capturado';
-      updateSummary();fetchWeather(-29.6838,-53.8105,'study-area');
+      $('#location-value').textContent='Santa Maria, RS';$('#location-detail').textContent='Santa Maria e região · GPS ainda não capturado';
+      $('#location-address').hidden=true;$('#location-help').hidden=true;$('#locate').disabled=false;$('#locate').textContent='Usar minha localização ↗';
+      $('#test-camera').disabled=false;$('#test-camera').textContent='Autorizar / testar câmera ↗';$('#camera-status').textContent='A câmera será testada ao marcar esta opção.';
+      $('#camera-footnote').textContent='Opcional. Na etapa de fotografia, a galeria abre o seletor do aparelho; você escolhe quais imagens compartilhar.';
+      updateSummary();fetchWeather(region.latitude,region.longitude,'study-area');
     }
   };
 
@@ -300,3 +398,4 @@
   window.addEventListener('waind:screen-settled',()=>{resizeCanvas();syncMotion();});
   document.addEventListener('visibilitychange',syncMotion);window.addEventListener('resize',()=>{resizeCanvas();syncMotion();});resizeCanvas();syncMotion();
 })();
+
