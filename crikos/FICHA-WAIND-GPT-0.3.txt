@@ -1,0 +1,127 @@
+NOME DO PROJETO: WAIND
+EM UMA FRASE: O cheiro que você percebe vira um relato no mapa, ajudando a conhecer o entorno da UFN.
+RESUMO:
+WAIND conecta a percepção das pessoas ao território. Quem sente um odor pode descrever sua intensidade, indicar o lugar e acrescentar contexto em uma jornada de sete etapas. O vento inspira a identidade visual e integra o contexto meteorológico consultado pelo aplicativo.
+INTEGRANTES:
+Murillo Viçosa — idealizou o conceito, definiu a identidade visual e desenvolveu o aplicativo.
+ORIENTADORES:
+Cristian Vinicius Machado Fagundes — professor orientador.
+Mirkos Martins — professor orientador.
+PROBLEMA:
+Um cheiro pode incomodar muita gente e continuar invisível nos registros da cidade. No entorno universitário, faltam formas simples de organizar onde, quando e como cada pessoa percebe esse incômodo. Registrar a experiência não significa comprovar sua origem.
+COMO FUNCIONA:
+Abra o WAIND no navegador do celular. Informe nome e e-mail e confirme os dados e o consentimento.
+Conte se percebe um odor agora, quer lembrar uma ocorrência anterior ou prefere explorar o mapa.
+Escolha a intensidade de 1 a 5 e um ou mais dos oito tipos de odor.
+Se quiser, acrescente uma foto, marque que o cheiro está no ar e descreva pistas vistas por perto.
+Use o GPS autorizado ou coloque um pino no mapa do entorno da UFN.
+Revise suas escolhas, salve neste navegador e baixe os relatos em um arquivo JSON.
+RESULTADOS:
+A GPT 0.3 está publicada e permite demonstrar sete etapas guiadas, cinco níveis de intensidade e oito categorias com ilustrações animadas em SVG.
+O protótipo consulta temperatura, umidade e velocidade do vento pela Open-Meteo. Integra mapa geográfico em preto e branco, resumo no pino, revisão e exportação JSON.
+São resultados de desenvolvimento e demonstração do aplicativo. Não representam uma comprovação da origem dos odores nem uma avaliação de impacto urbano.
+DESAFIOS:
+Traduzir uma sensação subjetiva em um registro compreensível. Orientar pessoas diferentes sem transformar percepção em acusação. Conciliar movimento visual, privacidade e uma interface que possa ser pausada. Distinguir o clima atual das condições de uma ocorrência lembrada.
+APRENDIZADOS:
+Uma jornada curta por etapas organiza as perguntas e permite revisar escolhas. Um odor pode ser percebido sem aparecer na foto. Localização, horário e clima acrescentam contexto, mas não comprovam a fonte. A mesma informação precisa ser compreensível para visitantes de diferentes idades.
+PRÓXIMOS PASSOS:
+Avaliar a clareza e a usabilidade com participantes, seguindo a pesquisa orientada a projetos. Planejar a coleta compartilhada com critérios de consentimento e qualidade dos dados. Investigar aprendizado de máquina e visão computacional com dados apropriados e validação, sem confundir hipótese com causa comprovada.
+CURIOSIDADES:
+O nome WAIND junta vento e inteligência artificial.
+As letras AI ganham destaque sutil dentro da marca W[AI]ND.
+O preto e branco deixa a cor aparecer principalmente na intensidade.
+Oito desenhos em nanquim reagem ao toque e à seleção.
+As trocas de tela seguem uma coreografia inspirada no vento.
+É possível lembrar uma ocorrência anterior ou apenas explorar o mapa.
+TECNOLOGIAS: HTML, CSS, Tailwind CSS compilado, JavaScript, SVG, Canvas, Web Animations API, geolocalização do navegador, Open-Meteo, OpenStreetMap, LocalStorage, JSON, GitHub Pages
+DADOS UTILIZADOS:
+Nome e e-mail informados no teste, consentimento, intensidade de 1 a 5, categorias de percepção, descrição de Outros, data e hora do registro, horário aproximado de ocorrências anteriores, localização por GPS ou pino, pistas visuais e observação de até 400 caracteres.
+O contexto meteorológico contém temperatura, umidade e velocidade do vento, consultadas para coordenadas arredondadas. Não inclui direção do vento nesta versão.
+A foto opcional permanece na sessão. Somente seus metadados entram no registro salvo e na exportação. Os mapas fornecem a referência geográfica.
+TEMAS: cidades, ciência cidadã, percepção de odores, ambiente urbano, participação comunitária, experiência do usuário, privacidade, dados geográficos, meteorologia, inteligência artificial, Design Science Research
+DISCIPLINA: Studio I: Projetos Assistidos por IA, integrado a Design Orientado a Projetos
+SEMESTRE: 2026/2
+DURAÇÃO: Projeto desenvolvido no semestre 2026/2, com evolução contínua do protótipo.
+STATUS: Protótipo interativo GPT 0.3 publicado para avaliação.
+DESCRIÇÃO COMPLETA:
+WAIND é um projeto de Murillo Viçosa no Bacharelado em Inteligência Artificial e Ciência de Dados da Universidade Franciscana. Tem orientação de Cristian Vinicius Machado Fagundes e Mirkos Martins e focaliza o entorno universitário no Centro de Santa Maria, no Rio Grande do Sul.
+O aplicativo transforma uma percepção pessoal de odor em um relato organizado. A pessoa informa a intensidade e o tipo de cheiro, acrescenta contexto e escolhe o local em um mapa. A interface preserva a linguagem de papel e nanquim, com hachuras, espirais e movimentos inspirados no vento.
+A metodologia Design Science Research orienta a construção e a avaliação do artefato. O projeto distingue percepção sensorial, hipótese contextual e causa comprovada. Uma pista visível não é um laudo e o celular não mede substâncias químicas.
+A inteligência artificial apoiou o desenvolvimento e a estruturação do projeto. A versão atual prepara dados para pesquisas futuras, preservando a distinção entre o que já funciona no navegador e os modelos que ainda precisam ser investigados e validados.
+FRASE DE ABERTURA:
+O vento trouxe um cheiro estranho no caminho da faculdade? Que tal tentar colocá-lo no mapa em menos de um minuto?
+NÃO PODE FALTAR:
+Dizer WAIND como uáind, em uma palavra só.
+Apresentar Murillo Viçosa como único integrante e autor do aplicativo.
+Situar o projeto no entorno da UFN, no Centro de Santa Maria.
+Mostrar a jornada em sete etapas, a intensidade de 1 a 5 e as oito categorias animadas.
+Explicar que o cheiro pode estar no ar sem foco visível na foto.
+Distinguir percepção, hipótese de origem e causa comprovada.
+Explicar o armazenamento local quando perguntarem sobre envio ou acesso aos relatos.
+Convidar o visitante a abrir o site no celular ou por um QR Code que aponte para ele.
+EXPLICAÇÃO PARA CRIANÇAS:
+Imagine uma equipe de detetives do vento procurando pistas invisíveis pelo bairro. Seu nariz percebe o cheiro e o WAIND ajuda a contar onde foi, como parecia e se era fraquinho ou forte. A foto mostra o que está por perto, mas não fotografa o cheiro. O mapa guarda a pista, não aponta um culpado.
+DETALHES TÉCNICOS:
+Aplicação web com capa e sete etapas. Usa HTML, CSS, Tailwind compilado e JavaScript, com oito categorias ilustradas em SVG, partículas em Canvas e transições coordenadas por wind-motion.js.
+A escala possui cinco níveis: Muito fraco, Fraco, Intermediário, Forte e Muito forte. As oito categorias atuais são Resíduos, Contentor de lixo, Esgoto, Valas a céu aberto, Resíduos orgânicos alimentares, Resíduos metabólicos, Resíduos químicos e Outros.
+O contexto consulta temperatura, umidade relativa e velocidade do vento na Open-Meteo, em horário de Santa Maria. Não consulta direção do vento nem calcula trajetórias de dispersão. Nos relatos anteriores, o clima exibido continua sendo atual.
+O mapa usa base geográfica OpenStreetMap, conversão de coordenadas para posicionamento, zoom, teclado e pino com resumo. A posição manual é indicada pela pessoa e não recebe precisão de sensor.
+O rascunho mantém as escolhas durante a navegação. Relatos concluídos ficam no LocalStorage e podem ser exportados em JSON. As fotos permanecem na memória da sessão. Nome e e-mail são obrigatórios na GPT 0.3.
+A pessoa pode pausar as animações. O aplicativo também respeita a preferência de movimento reduzido.
+Os registros identificam a informação como percepção cidadã isolada e não confirmada. Não há banco compartilhado, inferência de imagem ou modelo preditivo em execução.
+DESTAQUES NA TELA:
+Sete etapas para escutar a cidade
+Intensidade do odor de 1 a 5
+Oito categorias ilustradas ganham movimento
+O cheiro pode estar só no ar
+Um pino marca sua percepção no mapa
+Seu relato pode ser revisado e exportado
+PERGUNTAS DOS VISITANTES:
+O que significa WAIND e como se fala? - Junta vento e inteligência artificial. Fale uáind, em uma palavra só.
+Como eu abro no meu celular? - Acesse o site no navegador ou leia um QR Code que aponte para ele. A demonstração está disponível no GitHub Pages.
+Preciso preencher meu nome e e-mail? - Sim, a GPT 0.3 exige esses campos e a confirmação de consentimento. Eles ficam com o relato neste navegador e entram na exportação que você baixar.
+Só posso contar um cheiro que estou sentindo agora? - Não. Você também pode lembrar uma ocorrência anterior, indicar quando aconteceu ou escolher apenas explorar o mapa.
+O que significa a escala de 1 a 5? - É a força do odor na sua percepção, de Muito fraco a Muito forte. Não é uma medição da concentração de uma substância.
+Posso escolher mais de um tipo de cheiro? - Sim. Há oito categorias, explicações no botão i e a opção Outros para descrever a percepção com suas palavras.
+E se o vento trouxer o cheiro e não aparecer nada na foto? - Você pode marcar que o cheiro está no ar, sem foco visível. A foto é opcional e a ausência de uma fonte visível não invalida sua percepção.
+A foto vai para algum servidor ou inteligência artificial? - Não nesta versão. Ela fica na sessão do navegador e não é enviada para análise, e o arquivo exportado leva apenas seus metadados.
+O celular sente o cheiro sozinho? - Não. Quem percebe o odor é a pessoa, e o celular ajuda a organizar o relato sem funcionar como sensor químico.
+O que aparece nas condições do ar? - Temperatura, umidade e velocidade do vento consultadas na Open-Meteo para a região. São informações meteorológicas de contexto, não medidas feitas pelo celular.
+As linhas de vento mostram para onde o cheiro está indo? - Não. Elas fazem parte da linguagem visual do WAIND, e esta versão não mede a direção do vento nem calcula a dispersão do odor.
+Se eu contar algo de ontem, o clima também será de ontem? - Não. O aplicativo identifica o clima como atual para não apresentá-lo como condição daquele episódio.
+Preciso autorizar o GPS? - Não. Você pode escolher o local manualmente no mapa, e o pino permite conferir o resumo do relato.
+Onde entra a inteligência artificial? - Ela apoiou a engenharia, a interface, o código e a organização dos dados. Modelos de análise de imagens e de previsão são possibilidades de pesquisa, não recursos executados nesta demonstração.
+Meu relato prova que um lugar está causando o cheiro? - Não. Ele registra uma percepção e pistas de contexto, enquanto comprovar uma causa exige avaliação técnica.
+Quem consegue ver os relatos que eu salvo? - Eles ficam neste navegador, sem formar um banco público compartilhado. Você pode baixar o JSON e escolher se quer compartilhá-lo, lembrando que ele inclui nome e e-mail.
+Por que o aplicativo parece um desenho em preto e branco? - O papel e o nanquim fazem parte da identidade autoral do projeto. As espirais dão forma ao invisível e a cor destaca a intensidade.
+Quem criou o projeto e o que vem depois? - Murillo Viçosa criou e desenvolveu o WAIND, com orientação de Cristian Vinicius Machado Fagundes e Mirkos Martins. Os próximos passos envolvem avaliação com participantes e investigação de coleta compartilhada e modelos validados.
+O QUE NÃO DIZER:
+Não afirmar que o celular possui sensor químico, nariz eletrônico ou capacidade de sentir cheiro sozinho.
+Não tratar relato cidadão como laudo oficial, perícia, prova de culpa ou identificação confirmada de uma fonte.
+Não atribuir responsabilidade a estabelecimentos, moradores, pessoas ou animais com base na percepção ou na foto.
+Não inventar rede neural treinada, visão computacional em produção, modelo de dispersão executando ou porcentagens de acerto.
+Não afirmar que existe um banco público compartilhado de relatos em tempo real.
+Não dizer que as fotos são enviadas a servidores externos ou analisadas por IA nesta versão.
+Não inventar outros autores ou trocar os nomes do integrante e dos orientadores.
+Não chamar espontaneamente o projeto de incompleto nem transformar a apresentação em uma lista de faltas.
+Explicar limites e próximos passos com clareza quando o visitante perguntar, sem esconder o armazenamento local.
+Reservar os termos API, LocalStorage, módulos JavaScript e DSR para quem pedir detalhes técnicos.
+Não dizer que nome e e-mail são opcionais na GPT 0.3.
+Não afirmar que a GPT 0.3 consulta direção do vento ou que a animação simula sua trajetória real.
+Não substituir as categorias publicadas por fumaça, mofo ou outras categorias ainda não implementadas.
+Não prometer conclusão em menos de um minuto como resultado medido ou garantido. A abertura é um convite para experimentar.
+PRONÚNCIA:
+WAIND = uáind: ao FALAR o nome do projeto, diga sempre "uáind" em uma palavra só, com som de "uái" seguido de "nd", rimando com a palavra inglesa "find". O nome junta Wind, vento, com AI, inteligência artificial. Nunca diga "vaind", nunca diga "uíndi" e nunca soletre as letras.
+UFN = u-éfe-êne.
+IACD = i-á-cê-dê.
+Studio I = estúdio um.
+DSR = dê-ésse-érre.
+OpenStreetMap = ôpen-strít-mép.
+Open-Meteo = ôpen-méteo.
+JSON = djêisson.
+GPS = gê-pê-ésse.
+LINK DO SITE: https://murillosvrj.github.io/mau-odor-ufn/
+INSTAGRAM DO PROJETO: não informado
+LINK DO REPOSITÓRIO: https://github.com/murillosvrj/mau-odor-ufn
+LINK DE DEMONSTRAÇÃO: https://murillosvrj.github.io/mau-odor-ufn/waind.html
+LINK DE VÍDEO: não informado

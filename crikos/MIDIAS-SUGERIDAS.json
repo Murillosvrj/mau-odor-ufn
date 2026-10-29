@@ -1,0 +1,71 @@
+{
+  "projeto": "WAIND",
+  "versao": "GPT 0.3",
+  "data": "2026-10-29",
+  "tipo": "Sugestão de roteiro e metadados, não importação validada do CRIKOS",
+  "midias": [
+    {
+      "arquivo": "01-waind-capa.png",
+      "tipo": "imagem gerada",
+      "tela": "Capa conceitual gerada nesta entrega. Não é um print do aplicativo.",
+      "legenda": "Capa ilustrada do WAIND, com marca editorial em nanquim, correntes de vento, um celular e um mapa urbano estilizado com pino âmbar. A composição apresenta o mapeamento participativo de odores urbanos e vento. É uma ilustração conceitual, não uma medição ou previsão de dispersão.",
+      "quando_mostrar": "quando apresentar o WAIND ou explicar o significado do nome",
+      "area": "cidades",
+      "chamada": "O invisível ganha um mapa"
+    },
+    {
+      "arquivo": "02-waind-boas-vindas-contexto.png",
+      "tipo": "print a capturar",
+      "tela": "Etapa 1 — O que o ar conta por aqui? Capture o panorama, os cards de data/hora, GPS e condições do ar. Se possível, inclua os campos de identificação e a confirmação de consentimento em uma captura de página inteira.",
+      "legenda": "Boas-vindas do WAIND: O que o ar conta por aqui? A tela apresenta a pesquisa no entorno da UFN, data e hora, GPS opcional e condições do ar com temperatura, umidade e velocidade do vento. Nome, e-mail e consentimento fazem parte do início da jornada.",
+      "quando_mostrar": "quando explicar como funciona, a identificação, o consentimento ou o clima",
+      "area": "cidades",
+      "chamada": "Sua percepção começa aqui"
+    },
+    {
+      "arquivo": "03-waind-intensidade.png",
+      "tipo": "print a capturar",
+      "tela": "Etapa 3 — Quão intenso está o odor? Selecione 3 — Intermediário. Enquadre os cinco slots, o nível selecionado, o medidor e a navegação.",
+      "legenda": "Escala de intensidade do WAIND, de 1 — Muito fraco a 5 — Muito forte. O nível 3 — Intermediário está selecionado, com cor e medidor correspondentes. A escolha representa a percepção da pessoa, não a concentração química do ar.",
+      "quando_mostrar": "quando falar da intensidade de 1 a 5 ou da força do incômodo",
+      "area": "cidades",
+      "chamada": "Quanto esse cheiro incomoda?"
+    },
+    {
+      "arquivo": "04-waind-tipos-de-odor.png",
+      "tipo": "print a capturar",
+      "tela": "Etapa 4 — Com o que o odor se parece? Selecione Resíduos e capture a grade inteira com as oito ilustrações e botões i. Use uma janela larga para caberem duas linhas de quatro cards.",
+      "legenda": "Oito categorias ilustradas do WAIND: Resíduos, Contentor de lixo, Esgoto, Valas a céu aberto, Resíduos orgânicos alimentares, Resíduos metabólicos, Resíduos químicos e Outros. A tela permite múltiplas escolhas e oferece explicações no botão i. Nesta captura, Resíduos está selecionado.",
+      "quando_mostrar": "quando falar das oito categorias, dos tipos de cheiro ou das ilustrações",
+      "area": "cidades",
+      "chamada": "Que cheiro é esse?"
+    },
+    {
+      "arquivo": "05-waind-foto-cheiro-no-ar.png",
+      "tipo": "print a capturar",
+      "tela": "Etapa 5 — O que a câmera pode ver? Mantenha sem foto e marque O cheiro está no ar, mas não há foco visível na foto. Mostre o scanner, Tirar foto, Escolher da galeria e o checkbox.",
+      "legenda": "Etapa opcional de fotografia do WAIND, com visor geométrico, câmera e galeria. A opção O cheiro está no ar, mas não há foco visível na foto está marcada. A pessoa pode continuar sem imagem, e fotos escolhidas ficam somente na sessão do navegador.",
+      "quando_mostrar": "quando falar de foto, câmera, privacidade ou cheiro trazido pelo vento",
+      "area": "cidades",
+      "chamada": "Cheiro nem sempre aparece"
+    },
+    {
+      "arquivo": "06-waind-mapa-pino-resumo.png",
+      "tipo": "print a capturar",
+      "tela": "Etapa 7 — Adicionar um local no mapa. Com os dados fictícios de intensidade 3 e categoria Resíduos, coloque um pino no entorno da UFN e toque nele para abrir o resumo. Role a página para enquadrar o mapa, o balão e a atribuição OpenStreetMap.",
+      "legenda": "Mapa geográfico em preto e branco do entorno da UFN, em Santa Maria, com base OpenStreetMap. Um pino indicado manualmente abre o resumo da percepção, com intensidade 3 de 5 e categoria Resíduos. O ponto representa o local informado, não uma fonte de odor comprovada.",
+      "quando_mostrar": "quando falar do mapa da UFN, do pino de localização ou do resumo do relato",
+      "area": "cidades",
+      "chamada": "Dê lugar à percepção"
+    },
+    {
+      "arquivo": "07-waind-demonstracao.mp4",
+      "tipo": "vídeo a gravar",
+      "tela": "Grave a jornada da capa à confirmação de salvamento local, incluindo triagem, intensidade, categorias, foto opcional, pistas, mapa, resumo no pino e revisão. Use dados fictícios.",
+      "legenda": "Demonstração gravada do WAIND GPT 0.3: a marca ganha movimento e o visitante percorre as etapas, escolhe a intensidade e o tipo de odor, marca o local no mapa e revisa o relato. O exemplo usa dados fictícios e termina com salvamento somente no navegador.",
+      "quando_mostrar": "quando pedir uma demonstração completa ou perguntar como usar o aplicativo",
+      "area": "cidades",
+      "chamada": "Veja o WAIND em ação"
+    }
+  ]
+}
