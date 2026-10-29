@@ -78,13 +78,17 @@
     openDialog($('#info-dialog'));
   }
   $$('[data-info]').forEach(button => button.addEventListener('click', () => showInfo(button.dataset.info)));
-  $$('[data-intensity-info]').forEach(button=>button.addEventListener('click',event=>{
+  $$('[data-intensity-info]').forEach(button=>{
+    button.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();button.focus({preventScroll:true});});
+    button.addEventListener('pointerup',event=>event.stopPropagation());
+    button.addEventListener('click',event=>{
     event.preventDefault();event.stopPropagation();
     const i=Number(button.dataset.intensityInfo)-1;
     $('#info-title').textContent=`${i+1} — ${levels[i].name}`;
     $('#info-body').replaceChildren(Object.assign(document.createElement('p'),{textContent:intensityDescriptions[i]}));
     openDialog($('#info-dialog'));
-  }));
+    });
+  });
   $$('[data-about]').forEach(button => button.addEventListener('click', () => showInfo('about')));
 
   function updateSummary() {

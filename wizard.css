@@ -101,8 +101,18 @@ html{overflow-x:clip}
 .permission-actions { margin:12px 0; }
 .permission-actions .text-button { text-align:left; }
 .camera-status { font-size:13px; line-height:1.7; margin-top:16px; }
-.intensity-card { position:relative; min-width:0; }
+.intensity-card { position:relative; min-width:0; transform:translateY(0); transform-origin:center; transition:transform .55s cubic-bezier(.34,1.56,.64,1); }
 .intensity-card .intensity-option { display:block; height:100%; }
-.intensity-card .intensity-key { padding-top:24px; }
-.intensity-card .intensity-info { position:absolute; z-index:3; right:6px; top:6px; width:24px; height:24px; min-width:24px; background:var(--paper,#FAF8F5); }
-@media(max-width:480px){.intensity-card .intensity-info {right:4px;top:4px;width:22px;height:22px;min-width:22px;} }
+.intensity-card .intensity-key { padding-top:32px; }
+.intensity-card .intensity-info { position:absolute; z-index:3; left:6px; right:auto; top:6px; width:24px; height:24px; min-width:24px; transform:none; background:var(--paper,#FAF8F5); }
+.intensity-card .selected-mark { left:auto; right:8px; top:6px; width:20px; height:20px; font-size:12px; line-height:20px; text-align:center; }
+/* One moving shell contains the radio, number window, check and info button. */
+.wizard-screen .intensity-card .intensity-key,
+.wizard-screen .intensity-card .intensity-option:hover .intensity-key,
+.wizard-screen .intensity-card .intensity-option input:checked + .intensity-key { transform:none; }
+.wizard-screen .intensity-card:has(input:checked) { transform:translateY(-3px); }
+@media(hover:hover) and (pointer:fine){
+  .wizard-screen .intensity-card:hover { transform:translateY(-4px) scale(1.015); }
+}
+.wizard-screen .intensity-card:active { transform:translateY(-1px) scale(.985); }
+@media(max-width:480px){.wizard-screen .intensity-card .intensity-key {height:132px;} .intensity-card .intensity-info {left:4px;right:auto;top:4px;} .intensity-card .selected-mark {right:5px;top:4px;} }

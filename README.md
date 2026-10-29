@@ -4,6 +4,12 @@ Protótipo de um sistema participativo de monitoramento e análise de mau odor u
 
 [Abrir WAIND](https://murillosvrj.github.io/mau-odor-ufn/)
 
+## GPT 0.4 — 29/10/2026
+
+Os botões de informação das intensidades ficam no canto superior esquerdo; o check colorido permanece livre à direita. O contêiner inteiro se move em hover, pressão e seleção, levando caixa, janela do número, check e “i” juntos. A rolagem interna dos números permanece. Clique, toque e teclado no “i” abrem somente o diálogo, sem selecionar ou trocar a intensidade. O topo dos cards tem espaço reservado para os dois controles, incluindo telas estreitas.
+
+Validado em 1365, 390 e 320 px, com movimento normal e reduzido, amostragem de posições durante animações e isolamento de clique/toque/teclado. A GPT 0.4 preserva GPS/endereço/clima, câmera/galeria, oito ilustrações, mapa vetorial hachurado, roda/pinça e calor dos relatos locais. A entrega modular e o HTML autocontido são recompilados juntos.
+
 ## O que funciona
 
 - Capa WAIND com emblema vetorial em nanquim; sete etapas com navegação inferior e progresso.
