@@ -8,6 +8,13 @@
     {name:'Intermediário',color:'#D97706'}, {name:'Forte',color:'#EA580C'},
     {name:'Muito forte',color:'#DC2626'}
   ];
+  const intensityDescriptions = [
+    'Odor sutil e quase imperceptível, sentido apenas com atenção ou em breves passagens de vento, sem causar desconforto relevante.',
+    'Odor leve, reconhecível ao passar pelo local, mas facilmente tolerável no trajeto.',
+    'Odor nítido e persistente no ar, que já causa incômodo moderado a quem circula ou permanece por perto.',
+    'Odor intenso e desagradável que chama atenção imediata e dá vontade de prender a respiração ou apressar o passo.',
+    'Odor extremo e sufocante, tornando muito desconfortável permanecer no local mesmo por poucos instantes.'
+  ];
   const types = [
     {id:'waste',label:'Resíduos',description:'Odor que lembra lixo ou resíduos acumulados, espalhados ou ensacados. Se você vê um contentor, pode selecionar essa categoria também. A escolha descreve sua percepção; não confirma a origem do cheiro.'},
     {id:'container',label:'Contentor de lixo',sub:'Containers',description:'Odor percebido próximo a um recipiente coletivo de armazenamento de lixo. Selecione quando houver essa associação na sua percepção. A proximidade do recipiente, por si só, não comprova que ele seja a fonte.'},
@@ -36,7 +43,7 @@
   $('#hero-art').innerHTML = OdorArt.hero();
   $('#wind-art').innerHTML = OdorArt.wind();
   $('#note-art').innerHTML = `<svg class="empty-illustration" viewBox="0 0 220 140" aria-hidden="true"><g stroke-width=".8"><ellipse cx="110" cy="76" rx="67" ry="50" stroke-dasharray="2 5"/><circle cx="110" cy="76" r="38"/><circle cx="110" cy="76" r="31"/><path d="M20 76h44m92 0h44M110 8v28m0 81v19M61 28l17 17m64 63 17 17M163 25l-17 18M57 122l19-18" stroke-dasharray="3 5"/><path d="M32 98C65 98 64 46 111 46c43 0 61 52 21 64-33 10-56-30-28-42 21-9 37 17 18 23-11 4-18-9-9-12" stroke-width="1.3"/><path d="M28 103C65 106 63 40 112 40c52 0 69 63 22 76-41 12-66-35-32-54 28-15 52 22 24 35M28 108C65 114 66 35 113 35c58 0 76 72 23 87M29 113C56 118 67 101 75 84M32 119c20 4 32-8 38-19"/><path d="m110 11-4 13h8Z" fill="#111"/><circle cx="34" cy="77" r="2"/><circle cx="183" cy="76" r="2"/><circle cx="64" cy="31" r="1"/><circle cx="169" cy="120" r="1"/><path d="m173 33 4 4m0-4-4 4M50 120l3 3m0-3-3 3"/></g></svg>`;
-  $('#intensity-options').innerHTML = levels.map((level,i) => `<label class="intensity-option" style="--level-color:${level.color}"><input type="radio" name="intensity" value="${i+1}" aria-label="${i+1}. ${level.name}" required><span class="intensity-key"><span class="selected-mark" aria-hidden="true">✓</span><span class="slot-window" aria-hidden="true"><span class="slot-track"><span>${i+1}</span><span>${i+1}</span></span></span><span class="level-label">${level.name}</span><span class="level-tick" aria-hidden="true"></span></span></label>`).join('');
+  $('#intensity-options').innerHTML = levels.map((level,i) => `<div class="intensity-card" style="--level-color:${level.color}"><label class="intensity-option"><input type="radio" name="intensity" value="${i+1}" aria-label="${i+1}. ${level.name}" required><span class="intensity-key"><span class="selected-mark" aria-hidden="true">✓</span><span class="slot-window" aria-hidden="true"><span class="slot-track"><span>${i+1}</span><span>${i+1}</span></span></span><span class="level-label">${level.name}</span><span class="level-tick" aria-hidden="true"></span></span></label><button type="button" class="info-button intensity-info" data-intensity-info="${i+1}" aria-label="Informações sobre intensidade ${i+1}: ${level.name}">i</button></div>`).join('');
   $('#odor-options').innerHTML = types.map((type,i) => `<div class="odor-card" data-kind="${type.id}"><label class="odor-choice"><input type="checkbox" name="odor" value="${type.id}"><span class="card-topline"><span class="card-index" aria-hidden="true">0${i+1}</span><span class="card-checkbox" aria-hidden="true"></span></span><span class="card-art" aria-hidden="true">${OdorArt.icon(type.id)}</span><span class="card-label">${type.label}</span>${type.sub?`<span class="card-sublabel">${type.sub}</span>`:''}</label><button type="button" class="info-button" data-info="${type.id}" aria-label="Informações sobre ${type.label}">i</button></div>`).join('');
   $('#context-tags').innerHTML = tags.map((tag,i) => `<label class="tag"><input type="checkbox" name="tag" value="${i}"><span>${tag}</span></label>`).join('');
 
@@ -71,6 +78,13 @@
     openDialog($('#info-dialog'));
   }
   $$('[data-info]').forEach(button => button.addEventListener('click', () => showInfo(button.dataset.info)));
+  $$('[data-intensity-info]').forEach(button=>button.addEventListener('click',event=>{
+    event.preventDefault();event.stopPropagation();
+    const i=Number(button.dataset.intensityInfo)-1;
+    $('#info-title').textContent=`${i+1} — ${levels[i].name}`;
+    $('#info-body').replaceChildren(Object.assign(document.createElement('p'),{textContent:intensityDescriptions[i]}));
+    openDialog($('#info-dialog'));
+  }));
   $$('[data-about]').forEach(button => button.addEventListener('click', () => showInfo('about')));
 
   function updateSummary() {
@@ -310,6 +324,7 @@
     ai:{computerVisionExecuted:false,predictionExecuted:false},storage:'browser-local',prototype:true
   };}
   function renderRecords(){
+    window.dispatchEvent(new Event('waind:records'));
     $('#local-count').textContent=String(records.length).padStart(2,'0');$('#export-records').disabled=!records.length;$('#clear-records').hidden=!records.length;
     $('#records-description').textContent=records.length?'Relatos locais de percepção · fotos não armazenadas · exportação disponível.':'Os registros que você salvar ficam disponíveis aqui.';
     $('#local-record-list').innerHTML=records.slice(-3).reverse().map(report=>{
@@ -338,6 +353,7 @@
 
   window.WaindApp = {
     state, levels, types, showToast, showInfo, createReport, fetchWeather,
+    getRecords:()=>records.map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),
     getPhotoURL:()=>photoURL,
     save(report){
       if(records.length>=100){showToast('Este caderno chegou a 100 relatos. Exporte os registros antes de limpar espaço.');return false;}

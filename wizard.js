@@ -1,13 +1,13 @@
 (() => {
   'use strict';
   const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], app=window.WaindApp;
-  let step='0', pinMap=null, manualLocation=null, mode=null, pending=null, saved=false, resetting=false;
+  let step='0', pinMap=null, manualLocation=null, mode=null, pending=null, saved=false, resetting=false, mapGpsAttempted=false;
   const value=name=>$(`input[name="${name}"]:checked`)?.value;
   const isPast=()=>value('screening')==='no'&&value('past-choice')==='yes';
   const exploring=()=>value('screening')==='no'&&value('past-choice')==='no';
   const dateLocal=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date()).replace(' ','T');
   const route=()=>value('screening')==='no' ? (exploring()?['1','2','past','7']:['1','2','past','3','4','5','6','7']) : ['1','2','3','4','5','6','7'];
-  const names={'1':'Quem somos','2':'Sua percepção',past:'Uma ocorrência anterior','3':'Intensidade','4':'Tipo de odor','5':'Fotografia','6':'Por perto','7':'Localização e revisão'};
+  const names={'1':'Início e contexto','2':'Sua percepção',past:'Uma ocorrência anterior','3':'Intensidade','4':'Tipo de odor','5':'Fotografia','6':'Por perto','7':'Localização e revisão'};
   WaindBrand.mount($('#enter-waind'));
   $('.screening-art').innerHTML=OdorArt.wind();
   $('#occurred-at').max=dateLocal();
@@ -18,6 +18,7 @@
   }
   const hints={'1':'Preencha nome e e-mail e confirme os dados.','2':'Escolha a opção que descreve este momento.',past:'Escolha uma opção e, se for registrar, indique quando aconteceu.','3':'Selecione uma intensidade para continuar.','4':'Selecione um tipo; para Outros, descreva o cheiro.','5':'Aguarde o carregamento da fotografia.','7':'Escolha GPS ou marque um local no mapa.'};
   function updateNavigation(){
+    $('#nav-caption').hidden=step==='1';
     if(step==='0')return;
     const okay=valid();$('#next-step').disabled=!okay;
     $('#step-hint').textContent=okay?(step==='7'?(exploring()?'Explore livremente. Nenhum relato será criado.':saved?'Registro salvo neste navegador.':'Revise os dados antes de enviar.'): 'Suas escolhas são mantidas ao voltar.'):hints[step]||'';
@@ -63,7 +64,7 @@
     if(WaindMotion.busy)return;
     if(!valid())return;
     if(step==='7'){if(saved){restart();return;}if(exploring()){navigate('0');return;}if(!$('#review-panel').hidden){save();return;}review();return;}
-    const r=route();navigate(r[r.indexOf(step)+1]||'7');
+    const r=route(),next=r[r.indexOf(step)+1]||'7';if(next==='7')requestMapGps();navigate(next);
   }
   function closeReview(animated=true){
     const change=()=>{pending=null;$('#review-panel').hidden=true;$('#location-panel').hidden=false;updateNavigation();pinMap?.refresh();};
@@ -77,14 +78,25 @@
     return `${address}Lat: ${loc.latitude.toFixed(5)} · Long: ${loc.longitude.toFixed(5)} · ${loc.source==='device-gps'?`GPS, precisão estimada ±${loc.accuracyMeters} m`:'pin indicado no mapa'}`;
   }
   function summary(){return [['Quando',isPast()?$('#occurred-at').value.replace('T',' ')+' · ocorrência anterior':'Percepção neste momento'],['Intensidade',app.state.intensity?`${app.state.intensity}/5 — ${app.levels[app.state.intensity-1].name}`:'A escolher'],['Tipo de odor',app.types.filter(t=>app.state.types.has(t.id)).map(t=>t.label).join(', ')||'A escolher'],...app.state.types.has('other')?[['Outro odor',$('#other-text').value.trim()]]:[],['Fotografia',app.state.photo?'Foto adicionada · nesta sessão':'Sem fotografia'],['Odor no ar',$('#invisible-source').checked?'Sem foco visível informado':'Não especificado'],['Por perto',[...app.state.tags].map(i=>['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'][i]).join(', ')||'Não informado'],['Observação',$('#observation').value.trim()||'Sem observação'],['Clima',weatherText()]];}
-  function ensureMap(){if(!pinMap){pinMap=WaindPin.mount($('#pin-map'),{initialCenter:app.state.gpsLocation,onChange(loc){manualLocation=loc;app.state.location=loc;pending=null;$('#location-error').hidden=true;updateNavigation();if(!exploring())app.fetchWeather(loc.latitude,loc.longitude,'manual-region');},getSummary:()=>exploring()?[['Exploração','Nenhum relato será salvo.']]:summary(),getPhotoURL:()=>exploring()?null:app.getPhotoURL()});}pinMap.refresh();}
+  function requestMapGps(){if(mapGpsAttempted||app.state.gpsLocation||$('#locate').disabled)return;mapGpsAttempted=true;$('#locate').click();}
+  function ensureMap(){
+    if(!pinMap){pinMap=WaindPin.mount($('#pin-map'),{
+      initialCenter:app.state.gpsLocation,getGpsLocation:()=>app.state.gpsLocation,getGpsPending:()=>$('#locate').disabled&&!app.state.location,
+      getRecords:()=>app.getRecords(),getLevels:()=>app.levels,
+      getPreview:()=>!saved&&!exploring()&&app.state.intensity?{intensity:app.state.intensity,location:app.state.location}:null,
+      onChange(loc){if(!exploring()){mode='pin';$('input[name="location-mode"][value="pin"]').checked=true;manualLocation=loc;app.state.location=loc;pending=null;$('#location-error').hidden=true;updateNavigation();app.fetchWeather(loc.latitude,loc.longitude,'manual-region');}},
+      getSummary:()=>exploring()?[['Exploração','Nenhum relato será salvo.']]:summary(),getPhotoURL:()=>exploring()?null:app.getPhotoURL(),
+      categoryLabel:id=>app.types.find(t=>t.id===id)?.label||id
+    });}
+    pinMap.refresh();requestMapGps();
+  }
   function setupLocation(){
     const explore=exploring();$('.location-choices').hidden=explore;$('#review-open').hidden=explore;$('#location-intro').textContent=explore?'Explore Santa Maria e região. Para registrar uma percepção, volte às perguntas.':isPast()?'Marque onde aconteceu a ocorrência anterior em Santa Maria e região. Sua localização atual pode ser diferente.':'Confirme onde você percebeu o odor em Santa Maria e região.';
     $('#place-title').innerHTML=explore?'Um olhar sobre <em>o território.</em>':'Onde o ar contou <em>essa história?</em>';
-    $('#past-place-confirm').hidden=!isPast();$('#gps-final').hidden=explore||mode!=='gps';$('#manual-map-panel').hidden=!explore&&mode!=='pin';
-    if(explore||mode==='pin')ensureMap();
+    $('#past-place-confirm').hidden=!isPast();$('#gps-final').hidden=explore||mode!=='gps';$('#manual-map-panel').hidden=false;
     const gps=app.state.gpsLocation;$('#gps-final-status').textContent=locationText(gps);$('#gps-choice-detail').textContent=gps?locationText(gps):'Capturar ou usar o GPS autorizado.';
     if(mode==='gps')app.state.location=gps||null;else if(mode==='pin')app.state.location=manualLocation;
+    ensureMap();if(mode==='gps')pinMap.setLocation(gps||null);else if(mode==='pin')pinMap.setLocation(manualLocation);else pinMap.setLocation(null);
     const loc=app.state.location;if(!explore&&loc)app.fetchWeather(loc.latitude,loc.longitude,mode==='gps'?'device-region':'manual-region');
   }
   function review(){
@@ -101,7 +113,7 @@
     withWind(()=>{$('#review-panel').hidden=false;$('#location-panel').hidden=true;window.scrollTo({top:0,behavior:'instant'});updateNavigation();});
   }
   function save(){if(WaindMotion.busy||!pending||saved)return;if(app.save(pending))withWind(()=>{saved=true;$('#saved-reference').textContent=`Registro ${pending.id.slice(0,8)} · salvo localmente`;pending=null;$('#review-panel').hidden=true;$('#location-panel').hidden=true;$('#success-panel').hidden=false;$('#records-wrap').hidden=false;window.scrollTo({top:0,behavior:'instant'});updateNavigation();});}
-  function restart(){withWind(()=>{resetting=true;pinMap?.destroy?.();pinMap=null;manualLocation=null;mode=null;pending=null;saved=false;app.reset();$('#past-time-field').hidden=true;$('#success-panel').hidden=true;$('#review-panel').hidden=true;$('#location-panel').hidden=false;resetting=false;navigate('1',{animated:false});});}
+  function restart(){withWind(()=>{resetting=true;mapGpsAttempted=false;pinMap?.destroy?.();pinMap=null;manualLocation=null;mode=null;pending=null;saved=false;app.reset();$('#past-time-field').hidden=true;$('#success-panel').hidden=true;$('#review-panel').hidden=true;$('#location-panel').hidden=false;resetting=false;navigate('1',{animated:false});});}
   $('#enter-waind').addEventListener('click',()=>navigate('1'));$('#home-waind').addEventListener('click',()=>navigate('0'));$('#back-step').addEventListener('click',back);$('#next-step').addEventListener('click',advance);
   $('#odor-form').addEventListener('submit',e=>{e.preventDefault();advance();});
   $('#odor-form').addEventListener('input',()=>{if(!resetting){pending=null;updateNavigation();}});
@@ -111,7 +123,9 @@
   window.addEventListener('waind:gps',()=>{if(mode==='gps')app.state.location=app.state.gpsLocation;if(!manualLocation)pinMap?.centerOn(app.state.gpsLocation);if(step==='7')setupLocation();updateNavigation();});
   window.addEventListener('waind:gps-error',()=>{
     $('#gps-final-help').hidden=$('#location-help').hidden;$('#gps-final-help').textContent=$('#location-help').textContent;
+    pinMap?.refresh();
   });
+  window.addEventListener('waind:records',()=>pinMap?.refresh());
   window.addEventListener('waind:change',()=>{updateNavigation();if(step==='7')pinMap?.refresh();});
   function editStep(dest){withWind(()=>{closeReview(false);navigate(dest,{animated:false});});}
   $('#review-open').addEventListener('click',review);$('#edit-report').addEventListener('click',()=>editStep('3'));$('#save-report').addEventListener('click',save);$('#new-report').addEventListener('click',restart);

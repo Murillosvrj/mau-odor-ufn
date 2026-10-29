@@ -1,182 +1,125 @@
-/* WAIND: seleção geográfica real. Tiles OSM somente para a área visível.
-   API: mount(element,{onChange,getSummary,getPhotoURL}) → refresh/setLocation/getLocation/destroy.
-   setLocation é silencioso, preserva a precisão do GPS. O pin manual não tem precisão medida. */
+/* Real vector geography; local-only heat and markers. MapLibre GL JS / OpenFreeMap. */
 (() => {
   'use strict';
-  let serial = 0;
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const radians = Math.PI / 180;
-  const home = {latitude:-29.6868, longitude:-53.8149};
-  function project(latitude, longitude, zoom) {
-    const size = 256 * 2 ** zoom, sin = Math.sin(clamp(latitude,-85.05112878,85.05112878) * radians);
-    return {x:(longitude + 180) / 360 * size, y:(.5 - Math.log((1 + sin)/(1 - sin)) / (4 * Math.PI)) * size};
+  const HOME={latitude:-29.6868,longitude:-53.8149},clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const valid=p=>p&&Number.isFinite(p.latitude)&&Number.isFinite(p.longitude)&&Math.abs(p.latitude)<=85&&Math.abs(p.longitude)<=180;
+  const xy=(p,z)=>{const n=512*2**z,s=Math.sin(p.latitude*Math.PI/180);return{x:(p.longitude+180)/360*n,y:(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n};};
+  const ll=(p,z)=>{const n=512*2**z;return{longitude:((p.x/n*360)%360+360)%360-180,latitude:Math.atan(Math.sinh(Math.PI*(1-2*clamp(p.y,0,n)/n)))*180/Math.PI};};
+  function style(){
+    const source='openmaptiles',roadFilter=['match',['get','class'],['motorway','trunk','primary','secondary','tertiary','minor','service','track','path'],true,false];
+    const roadWidth=['interpolate',['linear'],['zoom'],10,.6,14,2,16,7,19,26];
+    // Explicit allowlist: no inherited POI, shield, house number, building label,
+    // sprite or icon layers can leak through a provider style update.
+    return {version:8,glyphs:'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',sources:{openmaptiles:{type:'vector',url:'https://tiles.openfreemap.org/planet'}},layers:[
+      {id:'paper',type:'background',paint:{'background-color':'#FAF8F5'}},
+      {id:'blocks',type:'fill',source,'source-layer':'landuse',paint:{'fill-color':'#F6F3EE','fill-opacity':.8}},
+      {id:'landcover',type:'fill',source,'source-layer':'landcover',paint:{'fill-color':'#EFEBE3','fill-opacity':.28}},
+      {id:'parks',type:'fill',source,'source-layer':'park',paint:{'fill-color':'#EAE7DF','fill-opacity':.5}},
+      {id:'water-paper',type:'fill',source,'source-layer':'water',paint:{'fill-color':'#E3E0D8','fill-outline-color':'#B8B2A8'}},
+      {id:'water-lines',type:'line',source,'source-layer':'waterway',paint:{'line-color':'#B8B2A8','line-width':.7}},
+      {id:'building-paper',type:'fill',source,'source-layer':'building',minzoom:13,paint:{'fill-color':'#F1EDE5'}},
+      {id:'building-hatch',type:'fill',source,'source-layer':'building',minzoom:14,paint:{'fill-pattern':'odor-map-building-hatch','fill-opacity':.65}},
+      {id:'building-outline',type:'line',source,'source-layer':'building',minzoom:13,paint:{'line-color':'#8F887C','line-opacity':.65,'line-width':['interpolate',['linear'],['zoom'],13,.35,17,.8]}},
+      {id:'street-edges',type:'line',source,'source-layer':'transportation',filter:roadFilter,layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#B8B2A8','line-width':['interpolate',['linear'],['zoom'],10,1.6,14,3,16,8,19,27]}},
+      {id:'street-paper',type:'line',source,'source-layer':'transportation',filter:roadFilter,layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':'#FAF8F5','line-width':roadWidth}},
+      {id:'street-names',type:'symbol',source,'source-layer':'transportation_name',minzoom:15,filter:['all',['has','name'],roadFilter],layout:{'symbol-placement':'line','text-field':['coalesce',['get','name:pt'],['get','name']],'text-font':['Noto Sans Regular'],'text-size':['interpolate',['linear'],['zoom'],15,10,18,12],'text-letter-spacing':.035,'text-max-angle':30,'text-padding':12},paint:{'text-color':'#5C564C','text-halo-color':'#FAF8F5','text-halo-width':1.5}}
+    ]};
   }
-  function unproject(x, y, zoom) {
-    const size = 256 * 2 ** zoom;
-    return {latitude:Math.atan(Math.sinh(Math.PI * (1 - 2 * clamp(y,0,size)/size))) / radians,
-      longitude:((x / size * 360) % 360 + 360) % 360 - 180};
+  function hatch(){
+    const c=document.createElement('canvas');c.width=40;c.height=16;const ctx=c.getContext('2d');ctx.strokeStyle='#8F887C';ctx.lineWidth=.55;
+    for(let y=-16;y<=48;y+=4){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(40,y-16);ctx.stroke();}return ctx.getImageData(0,0,40,16);
   }
-  function mount(element, options = {}) {
-    if (typeof element === 'string') element = document.querySelector(element);
-    if (!element) throw new Error('WAIND: elemento do mapa não encontrado.');
-    const uid = `waind-pin-${++serial}`;
-    const host = document.createElement('section'); host.className = 'waind-pin';
-    host.setAttribute('aria-label','Escolher o local da ocorrência no mapa');
-    host.innerHTML = `<div class="pin-heading"><strong>Um ponto no território.</strong><span>SANTA MARIA E REGIÃO / RS</span></div>
-      <div class="pin-viewport" role="region" tabindex="0" aria-label="Mapa geográfico para posicionar o pin" aria-describedby="${uid}-help">
-        <div class="pin-base pin-tiles" aria-hidden="true"></div>
-        <div class="pin-crosshair" aria-hidden="true"></div>
-        <div class="pin-north" aria-hidden="true"><svg viewBox="0 0 38 55"><circle cx="19" cy="30" r="15" stroke-dasharray="2 3"/><circle cx="19" cy="30" r="11"/><path d="M19 13v34M2 30h34M19 16l4 14h-8z"/><path d="M19 16v14h4z" fill="#49443c"/><text x="19" y="8" text-anchor="middle">N</text></svg></div>
-        <div class="pin-controls" aria-label="Controles do mapa"><button type="button" data-pin-action="plus" aria-label="Ampliar mapa">+</button><button type="button" data-pin-action="minus" aria-label="Reduzir mapa">−</button><button type="button" data-pin-action="home" aria-label="Visão geral de Santa Maria">⌂</button></div>
-        <button type="button" class="pin-marker" aria-label="Abrir resumo no pin da ocorrência" aria-expanded="false" aria-controls="${uid}-popup" hidden><svg viewBox="0 0 48 55" aria-hidden="true"><ellipse class="pin-ring" cx="24" cy="49" rx="16" ry="4"/><path d="M24 49C19 40 9 31 9 21a15 15 0 0 1 30 0c0 10-10 19-15 28Z" fill="#fff" stroke="currentColor" stroke-width="1.6"/><path d="M13 22c1 8 7 16 11 23M16 23c1 6 5 13 8 18M19 24c1 5 3 9 5 13" fill="none" stroke="currentColor" stroke-width=".65"/><circle cx="24" cy="20" r="5" fill="currentColor"/><circle cx="24" cy="20" r="9" fill="none" stroke="currentColor" stroke-width=".6"/></svg></button>
-        <aside class="pin-popup" id="${uid}-popup" aria-label="Resumo da ocorrência neste pin" hidden><button type="button" class="pin-popup-close" aria-label="Fechar resumo do pin">×</button><p class="pin-caption">SEU RELATO / NESTE PONTO</p><h3>O que você percebeu.</h3><dl></dl><img alt="Foto selecionada para esta ocorrência" hidden></aside>
-        <p class="pin-error" hidden></p>
-        <div class="pin-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</div>
-      </div>
-      <div class="pin-actions"><button type="button" class="button button-ink" data-pin-action="place">Marcar no centro da mira</button><span class="pin-coordinates">Nenhum pin confirmado.</span></div>
-      <p class="pin-help" id="${uid}-help">Toque no mapa para marcar. Arraste para mover; use + e − para ampliar. Com o mapa em foco, use as setas e Enter para marcar na mira. Toque no pin para ler seu resumo.</p>
-      <details class="pin-coordinate-entry"><summary>Informar coordenadas manualmente</summary><p>Use coordenadas conhecidas do local, inclusive quando o mapa estiver indisponível.</p><div><label for="${uid}-lat">Latitude<input id="${uid}-lat" type="number" step="any" min="-85" max="85" placeholder="−29.68380" inputmode="decimal"></label><label for="${uid}-lon">Longitude<input id="${uid}-lon" type="number" step="any" min="-180" max="180" placeholder="−53.81050" inputmode="decimal"></label></div><button class="button button-outline" type="button" data-pin-action="coordinates">Confirmar coordenadas</button></details>
-      <p class="pin-map-status" role="status" aria-live="polite"></p>`;
-    element.replaceChildren(host);
-    const find = q => host.querySelector(q);
-    const viewport=find('.pin-viewport'), tiles=find('.pin-tiles'), marker=find('.pin-marker'), popup=find('.pin-popup'), status=find('.pin-map-status'), error=find('.pin-error');
-    const latitudeInput=find(`#${uid}-lat`), longitudeInput=find(`#${uid}-lon`);
-    const initial=options.initialCenter||home;
-    let zoom=options.initialCenter?15:12, center=project(initial.latitude,initial.longitude,zoom), width=0, height=0, location=null, drag=null, frame=0, destroyed=false;
-    const tileCache=new Map();
-    function visible() {return !destroyed && host.isConnected && host.getClientRects().length>0 && !document.hidden;}
-    function tileHealth() {
-      if(!visible())return;
-      const shown=[...tiles.children];
-      const loaded=shown.filter(img=>img.dataset.state==='loaded').length;
-      const failed=shown.filter(img=>img.dataset.state==='error').length;
-      error.hidden = failed===0 || loaded===shown.length;
-      error.textContent = loaded ? 'Parte do mapa não carregou. Confira o local antes de marcar.' : 'Mapa indisponível. Verifique a conexão ou informe coordenadas conhecidas abaixo.';
+  function mount(element,options={}){
+    if(typeof element==='string')element=document.querySelector(element);if(!element)throw new Error('Elemento do mapa não encontrado.');
+    const host=document.createElement('section');host.className='waind-pin';host.setAttribute('aria-label','Mapa de percepções em Santa Maria e região');
+    host.innerHTML=`<div class="pin-heading"><strong>Um ponto no território.</strong><span>SANTA MARIA E REGIÃO / RS</span></div>
+      <div class="pin-viewport" role="region" tabindex="0" aria-label="Mapa geográfico: arraste, use a roda ou faça pinça para ampliar">
+        <div class="pin-vector"></div><canvas class="pin-heat" aria-hidden="true"></canvas><div class="pin-record-points"></div><p class="pin-gps-wait" role="status" hidden>Localizando sua posição…<br><small>Você também pode informar coordenadas conhecidas abaixo.</small></p>
+        <div class="pin-crosshair" aria-hidden="true"></div><div class="pin-north" aria-hidden="true"><svg viewBox="0 0 38 55"><circle cx="19" cy="30" r="15" stroke-dasharray="2 3"/><path d="M19 13v34M2 30h34M19 16l4 14h-8z"/><text x="19" y="8" text-anchor="middle">N</text></svg></div>
+        <div class="pin-controls" aria-label="Controles do mapa"><button type="button" data-pin-action="plus" aria-label="Ampliar mapa">+</button><button type="button" data-pin-action="minus" aria-label="Reduzir mapa">−</button><button type="button" data-pin-action="home" aria-label="Voltar à minha localização ou a Santa Maria">⌂</button></div>
+        <button type="button" class="pin-marker" aria-label="Abrir resumo do pino atual" aria-expanded="false" hidden><svg viewBox="0 0 48 55" aria-hidden="true"><ellipse class="pin-ring" cx="24" cy="49" rx="16" ry="4"/><path d="M24 49C19 40 9 31 9 21a15 15 0 0 1 30 0c0 10-10 19-15 28Z" fill="#fff" stroke="currentColor" stroke-width="1.6"/><path d="M13 22c1 8 7 16 11 23M16 23c1 6 5 13 8 18M19 24c1 5 3 9 5 13" fill="none" stroke="currentColor" stroke-width=".65"/><circle cx="24" cy="20" r="5" fill="currentColor"/></svg></button>
+        <aside class="pin-popup" hidden><button type="button" class="pin-popup-close" aria-label="Fechar resumo do pin">×</button><p class="pin-caption"></p><h3>O que foi percebido.</h3><dl></dl><img alt="Fotografia deste relato na sessão" hidden></aside>
+        <p class="pin-error" role="status" hidden></p><div class="pin-attribution"><a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a> · <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></div>
+      </div><div class="pin-legend" aria-label="Legenda de intensidade">${['Muito fraco','Fraco','Intermediário','Forte','Muito forte'].map((label,i)=>`<span title="${i+1} — ${label}"><i style="--heat-color:${OdorHeat.colors[i]}"></i>${i+1}<span class="sr-only"> — ${label}</span></span>`).join('')}<small>INTENSIDADE / 1–5</small></div>
+      <p class="pin-heat-status" role="status"></p><div class="pin-actions"><button type="button" class="button button-ink" data-pin-action="place">Marcar no centro da mira</button><span class="pin-coordinates">Nenhum pin confirmado.</span></div>
+      <p class="pin-help">Toque para marcar. Arraste para mover; use a roda do mouse ou pinça com dois dedos para ampliar. Com o mapa em foco, setas movem e Enter confirma a mira. Toque nos pontos para ler os relatos.</p>
+      <details class="pin-coordinate-entry"><summary>Informar coordenadas manualmente</summary><p>Use coordenadas conhecidas se a cartografia estiver indisponível.</p><div><label>Latitude<input data-coordinate="lat" type="number" step="any" min="-85" max="85" inputmode="decimal" placeholder="−29.68680"></label><label>Longitude<input data-coordinate="lon" type="number" step="any" min="-180" max="180" inputmode="decimal" placeholder="−53.81490"></label></div><button class="button button-outline" type="button" data-pin-action="coordinates">Confirmar coordenadas</button></details>
+      <p class="pin-map-status" role="status" aria-live="polite"></p><p class="pin-method">DSR · O calor reúne percepções relatadas neste navegador e a prévia atual. Não representa medição química, confirmação de fonte ou previsão por IA. Sem dados, não há manchas demonstrativas.</p>`;
+    element.replaceChildren(host);const find=s=>host.querySelector(s),viewport=find('.pin-viewport'),base=find('.pin-vector'),canvas=find('.pin-heat'),marker=find('.pin-marker'),popup=find('.pin-popup'),error=find('.pin-error'),status=find('.pin-map-status');
+    const latInput=find('[data-coordinate="lat"]'),lonInput=find('[data-coordinate="lon"]');
+    const initial=valid(options.initialCenter)?options.initialCenter:HOME;
+    let zoom=valid(options.initialCenter)?16.5:12,center={...initial},location=null,map=null,destroyed=false,frame=0,width=0,height=0,activePopup=null,cartographyError=false;
+    const buttons=new Map();let allRecords=[];
+    const date=iso=>{try{return new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short',timeStyle:'short'}).format(new Date(iso))+' · Horário de Brasília';}catch{return 'Horário não informado';}};
+    function records(){return (options.getRecords?.()||[]).filter(r=>valid(r.location)&&Number.isInteger(r.intensity)&&r.intensity>=1&&r.intensity<=5);}
+    function project(p){if(map)return map.project([p.longitude,p.latitude]);const q=xy(p,zoom),c=xy(center,zoom);return {x:q.x-c.x+width/2,y:q.y-c.y+height/2};}
+    function camera(){if(map){const c=map.getCenter();center={latitude:c.lat,longitude:c.lng};zoom=map.getZoom();}return {center,zoom};}
+    function closePopup(){popup.hidden=true;activePopup=null;marker.setAttribute('aria-expanded','false');}
+    function fillPopup(){
+      if(!activePopup)return;const r=activePopup.record;
+      const rows=r?[['Intensidade',`${r.intensity}/5 — ${options.getLevels?.()[r.intensity-1]?.name||''}`],['Percepção',(r.categories||[]).map(id=>options.categoryLabel?.(id)||id).join(', ')||'Não informada'],['Quando',date(r.occurrence?.occurredAt||r.recordedAt)],['Registro','Percepção relatada · não confirmada']]:options.getSummary?.()||[];
+      find('.pin-caption').textContent=r?'RELATO LOCAL / NESTE PONTO':'PRÉVIA / PINO ATUAL';
+      popup.querySelector('dl').replaceChildren(...rows.map(([key,value])=>{const d=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=key;dd.textContent=String(value??'—');d.append(dt,dd);return d;}));
+      const photo=r?null:options.getPhotoURL?.(),img=popup.querySelector('img');img.hidden=!photo;if(photo)img.src=photo;else img.removeAttribute('src');
     }
-    function updateTiles(load=true) {
-      const left=center.x-width/2, top=center.y-height/2, n=2**zoom, required=new Set();
-      for(let tx=Math.floor(left/256);tx<=Math.floor((left+width)/256);tx++)for(let ty=Math.floor(top/256);ty<=Math.floor((top+height)/256);ty++){
-        if(ty<0||ty>=n)continue;
-        const x=(tx%n+n)%n, key=`${zoom}/${x}/${ty}`;required.add(key);
-        let img=tileCache.get(key);
-        if(!img && load){
-          img=document.createElement('img');img.className='pin-tile';img.alt='';img.draggable=false;img.dataset.state='loading';img.decoding='async';
-          img.addEventListener('load',()=>{img.dataset.state='loaded';tileHealth();});
-          img.addEventListener('error',()=>{img.dataset.state='error';tileHealth();});
-          // Browser cache defaults preserve the provider's HTTP caching directives.
-          img.referrerPolicy='strict-origin-when-cross-origin';
-          img.src=`https://tile.openstreetmap.org/${key}.png`;tileCache.set(key,img);
-        }
-        if(img){img.style.left=`${Math.round(tx*256-left)}px`;img.style.top=`${Math.round(ty*256-top)}px`;if(img.parentElement!==tiles)tiles.append(img);}
+    function positionPopup(){if(popup.hidden||!activePopup)return;const p=project(activePopup.record?.location||location);const w=popup.offsetWidth,h=popup.offsetHeight;popup.style.left=`${clamp(p.x-w/2,12,Math.max(12,width-w-12))}px`;popup.style.top=`${clamp(p.y-h-58,10,Math.max(10,height-h-10))}px`;}
+    function showPopup(record=null){activePopup={record};fillPopup();popup.hidden=false;marker.setAttribute('aria-expanded',String(!record));positionPopup();}
+    function updateCoordinates(){find('.pin-coordinates').textContent=location?`Lat: ${location.latitude.toFixed(5)} · Long: ${location.longitude.toFixed(5)} · ${location.source==='device-gps'?'GPS':'pin manual'}`:'Nenhum pin confirmado.';latInput.value=location?.latitude.toFixed(6)||'';lonInput.value=location?.longitude.toFixed(6)||'';}
+    function place(latitude,longitude,source='manual-map'){
+      location={latitude,longitude,source,isGeographic:true,accuracyMeters:null,capturedAt:new Date().toISOString()};updateCoordinates();closePopup();options.onChange?.({...location});status.textContent='Local marcado. Toque no pin para conferir seu relato.';queue();
+    }
+    function paint(){
+      frame=0;if(destroyed||!host.isConnected||!host.getClientRects().length)return;
+      const rect=viewport.getBoundingClientRect();width=rect.width;height=rect.height;if(!width||!height)return;camera();
+      const gpsPending=!!options.getGpsPending?.()&&!valid(options.getGpsLocation?.());host.classList.toggle('pin-gps-pending',gpsPending);find('.pin-gps-wait').hidden=!gpsPending;
+      find('[data-pin-action="place"]').disabled=gpsPending;
+      const points=[];allRecords=records();const ids=new Set();
+      for(const r of allRecords){
+        const id=String(r.id);ids.add(id);let b=buttons.get(id);
+        if(!b){b=document.createElement('button');b.type='button';b.className='pin-saved-marker';b.addEventListener('click',e=>{e.stopPropagation();const current=allRecords.find(p=>String(p.id)===id);if(current)showPopup(current);});find('.pin-record-points').append(b);buttons.set(id,b);}
+        b.setAttribute('aria-label',`Relato de intensidade ${r.intensity}, ${date(r.occurrence?.occurredAt||r.recordedAt)}`);b.style.setProperty('--record-color',OdorHeat.colors[r.intensity-1]);b.dataset.recordId=id;
+        const p=project(r.location);b.style.left=`${p.x}px`;b.style.top=`${p.y}px`;b.hidden=p.x< -20||p.y< -20||p.x>width+20||p.y>height+20;
+        points.push({...p,intensity:r.intensity});
       }
-      for(const [key,img] of tileCache){if(!required.has(key)&&img.parentElement===tiles)img.remove();}
-      // Keep a modest in-memory tile set; normal HTTP caching handles revisits.
-      if(tileCache.size>100)for(const [key] of tileCache){if(!required.has(key))tileCache.delete(key);if(tileCache.size<=70)break;}
-      tileHealth();
+      for(const [id,b]of buttons)if(!ids.has(id)){b.remove();buttons.delete(id);if(activePopup?.record&&String(activePopup.record.id)===id)closePopup();}
+      const preview=options.getPreview?.();if(valid(preview?.location)&&preview.intensity>=1&&preview.intensity<=5)points.push({...project(preview.location),intensity:preview.intensity});
+      marker.hidden=!location;if(location){const p=project(location);marker.style.left=`${p.x}px`;marker.style.top=`${p.y}px`;marker.hidden=p.x< -25||p.y<0||p.x>width+25||p.y>height+55;marker.style.color=OdorHeat.colors[(preview?.intensity||1)-1];}
+      const heat=OdorHeat.render(canvas,width,height,points,78271.51696*Math.cos(center.latitude*Math.PI/180)/2**zoom);
+      host.dataset.heatPoints=String(heat.points);host.dataset.maxDensity=String(heat.maxDensity);host.dataset.zoom=zoom.toFixed(2);host.dataset.centerLat=center.latitude.toFixed(6);host.dataset.centerLon=center.longitude.toFixed(6);
+      find('.pin-heat-status').textContent=`${allRecords.length} ${allRecords.length===1?'relato local':'relatos locais'}${preview?.location?' · prévia do pino incluída':''}${points.length?'':' · sem pontos geográficos para exibir'}`;
+      find('[data-pin-action="plus"]').disabled=zoom>=19;find('[data-pin-action="minus"]').disabled=zoom<=10;positionPopup();
     }
-    function fillPopup() {
-      const list=popup.querySelector('dl');list.replaceChildren();
-      const rows=options.getSummary?.()||[];
-      for(const [label,value] of rows){const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=String(label??'');dd.textContent=String(value??'—');row.append(dt,dd);list.append(row);}
-      const photo=options.getPhotoURL?.(),image=popup.querySelector('img');
-      image.hidden=!photo;if(photo)image.src=photo;else image.removeAttribute('src');
-    }
-    function markerPosition() {
-      if(!location){marker.hidden=true;popup.hidden=true;return;}
-      const point=project(location.latitude,location.longitude,zoom), x=point.x-center.x+width/2, y=point.y-center.y+height/2;
-      marker.hidden=x<-25||x>width+25||y<0||y>height+50;
-      marker.style.left=`${x}px`;marker.style.top=`${y}px`;
-      if(!popup.hidden){
-        if(marker.hidden){closePopup();return;}
-        const pw=popup.offsetWidth,ph=popup.offsetHeight, px=clamp(x-pw/2,12,Math.max(12,width-pw-12));
-        const above=y-62-ph>=10,py=above?y-62-ph:clamp(y+12,10,Math.max(10,height-ph-10));
-        popup.style.left=`${px}px`;popup.style.top=`${py}px`;popup.style.setProperty('--pin-tail',`${clamp(x-px,18,pw-18)}px`);popup.dataset.side=above?'above':'below';
-      }
-    }
-    function render(load=true) {
-      if(!visible())return;
-      const rect=viewport.getBoundingClientRect();width=rect.width;height=rect.height;
-      if(!width||!height)return;
-      updateTiles(load);markerPosition();
-      find('[data-pin-action="plus"]').disabled=zoom>=19;find('[data-pin-action="minus"]').disabled=zoom<=10;
-    }
-    function queueRender(load=true){cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>render(load));}
-    function closePopup(focus=false){popup.hidden=true;marker.setAttribute('aria-expanded','false');if(focus&&!marker.hidden)marker.focus({preventScroll:true});}
-    function showPopup(){if(!location)return;fillPopup();popup.hidden=false;marker.setAttribute('aria-expanded','true');markerPosition();}
-    function showCoordinates(){
-      find('.pin-coordinates').textContent=location?`${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}${location.source==='device-gps'?' · GPS':' · pin manual'}`:'Nenhum pin confirmado.';
-      if(location){latitudeInput.value=location.latitude.toFixed(6);longitudeInput.value=location.longitude.toFixed(6);}else{latitudeInput.value='';longitudeInput.value='';}
-    }
-    function selectAt(latitude,longitude,source='manual-map'){
-      location={latitude,longitude,source,isGeographic:true,accuracyMeters:null,capturedAt:new Date().toISOString()};
-      showCoordinates();closePopup();render();status.textContent='Local marcado. Toque no pin para conferir seu relato.';options.onChange?.({...location});
-    }
-    function atScreen(x,y){return unproject(center.x+x-width/2,center.y+y-height/2,zoom);}
-    function placeCenter(){const p=unproject(center.x,center.y,zoom);selectAt(p.latitude,p.longitude);}
-    function changeZoom(change){const next=clamp(zoom+change,10,19);if(next===zoom)return;const ratio=2**(next-zoom);center={x:center.x*ratio,y:center.y*ratio};zoom=next;render();status.textContent=`Ampliação ${zoom}.`;}
-    viewport.addEventListener('pointerdown',event=>{
-      if(event.target.closest('button,a,.pin-popup,.pin-controls')||event.button!==0||!event.isPrimary)return;
-      drag={x:event.clientX,y:event.clientY,startX:center.x,startY:center.y,moved:false,pointerId:event.pointerId};
-      viewport.setPointerCapture(event.pointerId);closePopup();
-    });
-    viewport.addEventListener('pointermove',event=>{
-      if(!drag||event.pointerId!==drag.pointerId)return;
-      const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
-      if(Math.hypot(dx,dy)>6)drag.moved=true;
-      if(drag.moved){center={x:drag.startX-dx,y:clamp(drag.startY-dy,0,256*2**zoom)};viewport.classList.add('is-dragging');queueRender(false);}
-    });
-    viewport.addEventListener('pointerup',event=>{
-      if(!drag||event.pointerId!==drag.pointerId)return;
-      const moved=drag.moved;drag=null;viewport.classList.remove('is-dragging');
-      if(viewport.hasPointerCapture(event.pointerId))viewport.releasePointerCapture(event.pointerId);
-      cancelAnimationFrame(frame);
-      if(!moved){const rect=viewport.getBoundingClientRect(),p=atScreen(event.clientX-rect.left,event.clientY-rect.top);selectAt(p.latitude,p.longitude);}else render();
-    });
-    viewport.addEventListener('pointercancel',()=>{drag=null;viewport.classList.remove('is-dragging');queueRender();});
-    viewport.addEventListener('keydown',event=>{
-      if(event.key==='Escape'){closePopup(true);return;}
-      if(event.target!==viewport)return;
-      const delta=event.shiftKey?140:40;
-      if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter','+','=','-'].includes(event.key))event.preventDefault();
-      if(event.key==='Enter'){placeCenter();return;}
-      if(event.key==='+'||event.key==='='){changeZoom(1);return;}if(event.key==='-'){changeZoom(-1);return;}
-      if(event.key==='ArrowLeft')center.x-=delta;else if(event.key==='ArrowRight')center.x+=delta;else if(event.key==='ArrowUp')center.y-=delta;else if(event.key==='ArrowDown')center.y+=delta;else return;
-      center.y=clamp(center.y,0,256*2**zoom);closePopup();render();status.textContent='Mira reposicionada. Pressione Enter para confirmar o pin.';
-    });
-    marker.addEventListener('click',()=>popup.hidden?showPopup():closePopup());
-    popup.querySelector('img').addEventListener('load',()=>{if(!popup.hidden)markerPosition();});
-    popup.querySelector('.pin-popup-close').addEventListener('click',()=>closePopup(true));
-    [latitudeInput,longitudeInput].forEach(input=>input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();find('[data-pin-action="coordinates"]').click();}}));
-    host.querySelectorAll('[data-pin-action]').forEach(button=>button.addEventListener('click',()=>{
-      const action=button.dataset.pinAction;
-      if(action==='plus')changeZoom(1);if(action==='minus')changeZoom(-1);
-      if(action==='home'){zoom=12;center=project(home.latitude,home.longitude,zoom);closePopup();render();status.textContent='Visão geral de Santa Maria e região. Seu pin foi preservado.';}
-      if(action==='place')placeCenter();
-      if(action==='coordinates'){
-        const lat=latitudeInput.valueAsNumber,lon=longitudeInput.valueAsNumber;
-        if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat< -85||lat>85||lon< -180||lon>180){status.textContent='Informe latitude entre −85 e 85 e longitude entre −180 e 180.';(!Number.isFinite(lat)||lat< -85||lat>85?latitudeInput:longitudeInput).focus();return;}
-        center=project(lat,lon,zoom);selectAt(lat,lon,'manual-coordinates');
-      }
+    function queue(){if(!frame&&!destroyed)frame=requestAnimationFrame(paint);}
+    function fly(p,z=16.5){if(!valid(p))return false;center={latitude:p.latitude,longitude:p.longitude};zoom=z;if(map)map.jumpTo({center:[center.longitude,center.latitude],zoom});queue();return true;}
+    function changeZoom(delta){if(map)map.zoomTo(clamp(map.getZoom()+delta,10,19),{duration:180});else{zoom=clamp(zoom+delta,10,19);queue();}}
+    function fallback(message){base.classList.add('pin-vector-fallback');error.textContent=message;error.hidden=false;queue();}
+    try{
+      if(!window.maplibregl)throw new Error('MapLibre unavailable');
+      map=new maplibregl.Map({container:base,style:style(),center:[center.longitude,center.latitude],zoom,minZoom:10,maxZoom:19,attributionControl:false,dragRotate:false,pitchWithRotate:false,touchPitch:false,scrollZoom:true,touchZoomRotate:true,cooperativeGestures:false,renderWorldCopies:false,canvasContextAttributes:{preserveDrawingBuffer:true}});
+      map.touchZoomRotate.disableRotation();
+      map.on('styleimagemissing',event=>{if(event.id==='odor-map-building-hatch'&&!map.hasImage(event.id))map.addImage(event.id,hatch());});
+      map.on('load',()=>{if(destroyed)return;if(!map.hasImage('odor-map-building-hatch'))map.addImage('odor-map-building-hatch',hatch());host.dataset.cartography=cartographyError?'unavailable':'loaded';error.hidden=!cartographyError;queue();});
+      map.on('error',event=>{cartographyError=true;host.dataset.cartography='unavailable';host.dataset.mapError=event.error?.message||'Cartografia indisponível';error.textContent='Cartografia indisponível ou incompleta. Confira a conexão; você pode informar coordenadas conhecidas abaixo.';error.hidden=false;});
+      map.on('idle',()=>{if(!cartographyError)return;try{if(map.querySourceFeatures('openmaptiles',{sourceLayer:'transportation'}).length){cartographyError=false;error.hidden=true;host.dataset.cartography='loaded';}}catch{/* Keep the fallback guidance until real cartography returns. */}});
+      map.on('move',queue);map.on('resize',queue);map.on('click',e=>{if(!destroyed)place(e.lngLat.lat,e.lngLat.lng);});
+    }catch{map?.remove();map=null;fallback('Cartografia indisponível neste navegador. Informe coordenadas conhecidas abaixo. A mira mantém a localização de referência.');}
+    marker.addEventListener('click',e=>{e.stopPropagation();if(location)showPopup();});find('.pin-popup-close').addEventListener('click',closePopup);popup.addEventListener('pointerdown',e=>e.stopPropagation());popup.querySelector('img').addEventListener('load',positionPopup);
+    host.querySelectorAll('[data-pin-action]').forEach(b=>b.addEventListener('click',()=>{
+      const action=b.dataset.pinAction;if(action==='plus')changeZoom(1);if(action==='minus')changeZoom(-1);
+      if(action==='home'){const gps=options.getGpsLocation?.();fly(valid(gps)?gps:HOME,valid(gps)?16.5:12);closePopup();status.textContent=valid(gps)?'Mapa centralizado na sua localização. Seu pin foi preservado.':'Visão geral de Santa Maria. Seu pin foi preservado.';}
+      if(action==='place'){camera();place(center.latitude,center.longitude);}
+      if(action==='coordinates'){const p={latitude:latInput.valueAsNumber,longitude:lonInput.valueAsNumber};if(!valid(p)){status.textContent='Informe latitude entre −85 e 85 e longitude entre −180 e 180.';latInput.focus();return;}fly(p);place(p.latitude,p.longitude,'manual-coordinates');}
     }));
-    const resize=new ResizeObserver(()=>queueRender());resize.observe(viewport);
-    const handleVisible=()=>{if(visible())queueRender();};document.addEventListener('visibilitychange',handleVisible);
-    const handleOnline=()=>{for(const [key,img] of tileCache)if(img.dataset.state==='error'){img.remove();tileCache.delete(key);}queueRender();};window.addEventListener('online',handleOnline);
-    render();
-    return {
-      refresh(){if(!popup.hidden)fillPopup();queueRender();},
-      centerOn(value){
-        if(!value||!Number.isFinite(value.latitude)||!Number.isFinite(value.longitude)||Math.abs(value.latitude)>85.05112878||Math.abs(value.longitude)>180)return false;
-        zoom=15;center=project(value.latitude,value.longitude,zoom);closePopup();queueRender();return true;
-      },
-      setLocation(value){
-        if(!value){location=null;showCoordinates();closePopup();queueRender();return true;}
-        if(!Number.isFinite(value.latitude)||!Number.isFinite(value.longitude)||Math.abs(value.latitude)>85.05112878||Math.abs(value.longitude)>180)return false;
-        location={...value,isGeographic:true};center=project(value.latitude,value.longitude,zoom);showCoordinates();closePopup();queueRender();return true;
-      },
-      getLocation(){return location?{...location}:null;},
-      destroy(){destroyed=true;cancelAnimationFrame(frame);resize.disconnect();document.removeEventListener('visibilitychange',handleVisible);window.removeEventListener('online',handleOnline);tileCache.clear();host.remove();}
+    viewport.addEventListener('keydown',e=>{if(e.target.closest('button,input,.pin-popup'))return;if(e.key==='Enter'){e.preventDefault();camera();place(center.latitude,center.longitude);}if(e.key==='Escape')closePopup();});
+    [latInput,lonInput].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();find('[data-pin-action="coordinates"]').click();}}));
+    const resize=new ResizeObserver(()=>{if(host.getClientRects().length)map?.resize();queue();});resize.observe(viewport);
+    const online=()=>{if(!map)return;map.triggerRepaint();queue();};window.addEventListener('online',online);
+    queue();
+    return {refresh(){if(destroyed)return;if(host.getClientRects().length)map?.resize();if(activePopup)fillPopup();queue();},
+      setLocation(value){if(value&&!valid(value))return false;location=value?{...value}:null;updateCoordinates();closePopup();queue();return true;},
+      centerOn(value){return fly(value);},getLocation(){return location?{...location}:null;},
+      destroy(){destroyed=true;cancelAnimationFrame(frame);resize.disconnect();window.removeEventListener('online',online);map?.remove();buttons.clear();host.remove();}
     };
   }
-  window.WaindPin={mount};
+  window.WaindPin=Object.freeze({mount,style});
 })();
-

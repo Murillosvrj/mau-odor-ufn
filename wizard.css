@@ -101,3 +101,8 @@ html{overflow-x:clip}
 .permission-actions { margin:12px 0; }
 .permission-actions .text-button { text-align:left; }
 .camera-status { font-size:13px; line-height:1.7; margin-top:16px; }
+.intensity-card { position:relative; min-width:0; }
+.intensity-card .intensity-option { display:block; height:100%; }
+.intensity-card .intensity-key { padding-top:24px; }
+.intensity-card .intensity-info { position:absolute; z-index:3; right:6px; top:6px; width:24px; height:24px; min-width:24px; background:var(--paper,#FAF8F5); }
+@media(max-width:480px){.intensity-card .intensity-info {right:4px;top:4px;width:22px;height:22px;min-width:22px;} }
