@@ -45,6 +45,8 @@
       <p class="pin-help">Toque para marcar. Arraste para mover; use a roda do mouse ou pinça com dois dedos para ampliar. Com o mapa em foco, setas movem e Enter confirma a mira. Toque nos pontos para ler os relatos.</p>
       <details class="pin-coordinate-entry"><summary>Informar coordenadas manualmente</summary><p>Use coordenadas conhecidas se a cartografia estiver indisponível.</p><div><label>Latitude<input data-coordinate="lat" type="number" step="any" min="-85" max="85" inputmode="decimal" placeholder="−29.68680"></label><label>Longitude<input data-coordinate="lon" type="number" step="any" min="-180" max="180" inputmode="decimal" placeholder="−53.81490"></label></div><button class="button button-outline" type="button" data-pin-action="coordinates">Confirmar coordenadas</button></details>
       <p class="pin-map-status" role="status" aria-live="polite"></p><p class="pin-method">DSR · O calor reúne os relatos públicos do WAIND (até 500 mais recentes), os deste navegador e a prévia atual, sem duplicar pontos. Não representa medição química, confirmação de fonte ou previsão por IA. Sem dados, não há manchas demonstrativas.</p>`;
+    if(options.readOnly){host.classList.add('is-read-only');host.querySelector('.pin-help').textContent='Arraste, amplie e toque nos pontos para consultar os relatos. Este mapa é apenas de leitura.';}
+    if(options.methodText)host.querySelector('.pin-method').textContent=options.methodText;
     element.replaceChildren(host);const find=s=>host.querySelector(s),viewport=find('.pin-viewport'),base=find('.pin-vector'),canvas=find('.pin-heat'),marker=find('.pin-marker'),popup=find('.pin-popup'),error=find('.pin-error'),status=find('.pin-map-status');
     const latInput=find('[data-coordinate="lat"]'),lonInput=find('[data-coordinate="lon"]');
     const initial=valid(options.initialCenter)?options.initialCenter:HOME;
@@ -66,6 +68,7 @@
     function showPopup(record=null){activePopup={record};fillPopup();popup.hidden=false;marker.setAttribute('aria-expanded',String(!record));positionPopup();}
     function updateCoordinates(){find('.pin-coordinates').textContent=location?`Lat: ${location.latitude.toFixed(5)} · Long: ${location.longitude.toFixed(5)} · ${location.source==='device-gps'?'GPS':'pin manual'}`:'Nenhum pin confirmado.';latInput.value=location?.latitude.toFixed(6)||'';lonInput.value=location?.longitude.toFixed(6)||'';}
     function place(latitude,longitude,source='manual-map'){
+      if(options.readOnly)return;
       location={latitude,longitude,source,isGeographic:true,accuracyMeters:null,capturedAt:new Date().toISOString()};updateCoordinates();closePopup();options.onChange?.({...location});status.textContent='Local marcado. Toque no pin para conferir seu relato.';queue();
     }
     function paint(){
@@ -99,10 +102,10 @@
       map.touchZoomRotate.disableRotation();
       map.on('styleimagemissing',event=>{if(event.id==='odor-map-building-hatch'&&!map.hasImage(event.id))map.addImage(event.id,hatch());});
       map.on('load',()=>{if(destroyed)return;if(!map.hasImage('odor-map-building-hatch'))map.addImage('odor-map-building-hatch',hatch());host.dataset.cartography=cartographyError?'unavailable':'loaded';error.hidden=!cartographyError;queue();});
-      map.on('error',event=>{cartographyError=true;host.dataset.cartography='unavailable';host.dataset.mapError=event.error?.message||'Cartografia indisponível';error.textContent='Cartografia indisponível ou incompleta. Confira a conexão; você pode informar coordenadas conhecidas abaixo.';error.hidden=false;});
+      map.on('error',event=>{cartographyError=true;host.dataset.cartography='unavailable';host.dataset.mapError=event.error?.message||'Cartografia indisponível';error.textContent=options.readOnly?'Cartografia indisponível ou incompleta. As contagens e os gráficos continuam disponíveis; confira sua conexão.':'Cartografia indisponível ou incompleta. Confira a conexão; você pode informar coordenadas conhecidas abaixo.';error.hidden=false;});
       map.on('idle',()=>{if(!cartographyError)return;try{if(map.querySourceFeatures('openmaptiles',{sourceLayer:'transportation'}).length){cartographyError=false;error.hidden=true;host.dataset.cartography='loaded';}}catch{/* Keep the fallback guidance until real cartography returns. */}});
       map.on('move',queue);map.on('resize',queue);map.on('click',e=>{if(!destroyed)place(e.lngLat.lat,e.lngLat.lng);});
-    }catch{map?.remove();map=null;fallback('Cartografia indisponível neste navegador. Informe coordenadas conhecidas abaixo. A mira mantém a localização de referência.');}
+    }catch{map?.remove();map=null;fallback(options.readOnly?'Cartografia indisponível neste navegador. Consulte os gráficos e a tabela de contagens.':'Cartografia indisponível neste navegador. Informe coordenadas conhecidas abaixo. A mira mantém a localização de referência.');}
     marker.addEventListener('click',e=>{e.stopPropagation();if(location)showPopup();});find('.pin-popup-close').addEventListener('click',closePopup);popup.addEventListener('pointerdown',e=>e.stopPropagation());popup.querySelector('img').addEventListener('load',positionPopup);
     host.querySelectorAll('[data-pin-action]').forEach(b=>b.addEventListener('click',()=>{
       const action=b.dataset.pinAction;if(action==='plus')changeZoom(1);if(action==='minus')changeZoom(-1);
@@ -115,7 +118,7 @@
     const resize=new ResizeObserver(()=>{if(host.getClientRects().length)map?.resize();queue();});resize.observe(viewport);
     const online=()=>{if(!map)return;map.triggerRepaint();queue();};window.addEventListener('online',online);
     queue();
-    return {refresh(){if(destroyed)return;if(host.getClientRects().length)map?.resize();if(activePopup)fillPopup();queue();},
+    return {refresh(){if(destroyed)return;if(host.getClientRects().length)map?.resize();if(activePopup?.record&&!records().some(r=>r.id===activePopup.record.id))closePopup();if(activePopup)fillPopup();queue();},
       setLocation(value){if(value&&!valid(value))return false;location=value?{...value}:null;updateCoordinates();closePopup();queue();return true;},
       centerOn(value){return fly(value);},getLocation(){return location?{...location}:null;},
       destroy(){destroyed=true;cancelAnimationFrame(frame);resize.disconnect();window.removeEventListener('online',online);map?.remove();buttons.clear();host.remove();}

@@ -52,7 +52,7 @@
   const infoContent = {
     invisible:{title:'Sentir não é o mesmo que enxergar.',body:'<p>O odor pode estar no ar mesmo quando a foto mostra um lugar aparentemente limpo. Marcar esta opção evita tratar a imagem como evidência visual de uma fonte de mau odor.</p><p>No futuro, essa informação poderá ajudar a interpretar as imagens usadas na pesquisa. Neste protótipo, nenhuma foto é analisada por IA.</p>'},
     method:{title:'Uma percepção. Muitas possibilidades.',body:'<p><strong>Relato:</strong> o que alguém sentiu em um lugar e momento.</p><p><strong>Hipótese:</strong> uma possível fonte, sugerida por observação ou por um modelo, que ainda exige investigação.</p><p><strong>Causa comprovada:</strong> exige evidências próprias e não é estabelecida por este formulário. Relatos isolados são preservados como “isolado / não confirmado”.</p>'},
-    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Ao enviar, o relato completo e a identificação são guardados no banco da pesquisa WAIND (Firebase/Firestore), com acesso restrito aos pesquisadores. O mapa coletivo mostra coordenadas, data, hora, intensidade, categorias e temperatura sem nome, e-mail, endereço ou textos livres. As coordenadas exatas podem revelar rotinas. Uma cópia com identificação fica neste navegador e na exportação JSON. Sem conexão, os relatos ficam pendentes e serão sincronizados ao reconectar. A foto é temporária e não é enviada; somente seus metadados integram o registro privado. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
+    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Ao enviar, o relato completo e a identificação são guardados no banco da pesquisa WAIND (Firebase/Firestore), com acesso restrito aos pesquisadores. O mapa coletivo mostra coordenadas, data, hora, intensidade, categorias e temperatura sem nome, e-mail, endereço ou textos livres. As coordenadas exatas podem revelar rotinas. Uma cópia com identificação fica neste navegador e na exportação JSON. Sem conexão, os relatos ficam pendentes e serão sincronizados ao reconectar. A fotografia opcional é redimensionada, sem EXIF do aparelho, e enviada somente ao acervo privado relatos_fotos para análise científica e treinamento futuro de modelos de Machine Learning. Ela nunca aparece no mapa público. Nenhuma imagem é analisada automaticamente nesta versão. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
   };
   function showToast(text) {
     clearTimeout(toastTimer); $('#toast').textContent = text; $('#toast').hidden = false;
@@ -298,17 +298,16 @@
     if(!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size>8*1024*1024){
       $('#photo-error').textContent=file.size>8*1024*1024?'A foto ultrapassa 8 MB. Escolha uma imagem menor.':'Escolha uma foto JPG, PNG ou WebP.';$('#photo-error').hidden=false;input.value='';return;
     }
-    const candidate=URL.createObjectURL(file), generation=++photoGeneration;
-    state.photoLoading=true; $('.review-button').disabled=true; $('#summary-photo').textContent='Carregando…';window.dispatchEvent(new Event('waind:change'));
-    const preview=new Image(); preview.src=candidate;
+    const generation=++photoGeneration;
+    state.photoLoading=true;$('.review-button').disabled=true;$('#summary-photo').textContent='Preparando…';window.dispatchEvent(new Event('waind:change'));
     try {
-      await preview.decode();
-      if(generation!==photoGeneration){URL.revokeObjectURL(candidate);return;}
-      if(photoURL) URL.revokeObjectURL(photoURL); photoURL=candidate;
-      state.photo={name:file.name,type:file.type,sizeBytes:file.size,width:preview.naturalWidth,height:preview.naturalHeight,retention:'session-only',visionAnalysis:null};
-      $('#preview-image').src=photoURL; $('#photo-preview').hidden=false; $('#photo-placeholder').hidden=true; updateSummary();
-    } catch {URL.revokeObjectURL(candidate);if(generation===photoGeneration){$('#photo-error').textContent='Não foi possível abrir essa imagem. Escolha outra foto.';$('#photo-error').hidden=false;}}
-    finally {if(generation===photoGeneration){state.photoLoading=false;$('.review-button').disabled=false;updateSummary();}}
+      const prepared=await WaindPhoto.process(file);
+      if(generation!==photoGeneration)return;
+      if(photoURL)URL.revokeObjectURL(photoURL);photoURL=URL.createObjectURL(prepared.blob);
+      state.photo=prepared.photo;
+      $('#preview-image').src=photoURL;$('#photo-preview').hidden=false;$('#photo-placeholder').hidden=true;updateSummary();
+    }catch(error){if(generation===photoGeneration){$('#photo-error').textContent='Não foi possível preparar a foto. '+(error.message||'Escolha outra imagem.');$('#photo-error').hidden=false;}}
+    finally{if(generation===photoGeneration){state.photoLoading=false;$('.review-button').disabled=false;updateSummary();}}
     input.value='';
   }
   $('#camera-input').addEventListener('change',event=>choosePhoto(event.target));
@@ -336,13 +335,13 @@
     $('#local-record-list').innerHTML=records.slice(-3).reverse().map(report=>{
       let date;try{date=report.occurrence?.kind==='past'?`Ocorrência ${localDate(report.occurrence.occurredAt)} · registrado ${localDate(report.recordedAt)}`:localDate(report.recordedAt);}catch{date='Data não disponível';}
       const labels=report.categories.map(id=>types.find(t=>t.id===id)?.label||id).join(', ');
-      const status=report.syncStatus==='pendente-sincronizacao'?'PENDENTE DE SINCRONIZAÇÃO':report.cloud?.confirmed?'ENVIADO AO BANCO':'SOMENTE NESTE NAVEGADOR';
+      const status=report.syncStatus==='pendente-sincronizacao'&&report.consent?.version!=='waind-pesquisa-mapa-0.6'?'ACEITE ANTERIOR · SOMENTE LOCAL':report.syncStatus==='pendente-sincronizacao'?'PENDENTE DE SINCRONIZAÇÃO':report.cloud?.confirmed?'ENVIADO AO BANCO':'SOMENTE NESTE NAVEGADOR';
       return `<div class="record-row"><div>${escape(labels)}<small>${escape(date)} · intensidade ${report.intensity} / 5 · ${status}</small></div><span>ISOLADO /<br>NÃO CONFIRMADO</span></div>`;
     }).join('');
   }
   $('#export-records').addEventListener('click',()=>{
     if(!records.length)return;
-    const payload={project:'WAIND — UFN / Santa Maria',exportedAt:new Date().toISOString(),schemaVersion:2,notice:'Relatos locais de percepção. Sem comprovação de causa. Fotografias não incluídas; apenas metadados.',records};
+    const payload={project:'WAIND — UFN / Santa Maria',exportedAt:new Date().toISOString(),schemaVersion:6,notice:'Relatos de percepção. Sem comprovação de causa. JSON privado com identificação e metadados; imagens omitidas. Fotos pendentes permanecem neste navegador até sincronizar.',records:records.map(r=>{const copy={...r,photo:r.photo?{...r.photo}:null};if(copy.photo)delete copy.photo.dataBase64;return copy;})};
     const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
     const link=document.createElement('a');link.href=url;link.download=`waind-relatos-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
   });
@@ -360,9 +359,13 @@
   function cache(next){
     // Never discard unsent reports when keeping the last 100 confirmed copies.
     const pending=next.filter(r=>r.syncStatus==='pendente-sincronizacao');
-    const confirmed=next.filter(r=>r.syncStatus!=='pendente-sincronizacao').slice(-100);
-    const keep=[...confirmed,...pending].sort((a,b)=>a.recordedAt.localeCompare(b.recordedAt));
-    localStorage.setItem(STORE_KEY,JSON.stringify(keep));records=keep;
+    const confirmed=next.filter(r=>r.syncStatus!=='pendente-sincronizacao').slice(-100).map(r=>WaindPhoto.compact({...r,photo:r.photo?{...r.photo}:null}));
+    let keep;
+    for(;;){
+      keep=[...confirmed,...pending].map(r=>({...r,photo:r.photo?{...r.photo}:null})).sort((a,b)=>a.recordedAt.localeCompare(b.recordedAt));
+      try{localStorage.setItem(STORE_KEY,JSON.stringify(keep));records=keep;break;}
+      catch(error){if(error.name!=='QuotaExceededError'||!confirmed.length)throw error;confirmed.splice(0,Math.max(1,Math.ceil(confirmed.length/2)));}
+    }
   }
   function remember(report){cache([...records.filter(r=>r.id!==report.id),report]);renderRecords();}
   function startMap(){
@@ -373,12 +376,12 @@
     if(syncing||navigator.onLine===false)return;
     syncing=true;let sent=0;
     try{
-      for(const report of records.filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap)){
+      for(const report of records.filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&r.consent?.version==='waind-pesquisa-mapa-0.6')){
         try{
           const receipt=await WaindCloud.save(report);
           // Do not restore a local copy if the participant erased it while sending.
           if(!records.some(r=>r.id===report.id))continue;
-          report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;
+          report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
           try{remember(report);}catch{renderRecords();}
           sent++;
         }catch(error){report.syncError=String(error?.code||'network');try{remember(report);}catch{/* Preserve the existing durable pending copy. */}}
@@ -404,7 +407,7 @@
       try{remember(report);durable=true;}catch{/* A confirmed cloud send can still succeed without local storage. */}
       try {
         const receipt=await WaindCloud.save(report);
-        report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;
+        report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
         try{remember(report);}catch{showToast('Enviado ao banco. Não foi possível atualizar a cópia neste navegador.');}
         return {status:'sincronizado',id:report.id};
       } catch(error) {

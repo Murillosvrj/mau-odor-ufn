@@ -1,4 +1,4 @@
-/* WAIND GPT 0.5: private research + anonymous map, written atomically. */
+/* WAIND GPT 0.6: private research + public map + optional private image, one atomic batch. */
 (() => {
   'use strict';
   const SDK='https://www.gstatic.com/firebasejs/13.1.0/';
@@ -12,6 +12,7 @@
         import(SDK+'firebase-app.js'),import(SDK+'firebase-auth.js'),import(SDK+'firebase-firestore.js')
       ]);
       const app=core.getApps().length?core.getApp():core.initializeApp(window.WaindFirebaseConfig);
+      await window.WaindAppCheck?.initialize(app, SDK);
       return {auth:identity.getAuth(app),identity,db:store.getFirestore(app),store};
     })().catch(error=>{connection=null;throw error;});
     return connection;
@@ -46,29 +47,35 @@
         endereco:{rua:a.street||'',bairro:a.district||'',cidade:a.city||'',estado:a.state||'',cep:a.postcode||''}},
       intensidade_odor:intensity,tipo_odor:{...odor,outro_descricao:categories.includes('other')?report.otherDescription||'':''},
       sem_foco_visivel:!!report.noVisibleSource,visivel_por_perto:report.visibleTags||[],observacao:report.observation||'',
-      foto_metadados:report.photo?{nome:report.photo.name,tipo:report.photo.type,tamanho_bytes:report.photo.sizeBytes,largura:report.photo.width,altura:report.photo.height,imagem_enviada:false}:null,
-      consentimento:{versao:'waind-pesquisa-mapa-0.5',aceito_em:report.consent.acceptedAt,pesquisa:true,mapa_publico:true,copia_local:true,contexto_confirmado:true},
+      foto_metadados:report.photo?{nome:report.photo.name,mime_type:report.photo.type,tamanho_bytes:report.photo.sizeBytes,largura:report.photo.width,altura:report.photo.height,largura_original:report.photo.originalWidth,altura_original:report.photo.originalHeight,sha256:report.photo.sha256,imagem_enviada:true,colecao_foto:'relatos_fotos'}:null,
+      consentimento:{versao:'waind-pesquisa-mapa-0.6',aceito_em:report.consent.acceptedAt,pesquisa:true,mapa_publico:true,copia_local:true,contexto_confirmado:true},
       status_qualidade:'isolado-nao-confirmado'
     };
     // Public projection is explicit: never copy identity, address, photo or free text.
     const map={latitude:loc.latitude,longitude:loc.longitude,intensidade_odor:intensity,tipo_odor:odor,...when,temperatura:temperature,status_qualidade:'isolado-nao-confirmado'};
-    return {perception,map};
+    const p=report.photo;
+    const photo=p?{relato_id:report.id,criado_em:createdAt,mime_type:p.type,largura:p.width,altura:p.height,
+      largura_original:p.originalWidth,altura_original:p.originalHeight,tamanho_bytes:p.sizeBytes,sha256:p.sha256,dados_base64:p.dataBase64||null,
+      rotulos_ml:{intensidade_nivel:report.intensity,categorias:categories,multi_hot:odor.multi_hot,sem_foco_visivel:!!report.noVisibleSource,visivel_por_perto:report.visibleTags||[]}}:null;
+    return {perception,map,photo};
   }
   const canonical=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
   async function write(report){
-    if(report.consent?.version!=='waind-pesquisa-mapa-0.5'||!report.consent.publicMap)throw Object.assign(new Error('Consent required'),{code:'consent-required'});
+    if(report.consent?.version!=='waind-pesquisa-mapa-0.6'||!report.consent.publicMap)throw Object.assign(new Error('Consent required'),{code:'consent-required'});
     const c=await connect();await identify(c);
     const {store,db}=c,publicRef=store.doc(db,'relatos_mapa',report.id);
-    const {perception,map}=payload(report,store.serverTimestamp());
+    const {perception,map,photo}=payload(report,store.serverTimestamp());
     // Read only the public receipt. Private research documents cannot be read by any client.
     const existing=await store.getDocFromServer(publicRef);
     if(existing.exists()){
       if(canonical(existing.data())!==canonical(map))throw Object.assign(new Error('Identifier conflict'),{code:'id-conflict'});
       return {alreadySaved:true,id:report.id,projectId:window.WaindFirebaseConfig.projectId};
     }
+    if(report.photo)await WaindPhoto.validate(report.photo);
     const batch=store.writeBatch(db);
     batch.set(store.doc(db,'relatos_pesquisa',report.id),perception);
     batch.set(publicRef,map);
+    if(photo)batch.set(store.doc(db,'relatos_fotos',report.id),photo);
     try{await batch.commit();}
     catch(error){
       // Another tab or a retried request may have completed the same immutable pair.
@@ -108,5 +115,17 @@
     }).catch(()=>onStatus('Sem conexão com o mapa coletivo. Os relatos deste navegador continuam visíveis.'));
     return ()=>{cancelled=true;unsubscribe();};
   }
-  window.WaindCloud=Object.freeze({save,message,payload,dateTime,listenMap});
+  // Snapshot por página: não cria outro listener permanente nem lê dados privados.
+  async function readMapPage({from,to,cursor=null,pageSize=100}){
+    const validDate=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v+'T12:00:00Z'))&&new Date(v+'T12:00:00Z').toISOString().slice(0,10)===v;
+    if(!validDate(from)||!validDate(to)||from>to||![100,200].includes(pageSize))throw Object.assign(new Error('Intervalo inválido.'),{code:'invalid-argument'});
+    const {store,db}=await connect();
+    const constraints=[store.where('data','>=',from),store.where('data','<=',to),store.orderBy('data','desc'),store.orderBy('hora','desc'),store.orderBy(store.documentId(),'desc')];
+    if(cursor)constraints.push(store.startAfter(cursor));
+    constraints.push(store.limit(pageSize+1)); // Um documento de sondagem; reaparece na próxima página.
+    const query=store.query(store.collection(db,'relatos_mapa'),...constraints);
+    const snapshot=await store.getDocsFromServer(query),documents=snapshot.docs.slice(0,pageSize);
+    return {documents:documents.map(doc=>({id:doc.id,data:doc.data()})),cursor:documents.at(-1)||null,hasMore:snapshot.docs.length>pageSize,returnedCount:snapshot.docs.length};
+  }
+  window.WaindCloud=Object.freeze({save,message,payload,dateTime,listenMap,readMapPage});
 })();

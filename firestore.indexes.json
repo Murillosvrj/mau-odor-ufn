@@ -1,0 +1,4 @@
+{
+  "indexes": [{"collectionGroup":"relatos_mapa","queryScope":"COLLECTION","fields":[{"fieldPath":"data","order":"DESCENDING"},{"fieldPath":"hora","order":"DESCENDING"}]}],
+  "fieldOverrides": []
+}
