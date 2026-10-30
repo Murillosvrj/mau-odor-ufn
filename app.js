@@ -314,8 +314,14 @@
   $('#gallery-input').addEventListener('change',event=>choosePhoto(event.target));
 
   function localDate(iso){return new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(iso));}
+  function reportId(){
+    if(crypto.randomUUID)return crypto.randomUUID();
+    const bytes=crypto.getRandomValues(new Uint8Array(16));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+    const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+  }
   function createReport(){return {
-    schemaVersion:1,id:window.crypto?.randomUUID?crypto.randomUUID():`local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+    schemaVersion:6,id:reportId(),
     recordedAt:new Date().toISOString(),timezone:'America/Sao_Paulo',intensity:state.intensity,
     categories:types.filter(t=>state.types.has(t.id)).map(t=>t.id),
     multiHot:Object.fromEntries(types.map(t=>[t.id,Number(state.types.has(t.id))])),
