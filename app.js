@@ -51,7 +51,7 @@
   const infoContent = {
     invisible:{title:'Sentir não é o mesmo que enxergar.',body:'<p>O odor pode estar no ar mesmo quando a foto mostra um lugar aparentemente limpo. Marcar esta opção evita tratar a imagem como evidência visual de uma fonte de mau odor.</p><p>No futuro, essa informação poderá ajudar a interpretar as imagens usadas na pesquisa. Neste protótipo, nenhuma foto é analisada por IA.</p>'},
     method:{title:'Uma percepção. Muitas possibilidades.',body:'<p><strong>Relato:</strong> o que alguém sentiu em um lugar e momento.</p><p><strong>Hipótese:</strong> uma possível fonte, sugerida por observação ou por um modelo, que ainda exige investigação.</p><p><strong>Causa comprovada:</strong> exige evidências próprias e não é estabelecida por este formulário. Relatos isolados são preservados como “isolado / não confirmado”.</p>'},
-    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Seus relatos ficam neste navegador. A foto é temporária e não acompanha a exportação JSON. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
+    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Ao enviar, seus relatos e a identificação são guardados no Firebase de desenvolvimento do WAIND, com acesso restrito. Uma cópia pode ficar neste navegador. A foto é temporária e não é enviada. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
   };
   function showToast(text) {
     clearTimeout(toastTimer); $('#toast').textContent = text; $('#toast').hidden = false;
@@ -345,7 +345,7 @@
   });
   $('#clear-records').addEventListener('click',()=>{
     $('#info-title').textContent='Apagar os relatos deste navegador?';
-    $('#info-body').innerHTML='<p>Você pode exportar o caderno antes de apagá-lo. Essa ação remove os relatos locais deste protótipo.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar relatos locais</button>';
+    $('#info-body').innerHTML='<p>Você pode exportar o caderno antes de apagá-lo. Essa ação remove somente as cópias deste navegador. Os registros já enviados ao Firebase permanecem no banco de desenvolvimento.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar relatos locais</button>';
     openDialog($('#info-dialog'));
     $('#confirm-clear').addEventListener('click',()=>{
       try{localStorage.removeItem(STORE_KEY);}catch{showToast('Não foi possível limpar o armazenamento.');return;}
@@ -359,11 +359,14 @@
     state, levels, types, showToast, showInfo, createReport, fetchWeather,
     getRecords:()=>records.map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),
     getPhotoURL:()=>photoURL,
-    save(report){
-      if(records.length>=100){showToast('Este caderno chegou a 100 relatos. Exporte os registros antes de limpar espaço.');return false;}
-      const next=[...records,report];
+    async save(report){
+      try {
+        const receipt=await WaindCloud.save(report);
+        report.storage='firebase-development';report.cloud={id:receipt.id,projectId:receipt.projectId,confirmed:true};
+      } catch(error) { showToast(WaindCloud.message(error));return false; }
+      const next=[...records.filter(r=>r.id!==report.id),report].slice(-100);
       try{localStorage.setItem(STORE_KEY,JSON.stringify(next));}
-      catch{showToast('Não foi possível salvar no navegador. Seu relato continua aberto para tentar novamente.');return false;}
+      catch{showToast('Enviado ao banco. Não foi possível guardar a cópia neste navegador.');}
       records=next;renderRecords();return true;
     },
     reset(){

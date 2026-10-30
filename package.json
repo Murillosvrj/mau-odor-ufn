@@ -1,11 +1,10 @@
 {
   "name": "waind-ufn",
-  "version": "0.4.0",
+  "version": "0.5.0-dev",
   "private": true,
-  "description": "WAIND — protótipo participativo de percepção de mau odor em Santa Maria e região/RS",
+  "description": "WAIND — integração Firebase em desenvolvimento",
   "scripts": {
     "build": "node build.mjs",
     "start": "node serve.mjs"
   }
 }
-

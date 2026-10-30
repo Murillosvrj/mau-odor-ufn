@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], app=window.WaindApp;
-  let step='0', pinMap=null, manualLocation=null, mode=null, pending=null, saved=false, resetting=false, mapGpsAttempted=false;
+  let step='0', pinMap=null, manualLocation=null, mode=null, pending=null, saved=false, resetting=false, mapGpsAttempted=false, submitting=false;
   const value=name=>$(`input[name="${name}"]:checked`)?.value;
   const isPast=()=>value('screening')==='no'&&value('past-choice')==='yes';
   const exploring=()=>value('screening')==='no'&&value('past-choice')==='no';
@@ -20,9 +20,9 @@
   function updateNavigation(){
     $('#nav-caption').hidden=step==='1';
     if(step==='0')return;
-    const okay=valid();$('#next-step').disabled=!okay;
-    $('#step-hint').textContent=okay?(step==='7'?(exploring()?'Explore livremente. Nenhum relato será criado.':saved?'Registro salvo neste navegador.':'Revise os dados antes de enviar.'): 'Suas escolhas são mantidas ao voltar.'):hints[step]||'';
-    $('#next-step').textContent='Continuar →';
+    const okay=valid();$('#next-step').disabled=!okay||submitting;
+    $('#step-hint').textContent=okay?(step==='7'?(exploring()?'Explore livremente. Nenhum relato será criado.':saved?'Envio confirmado no banco de desenvolvimento.':'Revise os dados antes de enviar.'): 'Suas escolhas são mantidas ao voltar.'):hints[step]||'';
+    $('#next-step').textContent=submitting?'Enviando…':'Continuar →';
     $('#next-step').setAttribute('aria-label',step==='7'?(saved?'Continuar para um novo relato':exploring()?'Continuar para o início':$('#review-panel').hidden?'Continuar para revisar o relato':'Continuar para enviar o relato'):'Continuar para a próxima etapa');
     $('#nav-caption').textContent=step==='7'?(saved?'REGISTRO CONCLUÍDO':exploring()?'EXPLORAR O TERRITÓRIO':$('#review-panel').hidden?'REVISAR RELATO':'ENVIAR RELATO'):names[step];
     $('#review-open').disabled=!locationValid()||app.state.photoLoading;
@@ -61,7 +61,7 @@
     const r=route(),i=r.indexOf(step);navigate(i>0?r[i-1]:'0');
   }
   function advance(){
-    if(WaindMotion.busy)return;
+    if(WaindMotion.busy||submitting)return;
     if(!valid())return;
     if(step==='7'){if(saved){restart();return;}if(exploring()){navigate('0');return;}if(!$('#review-panel').hidden){save();return;}review();return;}
     const r=route(),next=r[r.indexOf(step)+1]||'7';if(next==='7')requestMapGps();navigate(next);
@@ -104,7 +104,7 @@
     if(!validIdentity()||!app.state.intensity||!app.state.types.size||(app.state.types.has('other')&&!$('#other-text').value.trim())){app.showToast('Confira seus dados e as escolhas antes de revisar.');navigate(!validIdentity()?'1':!app.state.intensity?'3':'4');return;}
     if(!locationValid()||app.state.photoLoading){$('#location-error').hidden=false;return;}
     if(isPast()&&(!$('#occurred-at').value||$('#occurred-at').value>dateLocal())){navigate('past');return;}
-    pending=app.createReport();pending.schemaVersion=2;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={localStorage:true,contextConfirmed:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-preview-local-1'};
+    pending=app.createReport();pending.schemaVersion=2;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,localStorage:true,contextConfirmed:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-firebase-dev-1'};
     pending.occurrence={kind:isPast()?'past':'current',occurredAt:isPast()?new Date($('#occurred-at').value+':00-03:00').toISOString():pending.recordedAt,timezone:'America/Sao_Paulo',approximate:isPast()};
     pending.weatherContext={relationship:isPast()?'current-context-not-historical':'current-regional-context',notMeasuredAtSource:true};
     const rows=[['Nome',pending.participant.name],['E-mail',pending.participant.email],['Fuso horário','Horário de Brasília'],...summary(),['Localização',locationText(pending.location)]];
@@ -112,7 +112,23 @@
     $('#review-photo').hidden=!app.getPhotoURL();if(app.getPhotoURL())$('#review-photo').src=app.getPhotoURL();else $('#review-photo').removeAttribute('src');
     withWind(()=>{$('#review-panel').hidden=false;$('#location-panel').hidden=true;window.scrollTo({top:0,behavior:'instant'});updateNavigation();});
   }
-  function save(){if(WaindMotion.busy||!pending||saved)return;if(app.save(pending))withWind(()=>{saved=true;$('#saved-reference').textContent=`Registro ${pending.id.slice(0,8)} · salvo localmente`;pending=null;$('#review-panel').hidden=true;$('#location-panel').hidden=true;$('#success-panel').hidden=false;$('#records-wrap').hidden=false;window.scrollTo({top:0,behavior:'instant'});updateNavigation();});}
+  async function save(){
+    if(WaindMotion.busy||!pending||saved||submitting)return;
+    submitting=true;
+    const buttons=$$('#review-panel button, #back-step, #home-waind');
+    buttons.forEach(b=>b.disabled=true);$('#save-report').textContent='Enviando…';
+    $('#send-status').hidden=false;$('#send-status').textContent='Enviando ao banco de desenvolvimento do WAIND…';updateNavigation();
+    try {
+      if(await app.save(pending))withWind(()=>{
+        saved=true;$('#saved-reference').textContent=`Registro ${pending.id.slice(0,8)} · confirmado no Firebase`;
+        pending=null;$('#review-panel').hidden=true;$('#location-panel').hidden=true;$('#success-panel').hidden=false;
+        $('#records-wrap').hidden=false;window.scrollTo({top:0,behavior:'instant'});updateNavigation();
+      });
+      else $('#send-status').textContent='Envio não confirmado. Seus dados continuam aqui para tentar novamente.';
+    } finally {
+      submitting=false;buttons.forEach(b=>b.disabled=false);$('#save-report').textContent='Enviar Relato ↗';updateNavigation();
+    }
+  }
   function restart(){withWind(()=>{resetting=true;mapGpsAttempted=false;pinMap?.destroy?.();pinMap=null;manualLocation=null;mode=null;pending=null;saved=false;app.reset();$('#past-time-field').hidden=true;$('#success-panel').hidden=true;$('#review-panel').hidden=true;$('#location-panel').hidden=false;resetting=false;navigate('1',{animated:false});});}
   $('#enter-waind').addEventListener('click',()=>navigate('1'));$('#home-waind').addEventListener('click',()=>navigate('0'));$('#back-step').addEventListener('click',back);$('#next-step').addEventListener('click',advance);
   $('#odor-form').addEventListener('submit',e=>{e.preventDefault();advance();});
@@ -132,7 +148,7 @@
   $$('[data-edit]').forEach(b=>b.addEventListener('click',()=>editStep(b.dataset.edit)));
   ['camera-button','gallery-button'].forEach(id=>$('#'+id).addEventListener('click',()=>{$('#photo-consent').checked=true;}));
   $('#other-text').required=true;$('#other-field label .optional').textContent='DESCREVA SUA PERCEPÇÃO';
-  window.addEventListener('popstate',e=>{let dest=e.state?.waindStep||'0';if(dest!=='0'&&!route().includes(dest))dest='2';WaindMotion.finish();withWind(()=>{closeReview(false);navigate(dest,{historyWrite:false,animated:false});});});
+  window.addEventListener('popstate',e=>{if(submitting){history.pushState({waindStep:'7'},'','#passo-7');return;}let dest=e.state?.waindStep||'0';if(dest!=='0'&&!route().includes(dest))dest='2';WaindMotion.finish();withWind(()=>{closeReview(false);navigate(dest,{historyWrite:false,animated:false});});});
   history.replaceState({waindStep:'0'},'','#inicio');navigate('0',{historyWrite:false,animated:false});
 })();
 
