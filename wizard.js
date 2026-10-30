@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], app=window.WaindApp;
-  let step='0', pinMap=null, manualLocation=null, mode=null, pending=null, saved=false, resetting=false, mapGpsAttempted=false, submitting=false;
+  let step='0', pinMap=null, manualLocation=null, mode=null, pending=null, saved=false, savedId=null, resetting=false, mapGpsAttempted=false, submitting=false;
   const value=name=>$(`input[name="${name}"]:checked`)?.value;
   const isPast=()=>value('screening')==='no'&&value('past-choice')==='yes';
   const exploring=()=>value('screening')==='no'&&value('past-choice')==='no';
@@ -21,8 +21,8 @@
     $('#nav-caption').hidden=step==='1';
     if(step==='0')return;
     const okay=valid();$('#next-step').disabled=!okay||submitting;
-    $('#step-hint').textContent=okay?(step==='7'?(exploring()?'Explore livremente. Nenhum relato será criado.':saved?'Envio confirmado no banco de desenvolvimento.':'Revise os dados antes de enviar.'): 'Suas escolhas são mantidas ao voltar.'):hints[step]||'';
-    $('#next-step').textContent=submitting?'Enviando…':'Continuar →';
+    $('#step-hint').textContent=okay?(step==='7'?(exploring()?'Explore livremente. Nenhum relato será criado.':saved?'Confira abaixo a situação do registro.':'Revise os dados antes de enviar.'): 'Suas escolhas são mantidas ao voltar.'):hints[step]||'';
+    $('#next-step').textContent=submitting?'Enviando relato…':'Continuar →';
     $('#next-step').setAttribute('aria-label',step==='7'?(saved?'Continuar para um novo relato':exploring()?'Continuar para o início':$('#review-panel').hidden?'Continuar para revisar o relato':'Continuar para enviar o relato'):'Continuar para a próxima etapa');
     $('#nav-caption').textContent=step==='7'?(saved?'REGISTRO CONCLUÍDO':exploring()?'EXPLORAR O TERRITÓRIO':$('#review-panel').hidden?'REVISAR RELATO':'ENVIAR RELATO'):names[step];
     $('#review-open').disabled=!locationValid()||app.state.photoLoading;
@@ -56,7 +56,7 @@
     window.scrollTo({top:0,behavior:'instant'});window.dispatchEvent(new Event('resize'));updateNavigation();
   }
   function back(){
-    if(WaindMotion.busy)return;
+    if(WaindMotion.busy||submitting)return;
     if(step==='7'&&!$('#review-panel').hidden){closeReview();return;}
     const r=route(),i=r.indexOf(step);navigate(i>0?r[i-1]:'0');
   }
@@ -80,10 +80,11 @@
   function summary(){return [['Quando',isPast()?$('#occurred-at').value.replace('T',' ')+' · ocorrência anterior':'Percepção neste momento'],['Intensidade',app.state.intensity?`${app.state.intensity}/5 — ${app.levels[app.state.intensity-1].name}`:'A escolher'],['Tipo de odor',app.types.filter(t=>app.state.types.has(t.id)).map(t=>t.label).join(', ')||'A escolher'],...app.state.types.has('other')?[['Outro odor',$('#other-text').value.trim()]]:[],['Fotografia',app.state.photo?'Foto adicionada · nesta sessão':'Sem fotografia'],['Odor no ar',$('#invisible-source').checked?'Sem foco visível informado':'Não especificado'],['Por perto',[...app.state.tags].map(i=>['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'][i]).join(', ')||'Não informado'],['Observação',$('#observation').value.trim()||'Sem observação'],['Clima',weatherText()]];}
   function requestMapGps(){if(mapGpsAttempted||app.state.gpsLocation||$('#locate').disabled)return;mapGpsAttempted=true;$('#locate').click();}
   function ensureMap(){
-    if(!pinMap){pinMap=WaindPin.mount($('#pin-map'),{
+    if(!pinMap){app.startMap();pinMap=WaindPin.mount($('#pin-map'),{
       initialCenter:app.state.gpsLocation,getGpsLocation:()=>app.state.gpsLocation,getGpsPending:()=>$('#locate').disabled&&!app.state.location,
       getRecords:()=>app.getRecords(),getLevels:()=>app.levels,
-      getPreview:()=>!saved&&!exploring()&&app.state.intensity?{intensity:app.state.intensity,location:app.state.location}:null,
+      getMapStatus:()=>app.getMapStatus(),
+      getPreview:()=>!saved&&!exploring()&&app.state.intensity&&!app.getLocalRecords().some(r=>r.id===pending?.id)?{intensity:app.state.intensity,location:app.state.location}:null,
       onChange(loc){if(!exploring()){mode='pin';$('input[name="location-mode"][value="pin"]').checked=true;manualLocation=loc;app.state.location=loc;pending=null;$('#location-error').hidden=true;updateNavigation();app.fetchWeather(loc.latitude,loc.longitude,'manual-region');}},
       getSummary:()=>exploring()?[['Exploração','Nenhum relato será salvo.']]:summary(),getPhotoURL:()=>exploring()?null:app.getPhotoURL(),
       categoryLabel:id=>app.types.find(t=>t.id===id)?.label||id
@@ -104,7 +105,7 @@
     if(!validIdentity()||!app.state.intensity||!app.state.types.size||(app.state.types.has('other')&&!$('#other-text').value.trim())){app.showToast('Confira seus dados e as escolhas antes de revisar.');navigate(!validIdentity()?'1':!app.state.intensity?'3':'4');return;}
     if(!locationValid()||app.state.photoLoading){$('#location-error').hidden=false;return;}
     if(isPast()&&(!$('#occurred-at').value||$('#occurred-at').value>dateLocal())){navigate('past');return;}
-    pending=app.createReport();pending.schemaVersion=2;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,localStorage:true,contextConfirmed:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-firebase-dev-1'};
+    pending=app.createReport();pending.schemaVersion=5;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.5'};
     pending.occurrence={kind:isPast()?'past':'current',occurredAt:isPast()?new Date($('#occurred-at').value+':00-03:00').toISOString():pending.recordedAt,timezone:'America/Sao_Paulo',approximate:isPast()};
     pending.weatherContext={relationship:isPast()?'current-context-not-historical':'current-regional-context',notMeasuredAtSource:true};
     const rows=[['Nome',pending.participant.name],['E-mail',pending.participant.email],['Fuso horário','Horário de Brasília'],...summary(),['Localização',locationText(pending.location)]];
@@ -116,11 +117,12 @@
     if(WaindMotion.busy||!pending||saved||submitting)return;
     submitting=true;
     const buttons=$$('#review-panel button, #back-step, #home-waind');
-    buttons.forEach(b=>b.disabled=true);$('#save-report').textContent='Enviando…';
-    $('#send-status').hidden=false;$('#send-status').textContent='Enviando ao banco de desenvolvimento do WAIND…';updateNavigation();
+    buttons.forEach(b=>b.disabled=true);$('#save-report').textContent='Enviando relato…';
+    $('#send-status').hidden=false;$('#send-status').textContent='Enviando relato ao banco da pesquisa WAIND…';updateNavigation();
     try {
-      if(await app.save(pending))withWind(()=>{
-        saved=true;$('#saved-reference').textContent=`Registro ${pending.id.slice(0,8)} · confirmado no Firebase`;
+      const result=await app.save(pending);
+      if(result)await withWind(()=>{
+        saved=true;savedId=pending.id;showSaved(result.status,result.message);
         pending=null;$('#review-panel').hidden=true;$('#location-panel').hidden=true;$('#success-panel').hidden=false;
         $('#records-wrap').hidden=false;window.scrollTo({top:0,behavior:'instant'});updateNavigation();
       });
@@ -129,6 +131,16 @@
       submitting=false;buttons.forEach(b=>b.disabled=false);$('#save-report').textContent='Enviar Relato ↗';updateNavigation();
     }
   }
+  function showSaved(status,message){
+    const confirmed=status==='sincronizado';
+    $('#success-caption').textContent=confirmed?'PERCEPÇÃO REGISTRADA NO BANCO':'SALVO NESTE NAVEGADOR';
+    $('#success-description').textContent=confirmed?'Seu relato foi confirmado no banco da pesquisa WAIND. O ponto sem nome e e-mail participa do mapa coletivo. A cópia deste navegador pode ser exportada em JSON.':message||'Seu relato está pendente de sincronização. Ele foi salvo neste navegador e será enviado automaticamente quando a conexão voltar. Você também pode exportar o JSON.';
+    $('#saved-reference').textContent=`Registro ${savedId.slice(0,8)} · ${confirmed?'confirmado no Firebase':'pendente de sincronização'}`;
+  }
+  window.addEventListener('waind:records',()=>{
+    if(!savedId||!saved)return;
+    const record=app.getLocalRecords().find(r=>r.id===savedId);if(record)showSaved(record.syncStatus);
+  });
   function restart(){withWind(()=>{resetting=true;mapGpsAttempted=false;pinMap?.destroy?.();pinMap=null;manualLocation=null;mode=null;pending=null;saved=false;app.reset();$('#past-time-field').hidden=true;$('#success-panel').hidden=true;$('#review-panel').hidden=true;$('#location-panel').hidden=false;resetting=false;navigate('1',{animated:false});});}
   $('#enter-waind').addEventListener('click',()=>navigate('1'));$('#home-waind').addEventListener('click',()=>navigate('0'));$('#back-step').addEventListener('click',back);$('#next-step').addEventListener('click',advance);
   $('#odor-form').addEventListener('submit',e=>{e.preventDefault();advance();});

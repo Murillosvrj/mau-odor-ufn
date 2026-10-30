@@ -44,7 +44,7 @@
       <p class="pin-heat-status" role="status"></p><div class="pin-actions"><button type="button" class="button button-ink" data-pin-action="place">Marcar no centro da mira</button><span class="pin-coordinates">Nenhum pin confirmado.</span></div>
       <p class="pin-help">Toque para marcar. Arraste para mover; use a roda do mouse ou pinça com dois dedos para ampliar. Com o mapa em foco, setas movem e Enter confirma a mira. Toque nos pontos para ler os relatos.</p>
       <details class="pin-coordinate-entry"><summary>Informar coordenadas manualmente</summary><p>Use coordenadas conhecidas se a cartografia estiver indisponível.</p><div><label>Latitude<input data-coordinate="lat" type="number" step="any" min="-85" max="85" inputmode="decimal" placeholder="−29.68680"></label><label>Longitude<input data-coordinate="lon" type="number" step="any" min="-180" max="180" inputmode="decimal" placeholder="−53.81490"></label></div><button class="button button-outline" type="button" data-pin-action="coordinates">Confirmar coordenadas</button></details>
-      <p class="pin-map-status" role="status" aria-live="polite"></p><p class="pin-method">DSR · O calor reúne percepções relatadas neste navegador e a prévia atual. Não representa medição química, confirmação de fonte ou previsão por IA. Sem dados, não há manchas demonstrativas.</p>`;
+      <p class="pin-map-status" role="status" aria-live="polite"></p><p class="pin-method">DSR · O calor reúne os relatos públicos do WAIND (até 500 mais recentes), os deste navegador e a prévia atual, sem duplicar pontos. Não representa medição química, confirmação de fonte ou previsão por IA. Sem dados, não há manchas demonstrativas.</p>`;
     element.replaceChildren(host);const find=s=>host.querySelector(s),viewport=find('.pin-viewport'),base=find('.pin-vector'),canvas=find('.pin-heat'),marker=find('.pin-marker'),popup=find('.pin-popup'),error=find('.pin-error'),status=find('.pin-map-status');
     const latInput=find('[data-coordinate="lat"]'),lonInput=find('[data-coordinate="lon"]');
     const initial=valid(options.initialCenter)?options.initialCenter:HOME;
@@ -58,7 +58,7 @@
     function fillPopup(){
       if(!activePopup)return;const r=activePopup.record;
       const rows=r?[['Intensidade',`${r.intensity}/5 — ${options.getLevels?.()[r.intensity-1]?.name||''}`],['Percepção',(r.categories||[]).map(id=>options.categoryLabel?.(id)||id).join(', ')||'Não informada'],['Quando',date(r.occurrence?.occurredAt||r.recordedAt)],['Registro','Percepção relatada · não confirmada']]:options.getSummary?.()||[];
-      find('.pin-caption').textContent=r?'RELATO LOCAL / NESTE PONTO':'PRÉVIA / PINO ATUAL';
+      find('.pin-caption').textContent=r?(r.public?'RELATO COLETIVO / NESTE PONTO':'RELATO LOCAL / NESTE PONTO'):'PRÉVIA / PINO ATUAL';
       popup.querySelector('dl').replaceChildren(...rows.map(([key,value])=>{const d=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=key;dd.textContent=String(value??'—');d.append(dt,dd);return d;}));
       const photo=r?null:options.getPhotoURL?.(),img=popup.querySelector('img');img.hidden=!photo;if(photo)img.src=photo;else img.removeAttribute('src');
     }
@@ -86,7 +86,7 @@
       marker.hidden=!location;if(location){const p=project(location);marker.style.left=`${p.x}px`;marker.style.top=`${p.y}px`;marker.hidden=p.x< -25||p.y<0||p.x>width+25||p.y>height+55;marker.style.color=OdorHeat.colors[(preview?.intensity||1)-1];}
       const heat=OdorHeat.render(canvas,width,height,points,78271.51696*Math.cos(center.latitude*Math.PI/180)/2**zoom);
       host.dataset.heatPoints=String(heat.points);host.dataset.maxDensity=String(heat.maxDensity);host.dataset.zoom=zoom.toFixed(2);host.dataset.centerLat=center.latitude.toFixed(6);host.dataset.centerLon=center.longitude.toFixed(6);
-      find('.pin-heat-status').textContent=`${allRecords.length} ${allRecords.length===1?'relato local':'relatos locais'}${preview?.location?' · prévia do pino incluída':''}${points.length?'':' · sem pontos geográficos para exibir'}`;
+      find('.pin-heat-status').textContent=`${allRecords.length} ${allRecords.length===1?'relato':'relatos'}${preview?.location?' · prévia do pino incluída':''}${points.length?'':' · sem pontos geográficos para exibir'} · ${options.getMapStatus?.()||''}`;
       find('[data-pin-action="plus"]').disabled=zoom>=19;find('[data-pin-action="minus"]').disabled=zoom<=10;positionPopup();
     }
     function queue(){if(!frame&&!destroyed)frame=requestAnimationFrame(paint);}

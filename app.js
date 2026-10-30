@@ -31,13 +31,14 @@
   let gpsGeneration=0, cameraGeneration=0, cameraPending=false, addressController=null, lastAddressRequest=0;
   const addressCache=new Map();
   const STORE_KEY = 'waind-relatos-local-v2';
-  let records = [], toastTimer, photoURL = null, photoGeneration = 0, weatherGeneration = 0;
+  let records = [], publicRecords = [], mapStatus='Mapa coletivo ainda não consultado.', mapStarted=false, stopMap=null, syncing=false;
+  let toastTimer, photoURL = null, photoGeneration = 0, weatherGeneration = 0;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let motionPaused = reducedMotion.matches;
   let lastFocused = null;
   try {
     const stored = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-    if (Array.isArray(stored)) records = stored.filter(r => r && typeof r.id === 'string' && Number.isInteger(r.intensity) && r.intensity >= 1 && r.intensity <= 5 && Array.isArray(r.categories)).slice(-100);
+    if (Array.isArray(stored)) records = stored.filter(r => r && typeof r.id === 'string' && Number.isInteger(r.intensity) && r.intensity >= 1 && r.intensity <= 5 && Array.isArray(r.categories));
   } catch { /* Browsers may disable storage; a save will explain that state. */ }
 
   $('#hero-art').innerHTML = OdorArt.hero();
@@ -51,7 +52,7 @@
   const infoContent = {
     invisible:{title:'Sentir não é o mesmo que enxergar.',body:'<p>O odor pode estar no ar mesmo quando a foto mostra um lugar aparentemente limpo. Marcar esta opção evita tratar a imagem como evidência visual de uma fonte de mau odor.</p><p>No futuro, essa informação poderá ajudar a interpretar as imagens usadas na pesquisa. Neste protótipo, nenhuma foto é analisada por IA.</p>'},
     method:{title:'Uma percepção. Muitas possibilidades.',body:'<p><strong>Relato:</strong> o que alguém sentiu em um lugar e momento.</p><p><strong>Hipótese:</strong> uma possível fonte, sugerida por observação ou por um modelo, que ainda exige investigação.</p><p><strong>Causa comprovada:</strong> exige evidências próprias e não é estabelecida por este formulário. Relatos isolados são preservados como “isolado / não confirmado”.</p>'},
-    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Ao enviar, seus relatos e a identificação são guardados no Firebase de desenvolvimento do WAIND, com acesso restrito. Uma cópia pode ficar neste navegador. A foto é temporária e não é enviada. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
+    about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Ao enviar, o relato completo e a identificação são guardados no banco da pesquisa WAIND (Firebase/Firestore), com acesso restrito aos pesquisadores. O mapa coletivo mostra coordenadas, data, hora, intensidade, categorias e temperatura sem nome, e-mail, endereço ou textos livres. As coordenadas exatas podem revelar rotinas. Uma cópia com identificação fica neste navegador e na exportação JSON. Sem conexão, os relatos ficam pendentes e serão sincronizados ao reconectar. A foto é temporária e não é enviada; somente seus metadados integram o registro privado. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
   };
   function showToast(text) {
     clearTimeout(toastTimer); $('#toast').textContent = text; $('#toast').hidden = false;
@@ -149,13 +150,13 @@
     const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(),9000);
     try {
       const lat = Number(latitude.toFixed(2)), lon = Number(longitude.toFixed(2));
-      const query = new URLSearchParams({latitude:String(lat),longitude:String(lon),current:'temperature_2m,relative_humidity_2m,wind_speed_10m',timezone:'America/Sao_Paulo',forecast_days:'1'});
+      const query = new URLSearchParams({latitude:String(lat),longitude:String(lon),current:'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code',timezone:'America/Sao_Paulo',forecast_days:'1'});
       const response = await fetch(`https://api.open-meteo.com/v1/forecast?${query}`,{signal:controller.signal});
       if(!response.ok) throw new Error('Weather unavailable');
       const data = await response.json(); const current = data.current;
       if(!current || ![current.temperature_2m,current.relative_humidity_2m,current.wind_speed_10m].every(Number.isFinite)) throw new Error('Incomplete weather');
       if(generation!==weatherGeneration) return;
-      state.weather = {source:'Open-Meteo',basis,latitude:lat,longitude:lon,observedAt:current.time,timezone:'America/Sao_Paulo',temperatureC:current.temperature_2m,relativeHumidityPercent:current.relative_humidity_2m,windSpeedKmh:current.wind_speed_10m};
+      state.weather = {source:'Open-Meteo',basis,latitude:lat,longitude:lon,observedAt:current.time,timezone:'America/Sao_Paulo',temperatureC:current.temperature_2m,relativeHumidityPercent:current.relative_humidity_2m,windSpeedKmh:current.wind_speed_10m,conditionCode:Number.isInteger(current.weather_code)?current.weather_code:null};
       $('#temperature').textContent = `${Math.round(current.temperature_2m)} °C`;
       $('#humidity').textContent = `${Math.round(current.relative_humidity_2m)} %`;
       $('#wind').textContent = `${Math.round(current.wind_speed_10m)} km/h`;
@@ -330,11 +331,13 @@
   function renderRecords(){
     window.dispatchEvent(new Event('waind:records'));
     $('#local-count').textContent=String(records.length).padStart(2,'0');$('#export-records').disabled=!records.length;$('#clear-records').hidden=!records.length;
-    $('#records-description').textContent=records.length?'Relatos locais de percepção · fotos não armazenadas · exportação disponível.':'Os registros que você salvar ficam disponíveis aqui.';
+    const waiting=records.filter(r=>r.syncStatus==='pendente-sincronizacao').length;
+    $('#records-description').textContent=records.length?`Cópias deste navegador · ${waiting} ${waiting===1?'pendente':'pendentes'} de sincronização · exportação disponível.`:'Os registros que você salvar ficam disponíveis aqui.';
     $('#local-record-list').innerHTML=records.slice(-3).reverse().map(report=>{
       let date;try{date=report.occurrence?.kind==='past'?`Ocorrência ${localDate(report.occurrence.occurredAt)} · registrado ${localDate(report.recordedAt)}`:localDate(report.recordedAt);}catch{date='Data não disponível';}
       const labels=report.categories.map(id=>types.find(t=>t.id===id)?.label||id).join(', ');
-      return `<div class="record-row"><div>${escape(labels)}<small>${escape(date)} · intensidade ${report.intensity} / 5</small></div><span>ISOLADO /<br>NÃO CONFIRMADO</span></div>`;
+      const status=report.syncStatus==='pendente-sincronizacao'?'PENDENTE DE SINCRONIZAÇÃO':report.cloud?.confirmed?'ENVIADO AO BANCO':'SOMENTE NESTE NAVEGADOR';
+      return `<div class="record-row"><div>${escape(labels)}<small>${escape(date)} · intensidade ${report.intensity} / 5 · ${status}</small></div><span>ISOLADO /<br>NÃO CONFIRMADO</span></div>`;
     }).join('');
   }
   $('#export-records').addEventListener('click',()=>{
@@ -345,7 +348,7 @@
   });
   $('#clear-records').addEventListener('click',()=>{
     $('#info-title').textContent='Apagar os relatos deste navegador?';
-    $('#info-body').innerHTML='<p>Você pode exportar o caderno antes de apagá-lo. Essa ação remove somente as cópias deste navegador. Os registros já enviados ao Firebase permanecem no banco de desenvolvimento.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar relatos locais</button>';
+    $('#info-body').innerHTML='<p>Exporte o caderno antes de apagá-lo se quiser uma cópia. Registros pendentes serão perdidos e não poderão mais ser sincronizados. Os já enviados permanecem no banco da pesquisa.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar relatos locais</button>';
     openDialog($('#info-dialog'));
     $('#confirm-clear').addEventListener('click',()=>{
       try{localStorage.removeItem(STORE_KEY);}catch{showToast('Não foi possível limpar o armazenamento.');return;}
@@ -354,20 +357,62 @@
   });
   renderRecords(); updateSummary();
 
+  function cache(next){
+    // Never discard unsent reports when keeping the last 100 confirmed copies.
+    const pending=next.filter(r=>r.syncStatus==='pendente-sincronizacao');
+    const confirmed=next.filter(r=>r.syncStatus!=='pendente-sincronizacao').slice(-100);
+    const keep=[...confirmed,...pending].sort((a,b)=>a.recordedAt.localeCompare(b.recordedAt));
+    localStorage.setItem(STORE_KEY,JSON.stringify(keep));records=keep;
+  }
+  function remember(report){cache([...records.filter(r=>r.id!==report.id),report]);renderRecords();}
+  function startMap(){
+    mapStarted=true;stopMap?.();
+    WaindCloud.listenMap(items=>{publicRecords=items;window.dispatchEvent(new Event('waind:records'));},text=>{mapStatus=text;window.dispatchEvent(new Event('waind:records'));}).then(stop=>{stopMap=stop;});
+  }
+  async function syncPending(){
+    if(syncing||navigator.onLine===false)return;
+    syncing=true;let sent=0;
+    try{
+      for(const report of records.filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap)){
+        try{
+          const receipt=await WaindCloud.save(report);
+          // Do not restore a local copy if the participant erased it while sending.
+          if(!records.some(r=>r.id===report.id))continue;
+          report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;
+          try{remember(report);}catch{renderRecords();}
+          sent++;
+        }catch(error){report.syncError=String(error?.code||'network');try{remember(report);}catch{/* Preserve the existing durable pending copy. */}}
+      }
+    }finally{syncing=false;if(sent)showToast(`${sent} ${sent===1?'relato sincronizado':'relatos sincronizados'} com o banco da pesquisa.`);}
+  }
+  window.addEventListener('online',()=>{syncPending();if(mapStarted)startMap();});
+  window.addEventListener('storage',event=>{
+    if(event.key!==STORE_KEY)return;
+    try{const next=JSON.parse(event.newValue||'[]');if(Array.isArray(next)){records=next;renderRecords();}}catch{/* Keep the current caderno if external data is invalid. */}
+  });
+  setTimeout(syncPending,1200);setInterval(syncPending,60000);
 
   window.WaindApp = {
     state, levels, types, showToast, showInfo, createReport, fetchWeather,
-    getRecords:()=>records.map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),
+    startMap,syncPending,getMapStatus:()=>mapStatus,
+    getLocalRecords:()=>records.map(r=>({...r})),
+    getRecords:()=>[...new Map([...records.map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),...publicRecords].map(r=>[r.id,r])).values()],
     getPhotoURL:()=>photoURL,
     async save(report){
+      report.syncStatus='pendente-sincronizacao';report.storage='browser-local';
+      let durable=false;
+      try{remember(report);durable=true;}catch{/* A confirmed cloud send can still succeed without local storage. */}
       try {
         const receipt=await WaindCloud.save(report);
-        report.storage='firebase-development';report.cloud={id:receipt.id,projectId:receipt.projectId,confirmed:true};
-      } catch(error) { showToast(WaindCloud.message(error));return false; }
-      const next=[...records.filter(r=>r.id!==report.id),report].slice(-100);
-      try{localStorage.setItem(STORE_KEY,JSON.stringify(next));}
-      catch{showToast('Enviado ao banco. Não foi possível guardar a cópia neste navegador.');}
-      records=next;renderRecords();return true;
+        report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;
+        try{remember(report);}catch{showToast('Enviado ao banco. Não foi possível atualizar a cópia neste navegador.');}
+        return {status:'sincronizado',id:report.id};
+      } catch(error) {
+        report.syncError=String(error?.code||'network');
+        try{remember(report);durable=true;}catch{/* Do not claim a local save without a durable copy. */}
+        if(!durable){showToast('Não foi possível enviar nem salvar neste navegador. Mantenha esta tela aberta e tente novamente.');return false;}
+        showToast(WaindCloud.message(error));return {status:'pendente-sincronizacao',id:report.id,message:WaindCloud.message(error)};
+      }
     },
     reset(){
       ++gpsGeneration;++cameraGeneration;cameraPending=false;addressController?.abort();

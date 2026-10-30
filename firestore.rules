@@ -1,72 +1,106 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signed() { return request.auth != null; }
-    function own() { return signed() && resource.data.ownerUid == request.auth.uid; }
-    function text(v, max) { return v is string && v.size() <= max; }
-    function categories(v) {
-      return v is list && v.size() >= 1 && v.size() <= 8
-        && v.toSet().size() == v.size()
-        && v.hasOnly(['waste','container','sewer','ditch','organic','metabolic','chemical','other']);
+    function exact(d, keys) { return d is map && d.keys().size() == keys.size() && d.keys().hasOnly(keys); }
+    function text(v, maximum) { return v is string && v.size() <= maximum; }
+    function optionalNumber(v, low, high) { return v == null || (v is number && v >= low && v <= high); }
+    function categoryIds() { return ['waste','container','sewer','ditch','organic','metabolic','chemical','other']; }
+    function odor(d, privateData) {
+      let c=d.categorias;
+      let r=d.rotulos;
+      return exact(d,privateData ? ['categorias','rotulos','multi_hot','outro_descricao'] : ['categorias','rotulos','multi_hot'])
+        && c is list && c.size() >= 1 && c.size() <= 8 && c.toSet().size() == c.size() && c.hasOnly(categoryIds())
+        && r is list && r.size() == c.size() && r.toSet().size() == r.size()
+        && d.multi_hot == {'waste':('waste' in c ? 1 : 0),'container':('container' in c ? 1 : 0),
+          'sewer':('sewer' in c ? 1 : 0),'ditch':('ditch' in c ? 1 : 0),'organic':('organic' in c ? 1 : 0),
+          'metabolic':('metabolic' in c ? 1 : 0),'chemical':('chemical' in c ? 1 : 0),'other':('other' in c ? 1 : 0)}
+        && ('waste' in c) == ('Resíduos' in r) && ('container' in c) == ('Contentor de lixo' in r)
+        && ('sewer' in c) == ('Esgoto' in r) && ('ditch' in c) == ('Valas a céu aberto' in r)
+        && ('organic' in c) == ('Resíduos orgânicos alimentares' in r) && ('metabolic' in c) == ('Resíduos metabólicos' in r)
+        && ('chemical' in c) == ('Resíduos químicos' in r) && ('other' in c) == ('Outros' in r)
+        && (!privateData || (text(d.outro_descricao,160) && ('other' in c ? d.outro_descricao.size() > 0 : d.outro_descricao == '')));
     }
-    function validIdentity(d, id) {
-      return d.keys().hasOnly(['ownerUid','reportId','name','email','emailVerified','receivedAt','consent'])
-        && d.ownerUid == request.auth.uid && d.reportId == id
-        && text(d.name,120) && d.name.size() > 0
-        && text(d.email,254) && d.email.matches('[^@\\s]+@[^@\\s]+\\.[^@\\s]+')
-        && d.emailVerified == false && d.receivedAt == request.time
-        && d.consent.keys().hasOnly(['cloudStorage','contextConfirmed','version','acceptedAt'])
-        && d.consent.cloudStorage == true && d.consent.contextConfirmed == true
-        && d.consent.version == 'waind-firebase-dev-1' && text(d.consent.acceptedAt,40);
+    function intensity(d) {
+      return exact(d,['nivel','rotulo']) && d.nivel is int && d.nivel >= 1 && d.nivel <= 5
+        && d.rotulo == ['Muito fraco','Fraco','Intermediário','Forte','Muito forte'][d.nivel-1];
     }
-    function validReport(d,id) {
-      return d.keys().hasOnly(['schemaVersion','id','ownerUid','receivedAt','recordedAt','occurrence',
-        'intensity','categories','otherDescription','location','weather','photoProvided',
-        'noVisibleSource','visibleTags','observation','evidenceType','verificationStatus','causeProven','ai','appVersion'])
-        && d.schemaVersion == 3 && d.id == id && d.ownerUid == request.auth.uid
-        && d.receivedAt == request.time && text(d.recordedAt,40)
-        && d.intensity is int && d.intensity >= 1 && d.intensity <= 5
-        && categories(d.categories) && text(d.otherDescription,240)
-        && (!d.categories.hasAny(['other']) || d.otherDescription.size() > 0)
-        && d.location.keys().hasOnly(['latitude','longitude','source','accuracyMeters'])
-        && d.location.latitude is number && d.location.latitude >= -85 && d.location.latitude <= 85
-        && d.location.longitude is number && d.location.longitude >= -180 && d.location.longitude <= 180
-        && d.location.source in ['device-gps','manual-map','manual-coordinates']
-        && (d.location.accuracyMeters == null || (d.location.accuracyMeters is number && d.location.accuracyMeters >= 0))
-        && d.occurrence.keys().hasOnly(['kind','occurredAt','timezone','approximate'])
-        && d.occurrence.kind in ['current','past'] && text(d.occurrence.occurredAt,40)
-        && d.occurrence.timezone == 'America/Sao_Paulo'
-        && d.occurrence.approximate == (d.occurrence.kind == 'past')
-        && (d.weather == null || (d.weather.keys().hasOnly(['source','temperatureC','relativeHumidityPercent','windSpeedKmh','observedAt','timezone','basis'])
-          && d.weather.source == 'Open-Meteo' && d.weather.temperatureC is number
-          && d.weather.relativeHumidityPercent is number && d.weather.relativeHumidityPercent >= 0 && d.weather.relativeHumidityPercent <= 100
-          && d.weather.windSpeedKmh is number && d.weather.windSpeedKmh >= 0
-          && text(d.weather.observedAt,40) && d.weather.timezone == 'America/Sao_Paulo'
-          && d.weather.basis in ['study-area','device-region','manual-region']))
-        && d.visibleTags is list && d.visibleTags.size() <= 8
-        && d.visibleTags.toSet().size() == d.visibleTags.size()
-        && d.visibleTags.hasOnly(['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'])
-        && d.noVisibleSource is bool && d.photoProvided is bool && text(d.observation,400)
-        && d.evidenceType == 'citizen-perception' && d.verificationStatus == 'isolated-unconfirmed'
-        && d.causeProven == false && d.appVersion == '0.5.0-dev'
-        && d.ai.keys().hasOnly(['computerVisionExecuted','predictionExecuted'])
-        && d.ai.computerVisionExecuted == false && d.ai.predictionExecuted == false;
+    function when(d) {
+      return d.data is string && d.data.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && d.hora is string && d.hora.matches('^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$');
     }
-    match /relatos/{id} {
-      allow get: if signed() && (resource == null || resource.data.ownerUid == request.auth.uid);
-      allow list: if own() && request.query.limit <= 100;
-      allow create: if signed() && validReport(request.resource.data,id)
-        && getAfter(/databases/$(database)/documents/participantes/$(id)).data.ownerUid == request.auth.uid
-        && getAfter(/databases/$(database)/documents/participantes/$(id)).data.reportId == id;
+    function address(d) {
+      return exact(d,['rua','bairro','cidade','estado','cep']) && text(d.rua,300) && text(d.bairro,150)
+        && text(d.cidade,150) && text(d.estado,100) && text(d.cep,30);
+    }
+    function location(d) {
+      return exact(d,['latitude','longitude','origem','precisao_metros','endereco'])
+        && d.latitude is number && d.latitude >= -85 && d.latitude <= 85
+        && d.longitude is number && d.longitude >= -180 && d.longitude <= 180
+        && d.origem in ['device-gps','manual-map','manual-coordinates']
+        && optionalNumber(d.precisao_metros,0,100000) && address(d.endereco);
+    }
+    function weather(d) {
+      return exact(d,['temperatura_c','umidade_pct','vento_kmh','condicao_codigo','referencia_clima','momento','consultado_em','fonte'])
+        && optionalNumber(d.temperatura_c,-100,70) && optionalNumber(d.umidade_pct,0,100)
+        && optionalNumber(d.vento_kmh,0,500) && (d.condicao_codigo == null || (d.condicao_codigo is int && d.condicao_codigo >= 0 && d.condicao_codigo <= 99))
+        && d.referencia_clima in ['regiao-gps','regiao-pin','area-estudo']
+        && d.momento == 'atual-nao-historico' && (d.consultado_em == null || text(d.consultado_em,40)) && d.fonte == 'Open-Meteo';
+    }
+    function photo(d) {
+      return d == null || (exact(d,['nome','tipo','tamanho_bytes','largura','altura','imagem_enviada'])
+        && text(d.nome,255) && d.tipo in ['image/jpeg','image/png','image/webp']
+        && d.tamanho_bytes is int && d.tamanho_bytes > 0 && d.tamanho_bytes <= 8388608
+        && d.largura is int && d.largura > 0 && d.altura is int && d.altura > 0 && d.imagem_enviada == false);
+    }
+    function consent(d) {
+      return exact(d,['versao','aceito_em','pesquisa','mapa_publico','copia_local','contexto_confirmado'])
+        && d.versao == 'waind-pesquisa-mapa-0.5' && text(d.aceito_em,40)
+        && d.aceito_em.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}T.*Z$')
+        && d.pesquisa == true && d.mapa_publico == true && d.copia_local == true && d.contexto_confirmado == true;
+    }
+    function research(d) {
+      return exact(d,['nome','email','data','hora','tipo_ocorrencia','criado_em','temperatura','clima','localizacao','intensidade_odor','tipo_odor','sem_foco_visivel','visivel_por_perto','observacao','foto_metadados','consentimento','status_qualidade'])
+        && text(d.nome,120) && d.nome.size() > 0 && text(d.email,254) && d.email.matches('^[^ @]+@[^ @]+[.][^ @]+$')
+        && when(d) && d.tipo_ocorrencia in ['atual','anterior'] && d.criado_em == request.time
+        && optionalNumber(d.temperatura,-100,70) && weather(d.clima) && d.temperatura == d.clima.temperatura_c
+        && location(d.localizacao);
+    }
+    // Each create stays below the 1000-expression limit. Both new documents are mandatory.
+    // The private create validates identity/time/location/weather; its public twin validates the remaining private fields.
+    function researchDetails(d) {
+      return intensity(d.intensidade_odor) && odor(d.tipo_odor,true)
+        && d.sem_foco_visivel is bool && d.visivel_por_perto is list && d.visivel_por_perto.size() <= 8
+        && d.visivel_por_perto.hasOnly(['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'])
+        && text(d.observacao,400) && photo(d.foto_metadados) && consent(d.consentimento) && d.status_qualidade == 'isolado-nao-confirmado';
+    }
+    function publicMap(d) {
+      return exact(d,['latitude','longitude','intensidade_odor','tipo_odor','data','hora','temperatura','status_qualidade'])
+;
+    }
+    function paired(p, m) {
+      return m.latitude == p.localizacao.latitude && m.longitude == p.localizacao.longitude
+        && m.intensidade_odor == p.intensidade_odor && m.tipo_odor.categorias == p.tipo_odor.categorias
+        && exact(m.tipo_odor,['categorias','rotulos','multi_hot'])
+        && m.tipo_odor.rotulos == p.tipo_odor.rotulos && m.tipo_odor.multi_hot == p.tipo_odor.multi_hot
+        && m.data == p.data && m.hora == p.hora && m.temperatura == p.temperatura && m.status_qualidade == p.status_qualidade;
+    }
+    match /relatos_pesquisa/{id} {
+      allow create: if request.auth != null && id.matches('^[A-Za-z0-9-]{20,80}$')
+        && research(request.resource.data)
+        && !exists(/databases/$(database)/documents/relatos_mapa/$(id))
+        && paired(request.resource.data,getAfter(/databases/$(database)/documents/relatos_mapa/$(id)).data);
+      allow read, update, delete: if false;
+    }
+    match /relatos_mapa/{id} {
+      allow read: if true;
+      allow create: if request.auth != null && id.matches('^[A-Za-z0-9-]{20,80}$')
+        && publicMap(request.resource.data)
+        && researchDetails(getAfter(/databases/$(database)/documents/relatos_pesquisa/$(id)).data)
+        && !exists(/databases/$(database)/documents/relatos_pesquisa/$(id))
+        && paired(getAfter(/databases/$(database)/documents/relatos_pesquisa/$(id)).data,request.resource.data);
       allow update, delete: if false;
     }
-    match /participantes/{id} {
-      allow get: if own();
-      allow list: if own() && request.query.limit <= 100;
-      allow create: if signed() && validIdentity(request.resource.data,id)
-        && getAfter(/databases/$(database)/documents/relatos/$(id)).data.ownerUid == request.auth.uid;
-      allow update, delete: if false;
-    }
+    // Retain earlier development collections; disable all browser access to them.
     match /{document=**} { allow read, write: if false; }
   }
 }

@@ -7,7 +7,7 @@ for(const file of ['tailwind.css','styles.css','illustrations.css','map.css','ma
   const css=await fs.readFile(path.join(root,file),'utf8');
   html=html.replace(`<link rel="stylesheet" href="${file}">`,()=>`<style>\n/* ${file} */\n${css}\n</style>`);
 }
-for(const file of ['illustrations.js','brand.js','wind-motion.js','maplibre-gl.js','odor-heat.js','pin-map.js','firebase-config.js','firebase-store.js','app.js','wizard.js']){
+for(const file of ['illustrations.js','brand.js','wind-motion.js','maplibre-gl.js','odor-heat.js','pin-map.js','firebase-config.js','firebase-client.js','app.js','wizard.js']){
   const js=await fs.readFile(path.join(root,file),'utf8');
   html=html.replace(`<script src="${file}"></script>`,()=>`<script>\n/* ${file} */\n${js.replace(/<\/script/gi,'<\\/script')}\n</script>`);
 }
