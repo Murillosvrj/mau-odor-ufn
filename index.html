@@ -2174,7 +2174,7 @@ window.WaindAppCheckConfig = Object.freeze({
   window.addEventListener('waind:form-reset',render);
   window.addEventListener('waind:account', () => { render(); if (WaindCloud.currentAccount()) status('Conta conectada. Confira o contexto e o consentimento antes de continuar.'); });
   render(); controls(true);
-  WaindCloud.watchAccount().then(() => { controls(false); render(); }).catch(error => { controls(false); render(); status(WaindCloud.accountMessage(error), true); });
+  WaindCloud.watchAccount().then(() => { controls(false); render(); if (!WaindCloud.currentAccount()) status('Entre com Google ou use seu e-mail para começar.'); }).catch(error => { controls(false); render(); status(WaindCloud.accountMessage(error), true); });
 })();
 
 </script>
