@@ -521,7 +521,13 @@ window.WaindAppCheckConfig = Object.freeze({
   }
   // Exclusão pelo autor: apaga relato privado, ponto público e foto no mesmo lote (regras exigem os três juntos)
   // e grava um registro anônimo com data e motivo, sem ID do relato, conta, local ou nota.
-  async function remove(id,motivo){
+  const removing=new Map();
+  // Toque duplo ou duas abas: a mesma exclusão em andamento é reaproveitada, então só um registro anônimo é criado.
+  function remove(id,motivo){
+    if(!removing.has(id))removing.set(id,removeOnce(id,motivo).finally(()=>removing.delete(id)));
+    return removing.get(id);
+  }
+  async function removeOnce(id,motivo){
     if(!MOTIVOS.includes(motivo))throw Object.assign(new Error('Motivo inválido'),{code:'invalid-argument'});
     if(navigator.onLine===false)throw Object.assign(new Error('Offline'),{code:'offline'});
     const c=await connect();await c.auth.authStateReady();
