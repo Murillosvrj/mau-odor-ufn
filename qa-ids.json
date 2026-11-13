@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "notice": "IDs exclusivamente t\u00e9cnicos. GPT07 reserva 32 UUIDs para testes locais. testes_producao_0_8: relatos de teste feitos no app publicado em 13/11/2026 (verifica\u00e7\u00e3o da 0.8). Excluir tamb\u00e9m qualquer ocorr\u00eancia na coordenada sentinela (-80,0).",
+  "notice": "IDs exclusivamente t\u00e9cnicos. GPT07 reserva 32 UUIDs para testes locais. testes_producao_0_8: relatos de teste feitos no app publicado em 13/11/2026 (verifica\u00e7\u00e3o da 0.8). testes_pre_coleta: relatos do pesquisador feitos para testar o app antes da coleta (30/10 a 13/11/2026). Excluir tamb\u00e9m qualquer ocorr\u00eancia na coordenada sentinela (-80,0).",
   "gpt05": [
     "128de2aa-edfa-489c-b048-e7b157e0ba31",
     "22a4fc49-488d-4a11-b5bb-60a04ac98a28",
@@ -53,6 +53,12 @@
     "e64cc3c1-d2a8-4e0c-a93f-e089bd2d64c8",
     "1a4ac1c5-4a45-4d5a-9dc5-9bbb081765ec",
     "cb5e0162-e184-41d8-a71f-bf8c76dc2457"
+  ],
+  "testes_pre_coleta": [
+    "a576bf82-d16a-4a3f-a968-baf4e84c13d8",
+    "b1bd6fbf-7efc-4007-bd95-aab43940c3cc",
+    "ba7c7bf6-854e-4959-94e9-b9c4b4d19a27",
+    "c5628820-ffd4-47e3-ad36-57e2e3d35d8b"
   ],
   "sentinel": {
     "latitude": -80,
