@@ -72,3 +72,7 @@ Padrão: 60 exemplos sintéticos, somente pipeline. Texto/imagem exigem `EXECUTA
 ```
 
 Falta de suporte: `abstencao: true`, `intensidade_estimada: null`, motivo explícito. Nunca usar zero como intensidade. Registrar hashes/versões dos artefatos de treino administrativamente. Nunca modificar nota humana, `relatos_mapa`, cor do ponto ou relato original. As regras atuais negam acesso cliente a essa coleção; integração ainda não implementada.
+
+## Consenso, viés e retreino (0.8)
+
+`waind_consenso_vies_retreino_colab.ipynb` lê esta exportação e: agrupa relatos (100 m / 120 min, ou o `grupo_ocorrencia_ou_foto` exportado); estima o viés de cada `participante_pseudo_id` com encolhimento; calcula a intensidade ajustada (nota − viés, limitada a 1–5) e o consenso por grupo (mediana bruta, média ajustada, dispersão). Treina por grupo e só promove um modelo quando cumpre os mínimos (100 relatos, 15 participantes, 20 grupos, 8 grupos com 2+ pessoas) e vence a mediana por 0,05 nível nas divisões por grupo e por local. Cada rodada grava `registro.json`, consenso, viés e intensidade ajustada em `WAIND/modelos/<data>_<modo>/`; só a promoção em campo atualiza `vigente.json`. A nota humana nunca é alterada.
