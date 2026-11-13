@@ -109,7 +109,7 @@
     // Ocorrência anterior: busca o clima da hora informada antes de montar o relato.
     let historical=null;
     if(isPast()){reviewing=true;$('#review-open').disabled=true;try{const loc=app.state.location;historical=await app.fetchHistoricalWeather(loc.latitude,loc.longitude,$('#occurred-at').value,mode==='gps'?'device-region':'manual-region');}finally{reviewing=false;$('#review-open').disabled=false;}if(!isPast()||!locationValid())return;}
-    pending=app.createReport();if(historical)pending.weather=historical;pending.schemaVersion=7;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,accountAuthenticated:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.7'};
+    pending=app.createReport();if(historical)pending.weather=historical;if(app.state.correctionOf)pending.replaces=app.state.correctionOf;pending.schemaVersion=7;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,accountAuthenticated:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.8'};
     pending.occurrence={kind:isPast()?'past':'current',occurredAt:isPast()?new Date($('#occurred-at').value+':00-03:00').toISOString():pending.recordedAt,timezone:'America/Sao_Paulo',approximate:isPast()};
     pending.weatherContext={relationship:pending.weather?.moment==='historical-hourly'?'historical-hourly-regional-context':isPast()?'current-context-not-historical':'current-regional-context',notMeasuredAtSource:true};
     const rows=[['Nome',pending.participant.name],['E-mail',pending.participant.email],['Fuso horário','Horário de Brasília'],...summary(pending.weather),['Localização',locationText(pending.location)]];
@@ -165,6 +165,29 @@
   $('#review-open').addEventListener('click',review);$('#edit-report').addEventListener('click',()=>editStep('3'));$('#save-report').addEventListener('click',save);$('#new-report').addEventListener('click',restart);
   $$('[data-edit]').forEach(b=>b.addEventListener('click',()=>editStep(b.dataset.edit)));
   ['camera-button','gallery-button'].forEach(id=>$('#'+id).addEventListener('click',()=>{$('#photo-consent').checked=true;}));
+  // Corrigir (0.8): novo relato preenchido a partir do antigo, como ocorrência anterior na mesma hora e local.
+  // O antigo só é apagado depois que o novo chega ao banco (app.finishCorrection).
+  window.addEventListener('waind:correct',event=>{
+    const r=event.detail?.report;if(!r||r.autor_uid!==WaindCloud.currentAccount()?.uid)return;
+    WaindMotion.finish();resetting=true;pinMap?.destroy?.();pinMap=null;pending=null;saved=false;savedId=null;mapGpsAttempted=false;app.reset();
+    $('#success-panel').hidden=true;$('#review-panel').hidden=true;$('#location-panel').hidden=false;
+    const pick=(name,val)=>{const el=$(`input[name="${name}"][value="${val}"]`);if(el){el.checked=true;el.dispatchEvent(new Event('change',{bubbles:true}));}};
+    pick('screening','no');pick('past-choice','yes');$('#past-time-field').hidden=false;
+    const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(r.occurrence?.occurredAt||r.recordedAt)).map(x=>[x.type,x.value]));
+    $('#occurred-at').value=`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+    pick('intensity',r.intensity);(r.categories||[]).forEach(id=>pick('odor',id));
+    $('#other-text').value=r.otherDescription||'';
+    $$('input[name="tag"]').forEach(el=>{if((r.visibleTags||[]).includes(el.closest('label')?.textContent.trim())){el.checked=true;el.dispatchEvent(new Event('change',{bubbles:true}));}});
+    $('#invisible-source').checked=!!r.noVisibleSource;
+    $('#observation').value=r.observation||'';$('#observation').dispatchEvent(new Event('input',{bubbles:true}));
+    if(r.location&&Number.isFinite(r.location.latitude)&&Number.isFinite(r.location.longitude)){
+      manualLocation={latitude:r.location.latitude,longitude:r.location.longitude,source:'manual-map',accuracyMeters:null};
+      mode='pin';$('input[name="location-mode"][value="pin"]').checked=true;app.state.location=manualLocation;
+    }
+    app.state.correctionOf=r.id;resetting=false;
+    app.showToast('Correção: revise as etapas e envie. O relato antigo será apagado depois.');
+    navigate('1',{animated:false});
+  });
   let lastAccountUid=null;
   window.addEventListener('waind:account',()=>{
     const uid=WaindCloud.currentAccount()?.uid||null;

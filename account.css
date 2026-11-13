@@ -15,3 +15,9 @@
 .history-detail{border-top:1px solid #ddd7cc;padding:12px 0;font-size:12px;line-height:1.7}.history-detail summary{cursor:pointer;font-weight:500}.history-detail dl{margin:10px 0}.history-detail dt{font-size:10px;color:#686257}.history-detail dd{margin:0 0 8px;overflow-wrap:anywhere;white-space:pre-wrap}
 #history-status{width:100%;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
 @media(max-width:600px){.account-card{padding:18px 15px}.account-fields{grid-template-columns:1fr}.account-actions{align-items:stretch;gap:13px}.account-actions .button{width:100%}.account-connected-line{align-items:flex-start}.account-card h2{font-size:23px}}
+
+/* 0.8 — excluir e corrigir no histórico */
+.history-actions{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;margin:.75rem 0 .25rem}
+.history-actions .danger{color:#9b2c1f}
+.removal-reasons{border:0;margin:1rem 0;padding:0;display:grid;gap:.4rem}
+.removal-reasons legend{font-weight:600;margin-bottom:.4rem}

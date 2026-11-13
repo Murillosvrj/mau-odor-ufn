@@ -68,7 +68,7 @@ export async function exportDataset({collections,out,salt,qa,meters=100,minutes=
     check(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(id),`UUID inválido: ${id}`);
     check(Number.isInteger(p.intensidade_odor?.nivel)&&p.intensidade_odor.nivel>=1&&p.intensidade_odor.nivel<=5,`Intensidade inválida: ${id}`);
     check(['atual','anterior'].includes(p.tipo_ocorrencia)&&/^\d{4}-\d{2}-\d{2}$/.test(p.data)&&/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(p.hora)&&new Date(p.data+'T12:00:00Z').toISOString().slice(0,10)===p.data,`Ocorrência inválida: ${id}`);
-    const consent=p.consentimento;check(consent?.pesquisa===true&&['waind-pesquisa-mapa-0.5','waind-pesquisa-mapa-0.6','waind-pesquisa-mapa-0.7'].includes(consent.versao),`Consentimento não reconhecido: ${id}`);
+    const consent=p.consentimento;check(consent?.pesquisa===true&&['waind-pesquisa-mapa-0.5','waind-pesquisa-mapa-0.6','waind-pesquisa-mapa-0.7','waind-pesquisa-mapa-0.8'].includes(consent.versao),`Consentimento não reconhecido: ${id}`);
     const m=maps.get(id);check(m&&JSON.stringify(Object.keys(m).sort())===JSON.stringify([...mapKeys].sort()),`Par público ausente ou com campos indevidos: ${id}`);
     check(m.latitude===p.localizacao.latitude&&m.longitude===p.localizacao.longitude&&m.data===p.data&&m.hora===p.hora&&m.intensidade_odor.nivel===p.intensidade_odor.nivel&&m.intensidade_odor.rotulo===p.intensidade_odor.rotulo&&m.temperatura===p.temperatura&&m.status_qualidade===p.status_qualidade,`Par divergente: ${id}`);
     const cats=p.tipo_odor?.categorias;check(Array.isArray(cats)&&cats.length>0&&new Set(cats).size===cats.length&&cats.every(c=>categoryIds.includes(c)),`Categorias inválidas: ${id}`);

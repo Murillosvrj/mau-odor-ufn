@@ -69,6 +69,7 @@
       if(event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
     });
   });
+  $('#info-dialog').addEventListener('close',()=>{$('#info-eyebrow').textContent='NOTA DE CAMPO';});
   function showInfo(key) {
     const type = types.find(t => t.id === key);
     const content = type ? {title:type.label,body:`<p>${escape(type.description)}</p>`} : infoContent[key];
@@ -378,7 +379,11 @@
       for(const [label,value] of [['Nome informado no envio',report.participant?.name||''],['E-mail informado no envio',report.participant?.email||''],['Observação',report.observation||'Sem observação'],['Outro odor',report.otherDescription||'Não informado'],['Por perto',report.visibleTags?.join(', ')||'Não informado'],['Foto',report.photo?'Fotografia privada associada; imagem não carregada neste histórico.':'Sem fotografia'],['Identificador',report.id],['Qualidade','Percepção isolada / não confirmada']]){
         const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);
       }
-      details.append(title,dl);return details;
+      const actions=document.createElement('div');actions.className='history-actions';
+      const pendingHere=report.syncStatus==='pendente-sincronizacao';
+      if(!pendingHere){const fix=document.createElement('button');fix.type='button';fix.className='text-button';fix.textContent='Corrigir';fix.addEventListener('click',()=>askCorrection(report));actions.append(fix);}
+      const del=document.createElement('button');del.type='button';del.className='text-button danger';del.textContent=pendingHere?'Excluir deste aparelho':'Excluir relato';del.addEventListener('click',()=>askRemoval(report));actions.append(del);
+      details.append(title,dl,actions);return details;
     }));
     window.dispatchEvent(new Event('waind:records'));
   }
@@ -407,6 +412,45 @@
     $('#info-body').innerHTML='<p>Exporte seus relatos antes se quiser uma cópia. As pendências desta conta serão perdidas. Relatos enviados permanecem no banco e pendências de outras contas são preservadas.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar cópias desta conta</button>';
     openDialog($('#info-dialog'));$('#confirm-clear').addEventListener('click',()=>{if(activeUid!==uid)return;try{WaindLocal.remove(uid);records=[];renderRecords();$('#info-dialog').close();}catch{showToast('Não foi possível apagar as cópias locais.');}});
   });
+  // 0.8 — excluir e corrigir. Relato enviado: apaga relato, foto e ponto do mapa no banco (com motivo anônimo).
+  // Pendente só neste aparelho: apaga a cópia local. Corrigir = novo relato (ocorrência anterior, mesma hora e
+  // local) e o antigo só é apagado depois que o novo chega ao banco.
+  const MOTIVOS_TEXTO=[['intensidade-errada','Errei a intensidade'],['tipo-errado','Errei o tipo de odor'],['local-errado','Marquei o local errado'],['enviado-por-engano','Enviei por engano'],['nao-quero-participar','Não quero mais participar'],['outro','Outro motivo']];
+  function forget(id,uid=activeUid){cache(WaindLocal.read(uid).filter(r=>r.id!==id),uid);cloudHistory=cloudHistory.filter(r=>r.id!==id);renderRecords();}
+  function askRemoval(report){
+    const uid=activeUid;if(!uid||report.autor_uid!==uid)return;
+    const local=report.syncStatus==='pendente-sincronizacao';
+    $('#info-eyebrow').textContent='EXCLUIR RELATO';$('#info-title').textContent=local?'Excluir este relato pendente?':'Excluir este relato de vez?';
+    const body=$('#info-body');body.replaceChildren();
+    const p=document.createElement('p');p.textContent=local?'Ele ainda não foi enviado. A cópia neste aparelho será apagada.':'O relato, a foto e o ponto no mapa público serão apagados do banco da pesquisa. Isso não pode ser desfeito. Fica só um registro anônimo com a data e o motivo.';body.append(p);
+    const field=document.createElement('fieldset');field.className='removal-reasons';field.hidden=local;
+    const legend=document.createElement('legend');legend.textContent='Por que você quer excluir?';field.append(legend);
+    MOTIVOS_TEXTO.forEach(([value,text],i)=>{const label=document.createElement('label');label.className='check-line';const input=document.createElement('input');input.type='radio';input.name='removal-reason';input.value=value;input.checked=i===0;const span=document.createElement('span');span.textContent=text;label.append(input,span);field.append(label);});
+    body.append(field);
+    const confirm=document.createElement('button');confirm.type='button';confirm.className='button button-ink';confirm.id='confirm-removal';confirm.textContent=local?'Apagar deste aparelho':'Excluir de vez';body.append(confirm);
+    openDialog($('#info-dialog'));
+    confirm.addEventListener('click',async()=>{
+      if(activeUid!==uid)return;confirm.disabled=true;
+      if(local){try{forget(report.id,uid);$('#info-dialog').close();showToast('Relato pendente apagado deste aparelho.');}catch{showToast('Não foi possível apagar a cópia local.');confirm.disabled=false;}return;}
+      confirm.textContent='Excluindo…';
+      try{await WaindCloud.remove(report.id,body.querySelector('input[name="removal-reason"]:checked')?.value||'outro');if(activeUid===uid)forget(report.id,uid);$('#info-dialog').close();showToast('Relato excluído do banco e do mapa.');refreshHistory();}
+      catch(error){confirm.disabled=false;confirm.textContent='Excluir de vez';showToast(String(error?.code).includes('offline')||String(error?.code).includes('unavailable')?'Sem conexão. Tente excluir quando a internet voltar.':'Não foi possível excluir agora. Tente novamente.');}
+    });
+  }
+  function askCorrection(report){
+    const uid=activeUid;if(!uid||report.autor_uid!==uid)return;
+    $('#info-eyebrow').textContent='CORRIGIR RELATO';$('#info-title').textContent='Corrigir este relato?';
+    const body=$('#info-body');body.replaceChildren();
+    const p=document.createElement('p');p.textContent='Vamos abrir um relato novo já preenchido, como ocorrência anterior, na mesma data, hora e local. Ajuste o que precisar e envie. O relato antigo só é apagado depois que o novo chegar ao banco. A foto não é copiada: se quiser, tire outra.';body.append(p);
+    const go=document.createElement('button');go.type='button';go.className='button button-ink';go.id='confirm-correction';go.textContent='Abrir correção';body.append(go);
+    openDialog($('#info-dialog'));
+    go.addEventListener('click',()=>{$('#info-dialog').close();window.dispatchEvent(new CustomEvent('waind:correct',{detail:{report:{...report}}}));});
+  }
+  async function finishCorrection(report){
+    if(!report.replaces)return;
+    try{await WaindCloud.remove(report.replaces,'corrigido');forget(report.replaces,report.autor_uid);delete report.replaces;try{remember(report);}catch{/* cópia local opcional */}showToast('Correção enviada. O relato antigo foi apagado.');}
+    catch{showToast('Correção enviada, mas o relato antigo não pôde ser apagado agora. Exclua-o pelo histórico.');}
+  }
   function cache(next,uid=activeUid){const saved=WaindLocal.write(uid,next);if(uid===activeUid)records=saved;}
   function remember(report){const uid=report.autor_uid;cache([...WaindLocal.read(uid).filter(r=>r.id!==report.id),report],uid);if(uid===activeUid)renderRecords();}
   window.addEventListener('waind:account',()=>{
@@ -425,13 +469,14 @@
     const uid=activeUid;if(syncing||!uid||navigator.onLine===false)return;
     syncing=true;let sent=0;
     try{
-      for(const report of WaindLocal.read(uid).filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&r.consent?.version==='waind-pesquisa-mapa-0.7')){
+      for(const report of WaindLocal.read(uid).filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&['waind-pesquisa-mapa-0.7','waind-pesquisa-mapa-0.8'].includes(r.consent?.version))){
         if(activeUid!==uid)break;
         try{
           const receipt=await WaindCloud.save(report);
           if(!WaindLocal.read(uid).some(r=>r.id===report.id))continue;
           report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
           try{remember(report);}catch{if(activeUid===uid)renderRecords();}sent++;
+          await finishCorrection(report);
         }catch(error){report.syncError=String(error?.code||'network');try{remember(report);}catch{/* Não perder pendências duráveis. */}}
       }
     }finally{syncing=false;if(sent&&activeUid===uid){showToast(`${sent} relato(s) desta conta sincronizado(s).`);refreshHistory();}}
@@ -456,6 +501,7 @@
         const receipt=await WaindCloud.save(report);
         report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
         try{remember(report);}catch{showToast('Enviado ao banco. Não foi possível atualizar a cópia neste navegador.');}
+        await finishCorrection(report);
         if(activeUid===report.autor_uid)refreshHistory();
         return {status:'sincronizado',id:report.id};
       } catch(error) {
@@ -467,7 +513,7 @@
     },
     reset(){
       ++gpsGeneration;++cameraGeneration;cameraPending=false;addressController?.abort();
-      $('#odor-form').reset(); state.intensity=null;state.types.clear();state.tags.clear();state.location=null;state.pending=null;state.gpsLocation=null;removePhoto();
+      $('#odor-form').reset(); state.intensity=null;state.types.clear();state.tags.clear();state.location=null;state.pending=null;state.gpsLocation=null;state.correctionOf=null;removePhoto();
       $$('.odor-card').forEach(card=>card.classList.remove('is-selected','is-animating'));
       document.documentElement.style.setProperty('--intensity-color','#111');
       $('#intensity-readout').textContent='A intensidade começa na sua percepção.';

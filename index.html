@@ -340,6 +340,12 @@ html{overflow-x:clip}
 #history-status{width:100%;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
 @media(max-width:600px){.account-card{padding:18px 15px}.account-fields{grid-template-columns:1fr}.account-actions{align-items:stretch;gap:13px}.account-actions .button{width:100%}.account-connected-line{align-items:flex-start}.account-card h2{font-size:23px}}
 
+/* 0.8 — excluir e corrigir no histórico */
+.history-actions{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;margin:.75rem 0 .25rem}
+.history-actions .danger{color:#9b2c1f}
+.removal-reasons{border:0;margin:1rem 0;padding:0;display:grid;gap:.4rem}
+.removal-reasons legend{font-weight:600;margin-bottom:.4rem}
+
 </style>
 </head><body>
 <a class="skip-link" href="#screens">Pular para a etapa atual</a>
@@ -398,7 +404,7 @@ html{overflow-x:clip}
 <p id="account-status" role="status" aria-live="polite">Preparando acesso à conta…</p></section>
 <div class="permission-grid"><div class="permission-card"><p class="eyebrow">01 / CONTEXTO</p><label class="check-line"><input id="context-confirm" type="checkbox" required><span>Conferi a data, a hora e as condições do ar.</span></label><p class="footnote">Se o clima estiver indisponível, você ainda pode continuar. O GPS é opcional: o local também pode ser marcado no mapa.</p></div>
 <div class="permission-card"><p class="eyebrow">02 / FOTOGRAFIA</p><label class="check-line"><input id="photo-consent" type="checkbox" aria-describedby="camera-status"><span>Quero usar câmera ou galeria nas próximas etapas.</span></label><p id="camera-status" class="camera-status" role="status" aria-live="polite">A câmera será testada ao marcar esta opção.</p><div class="permission-actions"><button type="button" class="text-button" id="test-camera">Autorizar / testar câmera ↗</button></div><p class="footnote" id="camera-footnote">Opcional. Na etapa de fotografia, a galeria abre o seletor do aparelho; você escolhe quais imagens compartilhar.</p></div></div>
-<label class="check-line consent-line"><input id="data-consent" type="checkbox" required><span>Concordo com o registro vinculado à minha conta privada para histórico e pesquisa, com fotografia opcional, e com a exibição do ponto sem identificação direta no mapa público.</span></label><p class="footnote">Seu relato completo, nome, e-mail e fotografia opcional ficam vinculados à sua conta privada, para seu histórico e para pesquisa científica e treinamento futuro de modelos de Machine Learning. O mapa público mostra apenas coordenadas exatas, data, hora, intensidade, categorias e temperatura; não inclui nome, e-mail, identificador de conta, endereço, texto livre ou foto. Coordenadas e horários podem revelar rotinas. A imagem é redimensionada e reencodificada sem copiar EXIF original, permanece privada e não é exibida no histórico. Nenhuma IA analisa a foto ou estima intensidade nesta versão. Pendências ficam neste navegador, separadas por conta, e são reenviadas quando você está conectado à mesma conta e à internet. O JSON pessoal inclui identificação e metadados, sem imagens. Clima atual: Open-Meteo; mapa: OpenStreetMap.</p><p id="identity-error" class="field-error" role="alert" hidden>Entre na sua conta e confirme os dados e o consentimento para continuar.</p>
+<label class="check-line consent-line"><input id="data-consent" type="checkbox" required><span>Concordo com o registro vinculado à minha conta privada para histórico e pesquisa, com fotografia opcional, e com a exibição do ponto sem identificação direta no mapa público.</span></label><p class="footnote">Seu relato completo, nome, e-mail e fotografia opcional ficam vinculados à sua conta privada, para seu histórico e para pesquisa científica e treinamento futuro de modelos de Machine Learning. O mapa público mostra apenas coordenadas exatas, data, hora, intensidade, categorias e temperatura; não inclui nome, e-mail, identificador de conta, endereço, texto livre ou foto. Coordenadas e horários podem revelar rotinas. A imagem é redimensionada e reencodificada sem copiar EXIF original, permanece privada e não é exibida no histórico. Nenhuma IA analisa a foto ou estima intensidade nesta versão. Pendências ficam neste navegador, separadas por conta, e são reenviadas quando você está conectado à mesma conta e à internet. O JSON pessoal inclui identificação e metadados, sem imagens. <strong>Você pode excluir ou corrigir seus relatos a qualquer momento</strong> pelo histórico: o relato, a foto e o ponto do mapa são apagados do banco, e fica apenas um registro anônimo com a data e o motivo da exclusão. Cópias de pesquisa feitas antes da exclusão são descartadas em até quatro semanas; modelos já treinados não são refeitos. Clima: Open-Meteo (atual, ou da hora informada em ocorrências anteriores); mapa: OpenStreetMap.</p><p id="identity-error" class="field-error" role="alert" hidden>Entre na sua conta e confirme os dados e o consentimento para continuar.</p>
 </section>
 <section class="wizard-screen" data-step="2" aria-labelledby="screening-title" hidden><div class="screen-heading"><p class="eyebrow">UMA PAUSA PARA PERCEBER</p><h1 id="screening-title" tabindex="-1">Você se incomodou com algum mau cheiro <em>perto de você?</em></h1><p>Comece pelo que você está sentindo neste momento.</p></div><div class="screening-art" aria-hidden="true"></div><fieldset class="choice-grid"><legend class="sr-only">Percepção atual</legend><label class="choice-card"><input type="radio" name="screening" value="yes"><span><strong>Sim, senti um mau cheiro</strong><small>Quero registrar minha percepção.</small></span><span aria-hidden="true">↗</span></label><label class="choice-card"><input type="radio" name="screening" value="no"><span><strong>Não sinto mau cheiro neste momento</strong><small>Posso lembrar de uma ocorrência anterior.</small></span><span aria-hidden="true">→</span></label></fieldset></section>
 <section class="wizard-screen" data-step="past" aria-labelledby="past-title" hidden><div class="screen-heading"><p class="eyebrow">O TERRITÓRIO TAMBÉM TEM MEMÓRIA</p><h1 id="past-title" tabindex="-1">Gostaria de registrar alguma ocorrência <em>que você passou?</em></h1><p>Você pode contar sobre um mau cheiro percebido anteriormente.</p></div><fieldset class="choice-grid"><legend class="sr-only">Registrar ocorrência anterior</legend><label class="choice-card"><input type="radio" name="past-choice" value="yes"><span><strong>Sim, quero registrar</strong><small>Vou indicar quando e onde aconteceu.</small></span></label><label class="choice-card"><input type="radio" name="past-choice" value="no"><span><strong>Agora não, quero explorar o mapa</strong><small>Conhecer o território sem criar um relato.</small></span></label></fieldset><div id="past-time-field" class="other-field" hidden><label for="occurred-at">Quando aconteceu? <span class="optional">HORÁRIO DE SANTA MARIA</span></label><input type="datetime-local" id="occurred-at"><p class="footnote">Informe a data e a hora aproximadas. O clima exibido é atual e não representa aquele momento.</p></div></section>
@@ -449,7 +455,7 @@ html{overflow-x:clip}
 <div id="gps-final" class="permission-card" hidden><p id="gps-final-status">Capture sua localização para continuar.</p><button type="button" class="button button-outline" id="gps-final-button">Capturar GPS</button><p id="gps-final-help" class="permission-help footnote" role="status" hidden></p><label class="check-line" id="past-place-confirm" hidden><input type="checkbox" id="past-gps-confirm"><span>Confirmo que minha posição atual é o local da ocorrência anterior.</span></label></div>
 <div id="manual-map-panel" hidden><p class="footnote">Mapa geográfico · toque para marcar; depois toque no seu pin para conferir o resumo. A posição é indicada por você.</p><div id="pin-map"></div></div>
 <p class="field-error" id="location-error" hidden role="alert">Confirme uma localização para revisar.</p><button type="button" class="button button-ink review-button" id="review-open">Revisar meu relato ↗</button></div>
-<section id="review-panel" tabindex="-1" hidden aria-labelledby="review-title"><p class="eyebrow">UMA ÚLTIMA OLHADA</p><h2 id="review-title">Seu relato, do seu jeito.</h2><p>Confira os dados antes de finalizar.</p><dl id="review-details" class="review-details"></dl><img id="review-photo" alt="Fotografia selecionada para este relato" hidden><p class="review-disclaimer">Percepção isolada / não confirmada. Seu relato completo, nome, e-mail e fotografia opcional ficam vinculados à sua conta privada, para seu histórico e para pesquisa científica e treinamento futuro de modelos de Machine Learning. O mapa público mostra apenas coordenadas exatas, data, hora, intensidade, categorias e temperatura; não inclui nome, e-mail, identificador de conta, endereço, texto livre ou foto. Coordenadas e horários podem revelar rotinas. A imagem é redimensionada e reencodificada sem copiar EXIF original, permanece privada e não é exibida no histórico. Nenhuma IA analisa a foto ou estima intensidade nesta versão. Pendências ficam neste navegador, separadas por conta, e são reenviadas quando você está conectado à mesma conta e à internet. O JSON pessoal inclui identificação e metadados, sem imagens. Clima atual: Open-Meteo; mapa: OpenStreetMap.</p><p id="send-status" class="footnote" role="status" aria-live="polite" hidden></p><div class="dialog-actions"><button type="button" class="button button-outline" id="edit-report">Voltar e Editar</button><button type="button" class="button button-ink" id="save-report">Enviar Relato ↗</button></div><nav class="edit-links" aria-label="Editar partes do relato"><button type="button" data-edit="1">Dados pessoais</button><button type="button" data-edit="3">Intensidade</button><button type="button" data-edit="4">Tipo de odor</button><button type="button" data-edit="5">Foto</button><button type="button" data-edit="6">Observação</button><button type="button" data-edit="7">Localização</button></nav></section>
+<section id="review-panel" tabindex="-1" hidden aria-labelledby="review-title"><p class="eyebrow">UMA ÚLTIMA OLHADA</p><h2 id="review-title">Seu relato, do seu jeito.</h2><p>Confira os dados antes de finalizar.</p><dl id="review-details" class="review-details"></dl><img id="review-photo" alt="Fotografia selecionada para este relato" hidden><p class="review-disclaimer">Percepção isolada / não confirmada. Seu relato completo, nome, e-mail e fotografia opcional ficam vinculados à sua conta privada, para seu histórico e para pesquisa científica e treinamento futuro de modelos de Machine Learning. O mapa público mostra apenas coordenadas exatas, data, hora, intensidade, categorias e temperatura; não inclui nome, e-mail, identificador de conta, endereço, texto livre ou foto. Coordenadas e horários podem revelar rotinas. A imagem é redimensionada e reencodificada sem copiar EXIF original, permanece privada e não é exibida no histórico. Nenhuma IA analisa a foto ou estima intensidade nesta versão. Pendências ficam neste navegador, separadas por conta, e são reenviadas quando você está conectado à mesma conta e à internet. O JSON pessoal inclui identificação e metadados, sem imagens. <strong>Você pode excluir ou corrigir seus relatos a qualquer momento</strong> pelo histórico: o relato, a foto e o ponto do mapa são apagados do banco, e fica apenas um registro anônimo com a data e o motivo da exclusão. Cópias de pesquisa feitas antes da exclusão são descartadas em até quatro semanas; modelos já treinados não são refeitos. Clima: Open-Meteo (atual, ou da hora informada em ocorrências anteriores); mapa: OpenStreetMap.</p><p id="send-status" class="footnote" role="status" aria-live="polite" hidden></p><div class="dialog-actions"><button type="button" class="button button-outline" id="edit-report">Voltar e Editar</button><button type="button" class="button button-ink" id="save-report">Enviar Relato ↗</button></div><nav class="edit-links" aria-label="Editar partes do relato"><button type="button" data-edit="1">Dados pessoais</button><button type="button" data-edit="3">Intensidade</button><button type="button" data-edit="4">Tipo de odor</button><button type="button" data-edit="5">Foto</button><button type="button" data-edit="6">Observação</button><button type="button" data-edit="7">Localização</button></nav></section>
 <section id="success-panel" class="success-panel" tabindex="-1" hidden aria-labelledby="success-title"><span aria-hidden="true" class="success-seal">✓</span><p class="eyebrow" id="success-caption">PERCEPÇÃO REGISTRADA</p><h2 id="success-title">Obrigado por dar voz <em>ao território.</em></h2><p id="success-description">Seu relato foi confirmado no banco da pesquisa WAIND. A cópia deste navegador pode ser exportada em JSON.</p><p id="saved-reference" class="footnote"></p><button type="button" class="button button-ink" id="new-report">Começar outro relato ↗</button></section>
 </section></form><div id="records-wrap" hidden>    <section class="local-records" aria-labelledby="records-title"><div><p class="eyebrow">CADERNO DESTE NAVEGADOR</p><h2 id="records-title">Seus relatos</h2><p id="records-description">Os registros que você salvar ficam disponíveis aqui.</p></div><div class="record-actions"><span id="local-count" class="local-count">00</span><button type="button" class="button button-outline" id="export-records" disabled>Exportar JSON <span aria-hidden="true">↗</span></button><button type="button" class="text-button" id="clear-records" hidden>Apagar relatos locais</button></div><p id="history-status" role="status" aria-live="polite"></p><div class="history-actions"><button type="button" class="text-button" id="refresh-history">Atualizar histórico ↻</button><button type="button" class="text-button" id="more-history" hidden>Carregar mais relatos ↓</button></div><div id="local-record-list"></div></section>
 </div>
@@ -1113,6 +1119,8 @@ window.WaindAppCheckConfig = Object.freeze({
   const labels={waste:'Resíduos',container:'Contentor de lixo',sewer:'Esgoto',ditch:'Valas a céu aberto',organic:'Resíduos orgânicos alimentares',metabolic:'Resíduos metabólicos',chemical:'Resíduos químicos',other:'Outros'};
   const levels=['Muito fraco','Fraco','Intermediário','Forte','Muito forte'];
   const inFlight=new Map();
+  const CONSENTS=['waind-pesquisa-mapa-0.7','waind-pesquisa-mapa-0.8'];
+  const MOTIVOS=['corrigido','intensidade-errada','tipo-errado','local-errado','enviado-por-engano','nao-quero-participar','outro'];
   let connection,authentication;
   function connect(){
     if(!connection)connection=(async()=>{
@@ -1164,7 +1172,7 @@ window.WaindAppCheckConfig = Object.freeze({
       intensidade_odor:intensity,tipo_odor:{...odor,outro_descricao:categories.includes('other')?report.otherDescription||'':''},
       sem_foco_visivel:!!report.noVisibleSource,visivel_por_perto:report.visibleTags||[],observacao:report.observation||'',
       foto_metadados:report.photo?{nome:report.photo.name,mime_type:report.photo.type,tamanho_bytes:report.photo.sizeBytes,largura:report.photo.width,altura:report.photo.height,largura_original:report.photo.originalWidth,altura_original:report.photo.originalHeight,sha256:report.photo.sha256,imagem_enviada:true,colecao_foto:'relatos_fotos'}:null,
-      consentimento:{versao:'waind-pesquisa-mapa-0.7',aceito_em:report.consent.acceptedAt,pesquisa:true,mapa_publico:true,copia_local:true,contexto_confirmado:true,conta_autenticada:true},
+      consentimento:{versao:report.consent.version,aceito_em:report.consent.acceptedAt,pesquisa:true,mapa_publico:true,copia_local:true,contexto_confirmado:true,conta_autenticada:true},
       status_qualidade:'isolado-nao-confirmado'
     };
     // Public projection is explicit: never copy identity, address, photo or free text.
@@ -1177,7 +1185,7 @@ window.WaindAppCheckConfig = Object.freeze({
   }
   const canonical=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
   async function write(report){
-    if(report.consent?.version!=='waind-pesquisa-mapa-0.7'||!report.consent.publicMap||!report.consent.accountAuthenticated)throw Object.assign(new Error('Consent required'),{code:'consent-required'});
+    if(!CONSENTS.includes(report.consent?.version)||!report.consent.publicMap||!report.consent.accountAuthenticated)throw Object.assign(new Error('Consent required'),{code:'consent-required'});
     const c=await connect();const uid=await identify(c,report);
     const {store,db}=c,publicRef=store.doc(db,'relatos_mapa',report.id),privateRef=store.doc(db,'relatos_pesquisa',report.id);
     const confirmOwner=async()=>{const own=await store.getDocFromServer(privateRef);if(!own.exists()||own.data().autor_uid!==uid)throw Object.assign(new Error('Conflito de autoria'),{code:'id-conflict'});const expected={...perception},actual={...own.data()};delete expected.criado_em;delete actual.criado_em;if(canonical(actual)!==canonical(expected))throw Object.assign(new Error('Conflito de conteúdo'),{code:'id-conflict'});};
@@ -1246,7 +1254,25 @@ window.WaindAppCheckConfig = Object.freeze({
     const snapshot=await store.getDocsFromServer(query),documents=snapshot.docs.slice(0,pageSize);
     return {documents:documents.map(doc=>({id:doc.id,data:doc.data()})),cursor:documents.at(-1)||null,hasMore:snapshot.docs.length>pageSize,returnedCount:snapshot.docs.length};
   }
-  window.WaindCloud=Object.freeze({connect,save,message,payload,dateTime,listenMap,readMapPage});
+  // Exclusão pelo autor: apaga relato privado, ponto público e foto no mesmo lote (regras exigem os três juntos)
+  // e grava um registro anônimo com data e motivo, sem ID do relato, conta, local ou nota.
+  async function remove(id,motivo){
+    if(!MOTIVOS.includes(motivo))throw Object.assign(new Error('Motivo inválido'),{code:'invalid-argument'});
+    if(navigator.onLine===false)throw Object.assign(new Error('Offline'),{code:'offline'});
+    const c=await connect();await c.auth.authStateReady();
+    const user=c.auth.currentUser;if(!user||user.isAnonymous)throw Object.assign(new Error('Conta necessária'),{code:'account-required'});
+    const {store,db}=c,privateRef=store.doc(db,'relatos_pesquisa',id);
+    const own=await store.getDocFromServer(privateRef);
+    if(!own.exists())return {alreadyRemoved:true,id};
+    if(own.data().autor_uid!==user.uid)throw Object.assign(new Error('Relato de outra conta'),{code:'permission-denied'});
+    const batch=store.writeBatch(db);
+    batch.delete(privateRef);batch.delete(store.doc(db,'relatos_mapa',id));
+    if(own.data().foto_metadados)batch.delete(store.doc(db,'relatos_fotos',id));
+    batch.set(store.doc(store.collection(db,'relatos_exclusoes')),{excluido_em:store.serverTimestamp(),motivo,versao_app:'0.8'});
+    await batch.commit();
+    return {alreadyRemoved:false,id};
+  }
+  window.WaindCloud=Object.freeze({connect,save,message,payload,dateTime,listenMap,readMapPage,remove,MOTIVOS});
 })();
 
 </script>
@@ -1497,6 +1523,7 @@ window.WaindAppCheckConfig = Object.freeze({
       if(event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
     });
   });
+  $('#info-dialog').addEventListener('close',()=>{$('#info-eyebrow').textContent='NOTA DE CAMPO';});
   function showInfo(key) {
     const type = types.find(t => t.id === key);
     const content = type ? {title:type.label,body:`<p>${escape(type.description)}</p>`} : infoContent[key];
@@ -1806,7 +1833,11 @@ window.WaindAppCheckConfig = Object.freeze({
       for(const [label,value] of [['Nome informado no envio',report.participant?.name||''],['E-mail informado no envio',report.participant?.email||''],['Observação',report.observation||'Sem observação'],['Outro odor',report.otherDescription||'Não informado'],['Por perto',report.visibleTags?.join(', ')||'Não informado'],['Foto',report.photo?'Fotografia privada associada; imagem não carregada neste histórico.':'Sem fotografia'],['Identificador',report.id],['Qualidade','Percepção isolada / não confirmada']]){
         const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);
       }
-      details.append(title,dl);return details;
+      const actions=document.createElement('div');actions.className='history-actions';
+      const pendingHere=report.syncStatus==='pendente-sincronizacao';
+      if(!pendingHere){const fix=document.createElement('button');fix.type='button';fix.className='text-button';fix.textContent='Corrigir';fix.addEventListener('click',()=>askCorrection(report));actions.append(fix);}
+      const del=document.createElement('button');del.type='button';del.className='text-button danger';del.textContent=pendingHere?'Excluir deste aparelho':'Excluir relato';del.addEventListener('click',()=>askRemoval(report));actions.append(del);
+      details.append(title,dl,actions);return details;
     }));
     window.dispatchEvent(new Event('waind:records'));
   }
@@ -1835,6 +1866,45 @@ window.WaindAppCheckConfig = Object.freeze({
     $('#info-body').innerHTML='<p>Exporte seus relatos antes se quiser uma cópia. As pendências desta conta serão perdidas. Relatos enviados permanecem no banco e pendências de outras contas são preservadas.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar cópias desta conta</button>';
     openDialog($('#info-dialog'));$('#confirm-clear').addEventListener('click',()=>{if(activeUid!==uid)return;try{WaindLocal.remove(uid);records=[];renderRecords();$('#info-dialog').close();}catch{showToast('Não foi possível apagar as cópias locais.');}});
   });
+  // 0.8 — excluir e corrigir. Relato enviado: apaga relato, foto e ponto do mapa no banco (com motivo anônimo).
+  // Pendente só neste aparelho: apaga a cópia local. Corrigir = novo relato (ocorrência anterior, mesma hora e
+  // local) e o antigo só é apagado depois que o novo chega ao banco.
+  const MOTIVOS_TEXTO=[['intensidade-errada','Errei a intensidade'],['tipo-errado','Errei o tipo de odor'],['local-errado','Marquei o local errado'],['enviado-por-engano','Enviei por engano'],['nao-quero-participar','Não quero mais participar'],['outro','Outro motivo']];
+  function forget(id,uid=activeUid){cache(WaindLocal.read(uid).filter(r=>r.id!==id),uid);cloudHistory=cloudHistory.filter(r=>r.id!==id);renderRecords();}
+  function askRemoval(report){
+    const uid=activeUid;if(!uid||report.autor_uid!==uid)return;
+    const local=report.syncStatus==='pendente-sincronizacao';
+    $('#info-eyebrow').textContent='EXCLUIR RELATO';$('#info-title').textContent=local?'Excluir este relato pendente?':'Excluir este relato de vez?';
+    const body=$('#info-body');body.replaceChildren();
+    const p=document.createElement('p');p.textContent=local?'Ele ainda não foi enviado. A cópia neste aparelho será apagada.':'O relato, a foto e o ponto no mapa público serão apagados do banco da pesquisa. Isso não pode ser desfeito. Fica só um registro anônimo com a data e o motivo.';body.append(p);
+    const field=document.createElement('fieldset');field.className='removal-reasons';field.hidden=local;
+    const legend=document.createElement('legend');legend.textContent='Por que você quer excluir?';field.append(legend);
+    MOTIVOS_TEXTO.forEach(([value,text],i)=>{const label=document.createElement('label');label.className='check-line';const input=document.createElement('input');input.type='radio';input.name='removal-reason';input.value=value;input.checked=i===0;const span=document.createElement('span');span.textContent=text;label.append(input,span);field.append(label);});
+    body.append(field);
+    const confirm=document.createElement('button');confirm.type='button';confirm.className='button button-ink';confirm.id='confirm-removal';confirm.textContent=local?'Apagar deste aparelho':'Excluir de vez';body.append(confirm);
+    openDialog($('#info-dialog'));
+    confirm.addEventListener('click',async()=>{
+      if(activeUid!==uid)return;confirm.disabled=true;
+      if(local){try{forget(report.id,uid);$('#info-dialog').close();showToast('Relato pendente apagado deste aparelho.');}catch{showToast('Não foi possível apagar a cópia local.');confirm.disabled=false;}return;}
+      confirm.textContent='Excluindo…';
+      try{await WaindCloud.remove(report.id,body.querySelector('input[name="removal-reason"]:checked')?.value||'outro');if(activeUid===uid)forget(report.id,uid);$('#info-dialog').close();showToast('Relato excluído do banco e do mapa.');refreshHistory();}
+      catch(error){confirm.disabled=false;confirm.textContent='Excluir de vez';showToast(String(error?.code).includes('offline')||String(error?.code).includes('unavailable')?'Sem conexão. Tente excluir quando a internet voltar.':'Não foi possível excluir agora. Tente novamente.');}
+    });
+  }
+  function askCorrection(report){
+    const uid=activeUid;if(!uid||report.autor_uid!==uid)return;
+    $('#info-eyebrow').textContent='CORRIGIR RELATO';$('#info-title').textContent='Corrigir este relato?';
+    const body=$('#info-body');body.replaceChildren();
+    const p=document.createElement('p');p.textContent='Vamos abrir um relato novo já preenchido, como ocorrência anterior, na mesma data, hora e local. Ajuste o que precisar e envie. O relato antigo só é apagado depois que o novo chegar ao banco. A foto não é copiada: se quiser, tire outra.';body.append(p);
+    const go=document.createElement('button');go.type='button';go.className='button button-ink';go.id='confirm-correction';go.textContent='Abrir correção';body.append(go);
+    openDialog($('#info-dialog'));
+    go.addEventListener('click',()=>{$('#info-dialog').close();window.dispatchEvent(new CustomEvent('waind:correct',{detail:{report:{...report}}}));});
+  }
+  async function finishCorrection(report){
+    if(!report.replaces)return;
+    try{await WaindCloud.remove(report.replaces,'corrigido');forget(report.replaces,report.autor_uid);delete report.replaces;try{remember(report);}catch{/* cópia local opcional */}showToast('Correção enviada. O relato antigo foi apagado.');}
+    catch{showToast('Correção enviada, mas o relato antigo não pôde ser apagado agora. Exclua-o pelo histórico.');}
+  }
   function cache(next,uid=activeUid){const saved=WaindLocal.write(uid,next);if(uid===activeUid)records=saved;}
   function remember(report){const uid=report.autor_uid;cache([...WaindLocal.read(uid).filter(r=>r.id!==report.id),report],uid);if(uid===activeUid)renderRecords();}
   window.addEventListener('waind:account',()=>{
@@ -1853,13 +1923,14 @@ window.WaindAppCheckConfig = Object.freeze({
     const uid=activeUid;if(syncing||!uid||navigator.onLine===false)return;
     syncing=true;let sent=0;
     try{
-      for(const report of WaindLocal.read(uid).filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&r.consent?.version==='waind-pesquisa-mapa-0.7')){
+      for(const report of WaindLocal.read(uid).filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&['waind-pesquisa-mapa-0.7','waind-pesquisa-mapa-0.8'].includes(r.consent?.version))){
         if(activeUid!==uid)break;
         try{
           const receipt=await WaindCloud.save(report);
           if(!WaindLocal.read(uid).some(r=>r.id===report.id))continue;
           report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
           try{remember(report);}catch{if(activeUid===uid)renderRecords();}sent++;
+          await finishCorrection(report);
         }catch(error){report.syncError=String(error?.code||'network');try{remember(report);}catch{/* Não perder pendências duráveis. */}}
       }
     }finally{syncing=false;if(sent&&activeUid===uid){showToast(`${sent} relato(s) desta conta sincronizado(s).`);refreshHistory();}}
@@ -1884,6 +1955,7 @@ window.WaindAppCheckConfig = Object.freeze({
         const receipt=await WaindCloud.save(report);
         report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
         try{remember(report);}catch{showToast('Enviado ao banco. Não foi possível atualizar a cópia neste navegador.');}
+        await finishCorrection(report);
         if(activeUid===report.autor_uid)refreshHistory();
         return {status:'sincronizado',id:report.id};
       } catch(error) {
@@ -1895,7 +1967,7 @@ window.WaindAppCheckConfig = Object.freeze({
     },
     reset(){
       ++gpsGeneration;++cameraGeneration;cameraPending=false;addressController?.abort();
-      $('#odor-form').reset(); state.intensity=null;state.types.clear();state.tags.clear();state.location=null;state.pending=null;state.gpsLocation=null;removePhoto();
+      $('#odor-form').reset(); state.intensity=null;state.types.clear();state.tags.clear();state.location=null;state.pending=null;state.gpsLocation=null;state.correctionOf=null;removePhoto();
       $$('.odor-card').forEach(card=>card.classList.remove('is-selected','is-animating'));
       document.documentElement.style.setProperty('--intensity-color','#111');
       $('#intensity-readout').textContent='A intensidade começa na sua percepção.';
@@ -2061,7 +2133,7 @@ window.WaindAppCheckConfig = Object.freeze({
     // Ocorrência anterior: busca o clima da hora informada antes de montar o relato.
     let historical=null;
     if(isPast()){reviewing=true;$('#review-open').disabled=true;try{const loc=app.state.location;historical=await app.fetchHistoricalWeather(loc.latitude,loc.longitude,$('#occurred-at').value,mode==='gps'?'device-region':'manual-region');}finally{reviewing=false;$('#review-open').disabled=false;}if(!isPast()||!locationValid())return;}
-    pending=app.createReport();if(historical)pending.weather=historical;pending.schemaVersion=7;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,accountAuthenticated:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.7'};
+    pending=app.createReport();if(historical)pending.weather=historical;if(app.state.correctionOf)pending.replaces=app.state.correctionOf;pending.schemaVersion=7;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,accountAuthenticated:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.8'};
     pending.occurrence={kind:isPast()?'past':'current',occurredAt:isPast()?new Date($('#occurred-at').value+':00-03:00').toISOString():pending.recordedAt,timezone:'America/Sao_Paulo',approximate:isPast()};
     pending.weatherContext={relationship:pending.weather?.moment==='historical-hourly'?'historical-hourly-regional-context':isPast()?'current-context-not-historical':'current-regional-context',notMeasuredAtSource:true};
     const rows=[['Nome',pending.participant.name],['E-mail',pending.participant.email],['Fuso horário','Horário de Brasília'],...summary(pending.weather),['Localização',locationText(pending.location)]];
@@ -2117,6 +2189,29 @@ window.WaindAppCheckConfig = Object.freeze({
   $('#review-open').addEventListener('click',review);$('#edit-report').addEventListener('click',()=>editStep('3'));$('#save-report').addEventListener('click',save);$('#new-report').addEventListener('click',restart);
   $$('[data-edit]').forEach(b=>b.addEventListener('click',()=>editStep(b.dataset.edit)));
   ['camera-button','gallery-button'].forEach(id=>$('#'+id).addEventListener('click',()=>{$('#photo-consent').checked=true;}));
+  // Corrigir (0.8): novo relato preenchido a partir do antigo, como ocorrência anterior na mesma hora e local.
+  // O antigo só é apagado depois que o novo chega ao banco (app.finishCorrection).
+  window.addEventListener('waind:correct',event=>{
+    const r=event.detail?.report;if(!r||r.autor_uid!==WaindCloud.currentAccount()?.uid)return;
+    WaindMotion.finish();resetting=true;pinMap?.destroy?.();pinMap=null;pending=null;saved=false;savedId=null;mapGpsAttempted=false;app.reset();
+    $('#success-panel').hidden=true;$('#review-panel').hidden=true;$('#location-panel').hidden=false;
+    const pick=(name,val)=>{const el=$(`input[name="${name}"][value="${val}"]`);if(el){el.checked=true;el.dispatchEvent(new Event('change',{bubbles:true}));}};
+    pick('screening','no');pick('past-choice','yes');$('#past-time-field').hidden=false;
+    const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(r.occurrence?.occurredAt||r.recordedAt)).map(x=>[x.type,x.value]));
+    $('#occurred-at').value=`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+    pick('intensity',r.intensity);(r.categories||[]).forEach(id=>pick('odor',id));
+    $('#other-text').value=r.otherDescription||'';
+    $$('input[name="tag"]').forEach(el=>{if((r.visibleTags||[]).includes(el.closest('label')?.textContent.trim())){el.checked=true;el.dispatchEvent(new Event('change',{bubbles:true}));}});
+    $('#invisible-source').checked=!!r.noVisibleSource;
+    $('#observation').value=r.observation||'';$('#observation').dispatchEvent(new Event('input',{bubbles:true}));
+    if(r.location&&Number.isFinite(r.location.latitude)&&Number.isFinite(r.location.longitude)){
+      manualLocation={latitude:r.location.latitude,longitude:r.location.longitude,source:'manual-map',accuracyMeters:null};
+      mode='pin';$('input[name="location-mode"][value="pin"]').checked=true;app.state.location=manualLocation;
+    }
+    app.state.correctionOf=r.id;resetting=false;
+    app.showToast('Correção: revise as etapas e envie. O relato antigo será apagado depois.');
+    navigate('1',{animated:false});
+  });
   let lastAccountUid=null;
   window.addEventListener('waind:account',()=>{
     const uid=WaindCloud.currentAccount()?.uid||null;

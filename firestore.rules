@@ -87,7 +87,7 @@ service cloud.firestore {
     }
     function consent(d) {
       return exact(d,['versao','aceito_em','pesquisa','mapa_publico','copia_local','contexto_confirmado','conta_autenticada'])
-        && d.versao == 'waind-pesquisa-mapa-0.7' && text(d.aceito_em,40)
+        && d.versao in ['waind-pesquisa-mapa-0.7','waind-pesquisa-mapa-0.8'] && text(d.aceito_em,40)
         && d.aceito_em.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}T.*Z$')
         && d.pesquisa == true && d.mapa_publico == true && d.copia_local == true && d.contexto_confirmado == true && d.conta_autenticada == true;
     }
@@ -126,7 +126,11 @@ service cloud.firestore {
         && !exists(/databases/$(database)/documents/relatos_mapa/$(id))
         && paired(request.resource.data,getAfter(/databases/$(database)/documents/relatos_mapa/$(id)).data);
       allow read: if account() && resource.data.keys().hasAll(['autor_uid']) && resource.data.autor_uid == request.auth.uid;
-      allow update, delete: if false;
+      // 0.8: o autor pode excluir; o ponto público e a foto (se houver) somem no mesmo lote.
+      allow delete: if account() && resource.data.keys().hasAll(['autor_uid']) && resource.data.autor_uid == request.auth.uid
+        && !existsAfter(/databases/$(database)/documents/relatos_mapa/$(id))
+        && (resource.data.foto_metadados == null || !existsAfter(/databases/$(database)/documents/relatos_fotos/$(id)));
+      allow update: if false;
     }
     match /relatos_mapa/{id} {
       allow read: if true;
@@ -135,7 +139,10 @@ service cloud.firestore {
         && researchDetails(getAfter(/databases/$(database)/documents/relatos_pesquisa/$(id)).data)
         && !exists(/databases/$(database)/documents/relatos_pesquisa/$(id))
         && paired(getAfter(/databases/$(database)/documents/relatos_pesquisa/$(id)).data,request.resource.data);
-      allow update, delete: if false;
+      allow delete: if account() && exists(/databases/$(database)/documents/relatos_pesquisa/$(id))
+        && get(/databases/$(database)/documents/relatos_pesquisa/$(id)).data.get('autor_uid','') == request.auth.uid
+        && !existsAfter(/databases/$(database)/documents/relatos_pesquisa/$(id));
+      allow update: if false;
     }
     match /relatos_fotos/{id} {
       allow create: if account() && id.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
@@ -145,6 +152,15 @@ service cloud.firestore {
         && existsAfter(/databases/$(database)/documents/relatos_pesquisa/$(id))
         && existsAfter(/databases/$(database)/documents/relatos_mapa/$(id))
         && imageData(id,request.resource.data,getAfter(/databases/$(database)/documents/relatos_pesquisa/$(id)).data);
+      allow delete: if account() && resource.data.autor_uid == request.auth.uid
+        && !existsAfter(/databases/$(database)/documents/relatos_pesquisa/$(id));
+      allow read, update: if false;
+    }
+    // Registro anônimo de exclusões: só data, motivo e versão. Sem ID do relato, conta, local ou nota.
+    match /relatos_exclusoes/{id} {
+      allow create: if account() && exact(request.resource.data,['excluido_em','motivo','versao_app'])
+        && request.resource.data.excluido_em == request.time && request.resource.data.versao_app == '0.8'
+        && request.resource.data.motivo in ['corrigido','intensidade-errada','tipo-errado','local-errado','enviado-por-engano','nao-quero-participar','outro'];
       allow read, update, delete: if false;
     }
     function profile(d, uid) {
