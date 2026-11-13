@@ -1,4 +1,6 @@
-# WAIND — GPT 0.7
+# WAIND — 0.8
+
+Versão 0.8 (Claude): o clima passa a guardar direção e rajada do vento; em ocorrência anterior, o app consulta o clima Open-Meteo da hora informada (`clima.momento: historico-horario`). Regras aceitam o formato 0.7 e o 0.8. Consentimento continua `waind-pesquisa-mapa-0.7`. Ver `pesquisa/CONTRATO-DATASET-PESQUISA.md`.
 
 [Aplicativo](https://murillosvrj.github.io/mau-odor-ufn/) · [Painel](https://murillosvrj.github.io/mau-odor-ufn/painel.html)
 

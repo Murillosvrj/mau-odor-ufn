@@ -40,12 +40,18 @@ service cloud.firestore {
         && d.origem in ['device-gps','manual-map','manual-coordinates']
         && optionalNumber(d.precisao_metros,0,100000) && address(d.endereco);
     }
+    // 0.7: oito campos, sempre clima atual. 0.8: + direção/rajada do vento e clima horário histórico
+    // para ocorrências anteriores. Os dois formatos são aceitos para não recusar páginas em cache.
     function weather(d) {
-      return exact(d,['temperatura_c','umidade_pct','vento_kmh','condicao_codigo','referencia_clima','momento','consultado_em','fonte'])
+      return (exact(d,['temperatura_c','umidade_pct','vento_kmh','condicao_codigo','referencia_clima','momento','consultado_em','fonte'])
+          && d.momento == 'atual-nao-historico'
+        || exact(d,['temperatura_c','umidade_pct','vento_kmh','vento_direcao_graus','rajada_kmh','condicao_codigo','referencia_clima','momento','consultado_em','fonte'])
+          && optionalNumber(d.vento_direcao_graus,0,360) && optionalNumber(d.rajada_kmh,0,500)
+          && d.momento in ['atual-nao-historico','historico-horario'])
         && optionalNumber(d.temperatura_c,-100,70) && optionalNumber(d.umidade_pct,0,100)
         && optionalNumber(d.vento_kmh,0,500) && (d.condicao_codigo == null || (d.condicao_codigo is int && d.condicao_codigo >= 0 && d.condicao_codigo <= 99))
         && d.referencia_clima in ['regiao-gps','regiao-pin','area-estudo']
-        && d.momento == 'atual-nao-historico' && (d.consultado_em == null || text(d.consultado_em,40)) && d.fonte == 'Open-Meteo';
+        && (d.consultado_em == null || text(d.consultado_em,40)) && d.fonte == 'Open-Meteo';
     }
     function photo(d) {
       return d == null || (exact(d,['nome','mime_type','tamanho_bytes','largura','altura','largura_original','altura_original','sha256','imagem_enviada','colecao_foto'])
@@ -91,6 +97,7 @@ service cloud.firestore {
         && d.email == request.auth.token.email && text(d.nome,120) && d.nome.size() > 0 && text(d.email,254) && d.email.matches('^[^ @]+@[^ @]+[.][^ @]+$')
         && when(d) && d.tipo_ocorrencia in ['atual','anterior'] && d.criado_em == request.time
         && optionalNumber(d.temperatura,-100,70) && weather(d.clima) && d.temperatura == d.clima.temperatura_c
+        && (d.clima.momento == 'atual-nao-historico' || d.tipo_ocorrencia == 'anterior')
         && location(d.localizacao);
     }
     // Each create stays below the 1000-expression limit. Both new documents are mandatory.

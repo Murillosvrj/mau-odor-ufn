@@ -138,6 +138,31 @@
   }
   updateTime(); setInterval(updateTime,30000);
   let weatherRequest=null;
+  // Direção meteorológica: de onde o vento VEM (0° = norte, 90° = leste).
+  function windFrom(deg){return Number.isFinite(deg)?['N','NE','L','SE','S','SO','O','NO'][Math.round(((deg%360)+360)%360/45)%8]:null;}
+  function windText(w){if(!w||!Number.isFinite(w.windSpeedKmh))return '— km/h';const from=windFrom(w.windDirectionDeg);return `${Math.round(w.windSpeedKmh)} km/h${from?` · de ${from}`:''}`;}
+  // Clima da hora informada em uma ocorrência anterior. Até 90 dias: API de previsão
+  // com horas passadas; antes disso: API de previsão histórica. Retorna null se falhar,
+  // e o relato mantém o clima atual marcado como não histórico (comportamento 0.7).
+  async function fetchHistoricalWeather(latitude,longitude,localDateTime,basis){
+    if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(localDateTime||''))return null;
+    const hour=localDateTime.slice(0,13)+':00';
+    const ageDays=(Date.now()-new Date(localDateTime+':00-03:00').getTime())/86400000;
+    if(!(ageDays>=0))return null;
+    const lat=Number(latitude.toFixed(2)),lon=Number(longitude.toFixed(2));
+    const host=ageDays<=90?'https://api.open-meteo.com/v1/forecast':'https://historical-forecast-api.open-meteo.com/v1/forecast';
+    const query=new URLSearchParams({latitude:String(lat),longitude:String(lon),hourly:'temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code',timezone:'America/Sao_Paulo',start_hour:hour,end_hour:hour});
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),9000);
+    try{
+      const response=await fetch(`${host}?${query}`,{signal:controller.signal});
+      if(!response.ok)return null;
+      const h=(await response.json()).hourly,i=h?.time?.indexOf(hour);
+      if(!(i>=0))return null;
+      const v=k=>Number.isFinite(h[k]?.[i])?h[k][i]:null;
+      if(![v('temperature_2m'),v('relative_humidity_2m'),v('wind_speed_10m')].every(Number.isFinite))return null;
+      return {source:'Open-Meteo',basis,latitude:lat,longitude:lon,observedAt:hour,timezone:'America/Sao_Paulo',temperatureC:v('temperature_2m'),relativeHumidityPercent:v('relative_humidity_2m'),windSpeedKmh:v('wind_speed_10m'),windDirectionDeg:v('wind_direction_10m'),windGustsKmh:v('wind_gusts_10m'),conditionCode:Number.isInteger(h.weather_code?.[i])?h.weather_code[i]:null,moment:'historical-hourly'};
+    }catch{return null;}finally{clearTimeout(timeout);}
+  }
   async function fetchWeather(latitude,longitude,basis) {
     const key=`${latitude.toFixed(2)},${longitude.toFixed(2)},${basis}`;
     if(weatherRequest?.key===key&&(weatherRequest.loading||(state.weather&&Date.now()-weatherRequest.startedAt<300000)))return;
@@ -148,16 +173,16 @@
     const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(),9000);
     try {
       const lat = Number(latitude.toFixed(2)), lon = Number(longitude.toFixed(2));
-      const query = new URLSearchParams({latitude:String(lat),longitude:String(lon),current:'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code',timezone:'America/Sao_Paulo',forecast_days:'1'});
+      const query = new URLSearchParams({latitude:String(lat),longitude:String(lon),current:'temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code',timezone:'America/Sao_Paulo',forecast_days:'1'});
       const response = await fetch(`https://api.open-meteo.com/v1/forecast?${query}`,{signal:controller.signal});
       if(!response.ok) throw new Error('Weather unavailable');
       const data = await response.json(); const current = data.current;
       if(!current || ![current.temperature_2m,current.relative_humidity_2m,current.wind_speed_10m].every(Number.isFinite)) throw new Error('Incomplete weather');
       if(generation!==weatherGeneration) return;
-      state.weather = {source:'Open-Meteo',basis,latitude:lat,longitude:lon,observedAt:current.time,timezone:'America/Sao_Paulo',temperatureC:current.temperature_2m,relativeHumidityPercent:current.relative_humidity_2m,windSpeedKmh:current.wind_speed_10m,conditionCode:Number.isInteger(current.weather_code)?current.weather_code:null};
+      state.weather = {source:'Open-Meteo',basis,latitude:lat,longitude:lon,observedAt:current.time,timezone:'America/Sao_Paulo',temperatureC:current.temperature_2m,relativeHumidityPercent:current.relative_humidity_2m,windSpeedKmh:current.wind_speed_10m,windDirectionDeg:Number.isFinite(current.wind_direction_10m)?current.wind_direction_10m:null,windGustsKmh:Number.isFinite(current.wind_gusts_10m)?current.wind_gusts_10m:null,conditionCode:Number.isInteger(current.weather_code)?current.weather_code:null,moment:'current'};
       $('#temperature').textContent = `${Math.round(current.temperature_2m)} °C`;
       $('#humidity').textContent = `${Math.round(current.relative_humidity_2m)} %`;
-      $('#wind').textContent = `${Math.round(current.wind_speed_10m)} km/h`;
+      $('#wind').textContent = windText(state.weather);
       $('#weather-status').textContent = `Open-Meteo · ${basis==='study-area'?'Santa Maria':basis==='manual-region'?'região do pin':'região do GPS'} · ${current.time.slice(11,16)} · Horário de Brasília`;
     } catch {
       if(generation!==weatherGeneration) return;
@@ -417,7 +442,7 @@
   setTimeout(syncPending,1200);setInterval(syncPending,60000);
 
   window.WaindApp = {
-    state, levels, types, showToast, showInfo, createReport, fetchWeather,
+    state, levels, types, showToast, showInfo, createReport, fetchWeather, fetchHistoricalWeather, windText,
     startMap,syncPending,refreshHistory,getMapStatus:()=>mapStatus,
     getLocalRecords:()=>visibleRecords().map(r=>({...r})),
     getRecords:()=>[...new Map([...visibleRecords().map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),...publicRecords].map(r=>[r.id,r])).values()],

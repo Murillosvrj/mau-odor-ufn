@@ -71,13 +71,13 @@
     if(animated&&!$('#review-panel').hidden)return withWind(change);
     change();
   }
-  function weatherText(){const w=app.state.weather;return w?`${Math.round(w.temperatureC)} °C · ${w.relativeHumidityPercent}% umidade · ${Math.round(w.windSpeedKmh)} km/h vento — ${w.basis==='study-area'?'Santa Maria':w.basis==='manual-region'?'região do pin':'região do GPS'}, ${w.observedAt.replace('T',' ')} · Horário de Brasília${isPast()?' (atual; não corresponde à ocorrência anterior)':''}`:'Clima indisponível';}
+  function weatherText(w=app.state.weather){return w?`${Math.round(w.temperatureC)} °C · ${w.relativeHumidityPercent}% umidade · ${app.windText(w)} vento — ${w.basis==='study-area'?'Santa Maria':w.basis==='manual-region'?'região do pin':'região do GPS'}, ${w.observedAt.replace('T',' ')} · Horário de Brasília${w.moment==='historical-hourly'?' (clima da hora informada)':isPast()?' (atual; não corresponde à ocorrência anterior)':''}`:'Clima indisponível';}
   function locationText(loc){
     if(!loc)return 'Local ainda não confirmado';
     const a=loc.address,address=a?`${a.street} · ${[a.district,a.city,a.state].filter(Boolean).join(', ')} · ${a.postcode?'CEP: '+a.postcode:'CEP não informado neste ponto'} · `:'';
     return `${address}Lat: ${loc.latitude.toFixed(5)} · Long: ${loc.longitude.toFixed(5)} · ${loc.source==='device-gps'?`GPS, precisão estimada ±${loc.accuracyMeters} m`:'pin indicado no mapa'}`;
   }
-  function summary(){return [['Quando',isPast()?$('#occurred-at').value.replace('T',' ')+' · ocorrência anterior':'Percepção neste momento'],['Intensidade',app.state.intensity?`${app.state.intensity}/5 — ${app.levels[app.state.intensity-1].name}`:'A escolher'],['Tipo de odor',app.types.filter(t=>app.state.types.has(t.id)).map(t=>t.label).join(', ')||'A escolher'],...app.state.types.has('other')?[['Outro odor',$('#other-text').value.trim()]]:[],['Fotografia',app.state.photo?'Foto preparada · envio ao acervo privado':'Sem fotografia'],['Odor no ar',$('#invisible-source').checked?'Sem foco visível informado':'Não especificado'],['Por perto',[...app.state.tags].map(i=>['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'][i]).join(', ')||'Não informado'],['Observação',$('#observation').value.trim()||'Sem observação'],['Clima',weatherText()]];}
+  function summary(w=app.state.weather){return [['Quando',isPast()?$('#occurred-at').value.replace('T',' ')+' · ocorrência anterior':'Percepção neste momento'],['Intensidade',app.state.intensity?`${app.state.intensity}/5 — ${app.levels[app.state.intensity-1].name}`:'A escolher'],['Tipo de odor',app.types.filter(t=>app.state.types.has(t.id)).map(t=>t.label).join(', ')||'A escolher'],...app.state.types.has('other')?[['Outro odor',$('#other-text').value.trim()]]:[],['Fotografia',app.state.photo?'Foto preparada · envio ao acervo privado':'Sem fotografia'],['Odor no ar',$('#invisible-source').checked?'Sem foco visível informado':'Não especificado'],['Por perto',[...app.state.tags].map(i=>['Lixo acumulado','Contentor próximo','Bueiro / ralo','Água parada','Vala aberta','Restos de alimentos','Animais por perto','Nada aparente'][i]).join(', ')||'Não informado'],['Observação',$('#observation').value.trim()||'Sem observação'],['Clima',weatherText(w)]];}
   function requestMapGps(){if(mapGpsAttempted||app.state.gpsLocation||$('#locate').disabled)return;mapGpsAttempted=true;$('#locate').click();}
   function ensureMap(){
     if(!pinMap){app.startMap();pinMap=WaindPin.mount($('#pin-map'),{
@@ -100,15 +100,19 @@
     ensureMap();if(mode==='gps')pinMap.setLocation(gps||null);else if(mode==='pin')pinMap.setLocation(manualLocation);else pinMap.setLocation(null);
     const loc=app.state.location;if(!explore&&loc)app.fetchWeather(loc.latitude,loc.longitude,mode==='gps'?'device-region':'manual-region');
   }
-  function review(){
-    if(WaindMotion.busy)return;
+  let reviewing=false;
+  async function review(){
+    if(WaindMotion.busy||reviewing)return;
     if(!validIdentity()||!app.state.intensity||!app.state.types.size||(app.state.types.has('other')&&!$('#other-text').value.trim())){app.showToast('Confira seus dados e as escolhas antes de revisar.');navigate(!validIdentity()?'1':!app.state.intensity?'3':'4');return;}
     if(!locationValid()||app.state.photoLoading){$('#location-error').hidden=false;return;}
     if(isPast()&&(!$('#occurred-at').value||$('#occurred-at').value>dateLocal())){navigate('past');return;}
-    pending=app.createReport();pending.schemaVersion=7;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,accountAuthenticated:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.7'};
+    // Ocorrência anterior: busca o clima da hora informada antes de montar o relato.
+    let historical=null;
+    if(isPast()){reviewing=true;$('#review-open').disabled=true;try{const loc=app.state.location;historical=await app.fetchHistoricalWeather(loc.latitude,loc.longitude,$('#occurred-at').value,mode==='gps'?'device-region':'manual-region');}finally{reviewing=false;$('#review-open').disabled=false;}if(!isPast()||!locationValid())return;}
+    pending=app.createReport();if(historical)pending.weather=historical;pending.schemaVersion=7;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,accountAuthenticated:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.7'};
     pending.occurrence={kind:isPast()?'past':'current',occurredAt:isPast()?new Date($('#occurred-at').value+':00-03:00').toISOString():pending.recordedAt,timezone:'America/Sao_Paulo',approximate:isPast()};
-    pending.weatherContext={relationship:isPast()?'current-context-not-historical':'current-regional-context',notMeasuredAtSource:true};
-    const rows=[['Nome',pending.participant.name],['E-mail',pending.participant.email],['Fuso horário','Horário de Brasília'],...summary(),['Localização',locationText(pending.location)]];
+    pending.weatherContext={relationship:pending.weather?.moment==='historical-hourly'?'historical-hourly-regional-context':isPast()?'current-context-not-historical':'current-regional-context',notMeasuredAtSource:true};
+    const rows=[['Nome',pending.participant.name],['E-mail',pending.participant.email],['Fuso horário','Horário de Brasília'],...summary(pending.weather),['Localização',locationText(pending.location)]];
     $('#review-details').replaceChildren(...rows.map(([key,text])=>{const row=document.createElement('div'),dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=key;dd.textContent=text;row.append(dt,dd);return row;}));
     $('#review-photo').hidden=!app.getPhotoURL();if(app.getPhotoURL())$('#review-photo').src=app.getPhotoURL();else $('#review-photo').removeAttribute('src');
     withWind(()=>{$('#review-panel').hidden=false;$('#location-panel').hidden=true;window.scrollTo({top:0,behavior:'instant'});updateNavigation();});
