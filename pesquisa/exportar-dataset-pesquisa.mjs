@@ -62,7 +62,7 @@ export async function exportDataset({collections,out,salt,qa,meters=100,minutes=
   out=path.resolve(out);const parts=out.split(path.sep);check(!parts.some(p=>['publicacao-github','waind-preview','.git'].includes(p)),'Destino deve ficar fora do pacote público/fontes Web');
   try{await fs.access(path.join(out,'manifesto.json'));throw new Error('Destino já contém dataset. Use uma pasta nova para preservar a versão.');}catch(e){if(e.code!=='ENOENT')throw e;}
   const research=entries(collections.relatos_pesquisa),maps=entries(collections.relatos_mapa),photos=entries(collections.relatos_fotos);
-  const excluded=new Set([...qa.gpt05,...qa.gpt06,...qa.gpt07]),rows=[],images=[],ignored=[];
+  const excluded=new Set(Object.values(qa).filter(Array.isArray).flat()),rows=[],images=[],ignored=[];
   for(const [id,p]of [...research].sort(([a],[b])=>a.localeCompare(b))){
     if(excluded.has(id)||(p.localizacao?.latitude===-80&&p.localizacao?.longitude===0)){ignored.push({id,motivo:'qa-tecnico'});continue;}
     check(/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(id),`UUID inválido: ${id}`);
