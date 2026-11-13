@@ -11,7 +11,7 @@
   WaindBrand.mount($('#enter-waind'));
   $('.screening-art').innerHTML=OdorArt.wind();
   $('#occurred-at').max=dateLocal();
-  function validIdentity(){return $('#participant-name').value.trim().length>0&&$('#participant-email').value.trim().length>0&&$('#participant-email').validity.valid&&$('#context-confirm').checked&&$('#data-consent').checked;}
+  function validIdentity(){return !!WaindCloud.currentAccount()&&$('#participant-email').value===WaindCloud.currentAccount().email&&$('#participant-name').value.trim().length>0&&$('#participant-email').value.trim().length>0&&$('#participant-email').validity.valid&&$('#context-confirm').checked&&$('#data-consent').checked;}
   function locationValid(){return mode==='pin'?!!manualLocation:mode==='gps'&&!!app.state.gpsLocation&&(!isPast()||$('#past-gps-confirm').checked);}
   function valid(){
     switch(step){case '1':return validIdentity();case '2':return !!value('screening');case 'past':return value('past-choice')==='no'||(value('past-choice')==='yes'&&!!$('#occurred-at').value&&$('#occurred-at').value<=dateLocal());case '3':return !!app.state.intensity;case '4':return app.state.types.size>0&&(!app.state.types.has('other')||!!$('#other-text').value.trim());case '5':return !app.state.photoLoading;case '7':return exploring()||saved||locationValid();default:return true;}
@@ -105,7 +105,7 @@
     if(!validIdentity()||!app.state.intensity||!app.state.types.size||(app.state.types.has('other')&&!$('#other-text').value.trim())){app.showToast('Confira seus dados e as escolhas antes de revisar.');navigate(!validIdentity()?'1':!app.state.intensity?'3':'4');return;}
     if(!locationValid()||app.state.photoLoading){$('#location-error').hidden=false;return;}
     if(isPast()&&(!$('#occurred-at').value||$('#occurred-at').value>dateLocal())){navigate('past');return;}
-    pending=app.createReport();pending.schemaVersion=6;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.6'};
+    pending=app.createReport();pending.schemaVersion=7;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,accountAuthenticated:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.7'};
     pending.occurrence={kind:isPast()?'past':'current',occurredAt:isPast()?new Date($('#occurred-at').value+':00-03:00').toISOString():pending.recordedAt,timezone:'America/Sao_Paulo',approximate:isPast()};
     pending.weatherContext={relationship:isPast()?'current-context-not-historical':'current-regional-context',notMeasuredAtSource:true};
     const rows=[['Nome',pending.participant.name],['E-mail',pending.participant.email],['Fuso horário','Horário de Brasília'],...summary(),['Localização',locationText(pending.location)]];
@@ -120,9 +120,11 @@
     buttons.forEach(b=>b.disabled=true);$('#save-report').textContent='Enviando relato…';
     $('#send-status').hidden=false;$('#send-status').textContent='Enviando relato ao banco da pesquisa WAIND…';updateNavigation();
     try {
-      const result=await app.save(pending);
+      const report=pending;
+      const result=await app.save(report);
+      if(WaindCloud.currentAccount()?.uid!==report.autor_uid)return;
       if(result)await withWind(()=>{
-        saved=true;savedId=pending.id;showSaved(result.status,result.message);
+        saved=true;savedId=report.id;showSaved(result.status,result.message);
         pending=null;$('#review-panel').hidden=true;$('#location-panel').hidden=true;$('#success-panel').hidden=false;
         $('#records-wrap').hidden=false;window.scrollTo({top:0,behavior:'instant'});updateNavigation();
       });
@@ -159,6 +161,12 @@
   $('#review-open').addEventListener('click',review);$('#edit-report').addEventListener('click',()=>editStep('3'));$('#save-report').addEventListener('click',save);$('#new-report').addEventListener('click',restart);
   $$('[data-edit]').forEach(b=>b.addEventListener('click',()=>editStep(b.dataset.edit)));
   ['camera-button','gallery-button'].forEach(id=>$('#'+id).addEventListener('click',()=>{$('#photo-consent').checked=true;}));
+  let lastAccountUid=null;
+  window.addEventListener('waind:account',()=>{
+    const uid=WaindCloud.currentAccount()?.uid||null;
+    if(lastAccountUid&&lastAccountUid!==uid){WaindMotion.finish();resetting=true;pending=null;saved=false;savedId=null;manualLocation=null;mode=null;app.reset();$('#review-panel').hidden=true;$('#success-panel').hidden=true;$('#location-panel').hidden=false;resetting=false;navigate('1',{animated:false});}
+    lastAccountUid=uid;updateNavigation();
+  });
   $('#other-text').required=true;$('#other-field label .optional').textContent='DESCREVA SUA PERCEPÇÃO';
   window.addEventListener('popstate',e=>{if(submitting){history.pushState({waindStep:'7'},'','#passo-7');return;}let dest=e.state?.waindStep||'0';if(dest!=='0'&&!route().includes(dest))dest='2';WaindMotion.finish();withWind(()=>{closeReview(false);navigate(dest,{historyWrite:false,animated:false});});});
   history.replaceState({waindStep:'0'},'','#inicio');navigate('0',{historyWrite:false,animated:false});

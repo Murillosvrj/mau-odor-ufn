@@ -1,0 +1,17 @@
+/* Complemento de conta: papel, nanquim e tipografia do caderno existente. */
+.account-card{border:1px solid #cec8bd;background:#fff;padding:22px;margin:22px 0 25px;border-radius:4px}
+.account-card h2{font:normal 25px/1.2 Georgia,serif;margin:9px 0 12px;color:#111}
+.account-card .account-copy{font-size:12px;line-height:1.7;color:#514d46;max-width:65ch;margin-bottom:18px}
+.account-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0 14px}
+.account-fields>div{min-width:0}.account-fields label{display:block;font-size:11px;margin-bottom:7px}
+.account-fields input{width:100%;min-width:0;background:#FAF8F5;border:1px solid #c8c2b8;border-radius:3px;padding:12px;font:14px/1.4 system-ui,sans-serif;color:#111}
+.account-fields input:focus-visible,.account-card button:focus-visible{outline:2px solid #111;outline-offset:3px}
+#account-register-name{grid-column:1/-1}.account-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.account-separator{font:10px Consolas,monospace;color:#686257;letter-spacing:1px;margin-top:20px;padding-top:16px;border-top:1px solid #e0dbd1}
+.account-connected-line{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+#account-connected-email{font-size:13px;overflow-wrap:anywhere}#account-status{font-size:12px;line-height:1.7;margin-top:15px;min-height:20px}
+.account-card .identity-grid{margin-top:20px}.account-card input[readonly]{background:#f2efe9;color:#514d46}
+#profile-save{margin-top:12px}.history-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;width:100%}
+.history-detail{border-top:1px solid #ddd7cc;padding:12px 0;font-size:12px;line-height:1.7}.history-detail summary{cursor:pointer;font-weight:500}.history-detail dl{margin:10px 0}.history-detail dt{font-size:10px;color:#686257}.history-detail dd{margin:0 0 8px;overflow-wrap:anywhere;white-space:pre-wrap}
+#history-status{width:100%;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+@media(max-width:600px){.account-card{padding:18px 15px}.account-fields{grid-template-columns:1fr}.account-actions{align-items:stretch;gap:13px}.account-actions .button{width:100%}.account-connected-line{align-items:flex-start}.account-card h2{font-size:23px}}

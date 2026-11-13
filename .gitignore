@@ -2,3 +2,12 @@ node_modules/
 .pnpm-store/
 qa/
 entrega/
+dataset_privado/
+waind_resultados_privados/
+.segredos/
+.env
+.env.*
+*service-account*.json
+*serviceAccount*.json
+*credentials*.json
+*-debug.log

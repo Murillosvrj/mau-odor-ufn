@@ -3,11 +3,11 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=path.dirname(fileURLToPath(import.meta.url));
 let html=await fs.readFile(path.join(root,'waind.html'),'utf8');
-for(const file of ['tailwind.css','styles.css','illustrations.css','map.css','maplibre-gl.css','pin-map.css','wizard.css']){
+for(const file of ['tailwind.css','styles.css','illustrations.css','map.css','maplibre-gl.css','pin-map.css','wizard.css','account.css']){
   const css=await fs.readFile(path.join(root,file),'utf8');
   html=html.replace(`<link rel="stylesheet" href="${file}">`,()=>`<style>\n/* ${file} */\n${css}\n</style>`);
 }
-for(const file of ['illustrations.js','brand.js','wind-motion.js','maplibre-gl.js','odor-heat.js','pin-map.js','firebase-config.js','app-check-config.js','app-check.js','photo-process.js','firebase-client.js','app.js','wizard.js']){
+for(const file of ['illustrations.js','brand.js','wind-motion.js','maplibre-gl.js','odor-heat.js','pin-map.js','firebase-config.js','app-check-config.js','app-check.js','photo-process.js','firebase-client.js','account-service.js','local-store.js','app.js','wizard.js','account.js']){
   const js=await fs.readFile(path.join(root,file),'utf8');
   html=html.replace(`<script src="${file}"></script>`,()=>`<script>\n/* ${file} */\n${js.replace(/<\/script/gi,'<\\/script')}\n</script>`);
 }
@@ -26,7 +26,7 @@ for(const file of ['tailwind.css','styles.css','maplibre-gl.css','pin-map.css','
  const css=await fs.readFile(path.join(root,file),'utf8');
  dashboard=dashboard.replace(`<link rel="stylesheet" href="${file}">`,()=>`<style>\n/* ${file} */\n${css}\n</style>`);
 }
-for(const file of ['maplibre-gl.js','odor-heat.js','pin-map.js','firebase-config.js','app-check-config.js','app-check.js','firebase-client.js','dashboard-data.js','dashboard.js']){
+for(const file of ['maplibre-gl.js','odor-heat.js','pin-map.js','firebase-config.js','app-check-config.js','app-check.js','firebase-client.js','qa-ids.js','dashboard-data.js','dashboard.js']){
  const js=await fs.readFile(path.join(root,file),'utf8');
  dashboard=dashboard.replace(`<script src="${file}"></script>`,()=>`<script>\n/* ${file} */\n${js.replace(/<\/script/gi,'<\\/script')}\n</script>`);
 }

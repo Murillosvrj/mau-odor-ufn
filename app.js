@@ -30,16 +30,13 @@
   const region = {latitude:-29.6868,longitude:-53.8149,radiusKm:45};
   let gpsGeneration=0, cameraGeneration=0, cameraPending=false, addressController=null, lastAddressRequest=0;
   const addressCache=new Map();
-  const STORE_KEY = 'waind-relatos-local-v2';
+  let activeUid=null,cloudHistory=[],historyCursor=null,historyMore=false,historyBusy=false,historyGeneration=0;
+  let historyStatus='Entre na sua conta para consultar o histórico.';
   let records = [], publicRecords = [], mapStatus='Mapa coletivo ainda não consultado.', mapStarted=false, stopMap=null, syncing=false;
   let toastTimer, photoURL = null, photoGeneration = 0, weatherGeneration = 0;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let motionPaused = reducedMotion.matches;
   let lastFocused = null;
-  try {
-    const stored = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-    if (Array.isArray(stored)) records = stored.filter(r => r && typeof r.id === 'string' && Number.isInteger(r.intensity) && r.intensity >= 1 && r.intensity <= 5 && Array.isArray(r.categories));
-  } catch { /* Browsers may disable storage; a save will explain that state. */ }
 
   $('#hero-art').innerHTML = OdorArt.hero();
   $('#wind-art').innerHTML = OdorArt.wind();
@@ -54,6 +51,7 @@
     method:{title:'Uma percepção. Muitas possibilidades.',body:'<p><strong>Relato:</strong> o que alguém sentiu em um lugar e momento.</p><p><strong>Hipótese:</strong> uma possível fonte, sugerida por observação ou por um modelo, que ainda exige investigação.</p><p><strong>Causa comprovada:</strong> exige evidências próprias e não é estabelecida por este formulário. Relatos isolados são preservados como “isolado / não confirmado”.</p>'},
     about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Ao enviar, o relato completo e a identificação são guardados no banco da pesquisa WAIND (Firebase/Firestore), com acesso restrito aos pesquisadores. O mapa coletivo mostra coordenadas, data, hora, intensidade, categorias e temperatura sem nome, e-mail, endereço ou textos livres. As coordenadas exatas podem revelar rotinas. Uma cópia com identificação fica neste navegador e na exportação JSON. Sem conexão, os relatos ficam pendentes e serão sincronizados ao reconectar. A fotografia opcional é redimensionada, sem EXIF do aparelho, e enviada somente ao acervo privado relatos_fotos para análise científica e treinamento futuro de modelos de Machine Learning. Ela nunca aparece no mapa público. Nenhuma imagem é analisada automaticamente nesta versão. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
   };
+  infoContent.about.body="<p>WAIND — pesquisa de Murillo Viçosa, UFN, em Santa Maria e região, organizada por Design Science Research.</p><p>O relato registra uma percepção, não comprova a fonte nem mede concentração química. Nenhuma análise automática de fotografia ou estimativa de intensidade por IA é executada nesta versão.</p><p>Os novos relatos completos e a fotografia opcional ficam vinculados à sua conta privada para histórico pessoal, pesquisa científica e futuro treinamento de modelos. O mapa público mostra apenas coordenadas exatas, data, hora, intensidade, categorias e temperatura, sem nome, e-mail, identificador de conta, endereço, texto livre ou imagem. Coordenadas e horários podem revelar rotinas.</p><p>Fotografias são redimensionadas em até 640 px e 140 KiB, reencodificadas sem copiar EXIF original e armazenadas no acervo privado. O histórico mostra apenas seus metadados. Uma cópia local e a exportação JSON podem conter identificação; imagens não entram no JSON. Pendências são separadas por conta e exigem a mesma conta conectada para sincronizar. Registros antigos não são atribuídos automaticamente à conta.</p><p>Clima atual e regional: Open-Meteo, com coordenadas arredondadas. Endereço aproximado: OpenStreetMap/Nominatim. Fotos podem conter elementos identificáveis nos próprios pixels.</p>";
   function showToast(text) {
     clearTimeout(toastTimer); $('#toast').textContent = text; $('#toast').hidden = false;
     toastTimer = setTimeout(() => { $('#toast').hidden = true; }, 5200);
@@ -321,7 +319,7 @@
     return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
   }
   function createReport(){return {
-    schemaVersion:6,id:reportId(),
+    schemaVersion:7,id:reportId(),autor_uid:WaindCloud.currentAccount()?.uid||null,provedor_auth:WaindCloud.currentAccount()?.provider||null,
     recordedAt:new Date().toISOString(),timezone:'America/Sao_Paulo',intensity:state.intensity,
     categories:types.filter(t=>state.types.has(t.id)).map(t=>t.id),
     multiHot:Object.fromEntries(types.map(t=>[t.id,Number(state.types.has(t.id))])),
@@ -333,81 +331,99 @@
     evidenceType:'citizen-perception',verificationStatus:'isolated-unconfirmed',causeProven:false,
     ai:{computerVisionExecuted:false,predictionExecuted:false},storage:'browser-local',prototype:true
   };}
-  function renderRecords(){
-    window.dispatchEvent(new Event('waind:records'));
-    $('#local-count').textContent=String(records.length).padStart(2,'0');$('#export-records').disabled=!records.length;$('#clear-records').hidden=!records.length;
-    const waiting=records.filter(r=>r.syncStatus==='pendente-sincronizacao').length;
-    $('#records-description').textContent=records.length?`Cópias deste navegador · ${waiting} ${waiting===1?'pendente':'pendentes'} de sincronização · exportação disponível.`:'Os registros que você salvar ficam disponíveis aqui.';
-    $('#local-record-list').innerHTML=records.slice(-3).reverse().map(report=>{
-      let date;try{date=report.occurrence?.kind==='past'?`Ocorrência ${localDate(report.occurrence.occurredAt)} · registrado ${localDate(report.recordedAt)}`:localDate(report.recordedAt);}catch{date='Data não disponível';}
-      const labels=report.categories.map(id=>types.find(t=>t.id===id)?.label||id).join(', ');
-      const status=report.syncStatus==='pendente-sincronizacao'&&report.consent?.version!=='waind-pesquisa-mapa-0.6'?'ACEITE ANTERIOR · SOMENTE LOCAL':report.syncStatus==='pendente-sincronizacao'?'PENDENTE DE SINCRONIZAÇÃO':report.cloud?.confirmed?'ENVIADO AO BANCO':'SOMENTE NESTE NAVEGADOR';
-      return `<div class="record-row"><div>${escape(labels)}<small>${escape(date)} · intensidade ${report.intensity} / 5 · ${status}</small></div><span>ISOLADO /<br>NÃO CONFIRMADO</span></div>`;
-    }).join('');
+  function visibleRecords(){
+    if(!activeUid)return [];
+    return [...new Map([...cloudHistory,...records].filter(r=>r.autor_uid===activeUid).map(r=>[r.id,r])).values()].sort((a,b)=>(b.occurrence?.occurredAt||b.recordedAt).localeCompare(a.occurrence?.occurredAt||a.recordedAt));
   }
+  function renderRecords(){
+    const own=visibleRecords(),waiting=records.filter(r=>r.syncStatus==='pendente-sincronizacao').length;
+    $('#local-count').textContent=String(own.length).padStart(2,'0');$('#export-records').disabled=!own.length;
+    $('#clear-records').hidden=!activeUid||!records.length;
+    $('#records-description').textContent=activeUid?`${own.length} relatos carregados da sua conta · ${waiting} pendentes neste aparelho.`:'Entre para consultar seus relatos.';
+    $('#history-status').textContent=historyStatus;
+    $('#refresh-history').disabled=!activeUid||historyBusy;
+    $('#more-history').hidden=!historyMore;$('#more-history').disabled=historyBusy;
+    $('#local-record-list').replaceChildren(...own.map(report=>{
+      const details=document.createElement('details');details.className='history-detail';const title=document.createElement('summary');
+      const when=report.occurrence?.occurredAt||report.recordedAt;
+      let date;try{date=localDate(when);}catch{date='Data indisponível';}
+      const labels=report.categories.map(id=>types.find(t=>t.id===id)?.label||id).join(', ');
+      title.textContent=`${date} · ${report.intensity}/5 · ${labels} · ${report.syncStatus==='pendente-sincronizacao'?'Pendente neste aparelho':'Confirmado no banco'}`;
+      const dl=document.createElement('dl');
+      for(const [label,value] of [['Nome informado no envio',report.participant?.name||''],['E-mail informado no envio',report.participant?.email||''],['Observação',report.observation||'Sem observação'],['Outro odor',report.otherDescription||'Não informado'],['Por perto',report.visibleTags?.join(', ')||'Não informado'],['Foto',report.photo?'Fotografia privada associada; imagem não carregada neste histórico.':'Sem fotografia'],['Identificador',report.id],['Qualidade','Percepção isolada / não confirmada']]){
+        const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);
+      }
+      details.append(title,dl);return details;
+    }));
+    window.dispatchEvent(new Event('waind:records'));
+  }
+  async function refreshHistory(append=false){
+    const uid=activeUid;if(!uid)return;
+    const n=++historyGeneration;historyBusy=true;historyStatus='Consultando o histórico privado da sua conta…';
+    if(!append){cloudHistory=[];historyCursor=null;historyMore=false;}renderRecords();
+    try{
+      const page=await WaindCloud.readHistory({cursor:append?historyCursor:null});
+      if(n!==historyGeneration||uid!==activeUid||page.uid!==uid)return;
+      cloudHistory=[...new Map([...cloudHistory,...page.records].map(r=>[r.id,r])).values()];historyCursor=page.cursor;historyMore=page.hasMore;
+      historyStatus=historyMore?'Histórico parcial. Carregue mais para consultar os anteriores.':'Histórico atualizado. Fotografias permanecem no acervo privado.';
+    }catch(error){if(n===historyGeneration&&uid===activeUid)historyStatus=String(error.code).includes('failed-precondition')?'O histórico ainda aguarda configuração da consulta. Suas cópias locais continuam disponíveis.':'Histórico indisponível agora. Suas pendências desta conta permanecem neste aparelho.';}
+    finally{if(n===historyGeneration&&uid===activeUid){historyBusy=false;renderRecords();}}
+  }
+  $('#refresh-history').addEventListener('click',()=>refreshHistory());
+  $('#more-history').addEventListener('click',()=>refreshHistory(true));
   $('#export-records').addEventListener('click',()=>{
-    if(!records.length)return;
-    const payload={project:'WAIND — UFN / Santa Maria',exportedAt:new Date().toISOString(),schemaVersion:6,notice:'Relatos de percepção. Sem comprovação de causa. JSON privado com identificação e metadados; imagens omitidas. Fotos pendentes permanecem neste navegador até sincronizar.',records:records.map(r=>{const copy={...r,photo:r.photo?{...r.photo}:null};if(copy.photo)delete copy.photo.dataBase64;return copy;})};
-    const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
-    const link=document.createElement('a');link.href=url;link.download=`waind-relatos-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+    const own=visibleRecords();if(!activeUid||!own.length)return;
+    const payload={project:'WAIND — UFN / Santa Maria',schemaVersion:7,exportedAt:new Date().toISOString(),historyPartial:historyMore,notice:'Exportação privada dos relatos carregados desta conta. Contém identificação e metadados; imagens omitidas. Não representa o dataset científico completo.',records:own.map(r=>{const copy={...r,photo:r.photo?{...r.photo}:null};if(copy.photo)delete copy.photo.dataBase64;return copy;})};
+    const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download=`waind-meus-relatos-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
   });
   $('#clear-records').addEventListener('click',()=>{
-    $('#info-title').textContent='Apagar os relatos deste navegador?';
-    $('#info-body').innerHTML='<p>Exporte o caderno antes de apagá-lo se quiser uma cópia. Registros pendentes serão perdidos e não poderão mais ser sincronizados. Os já enviados permanecem no banco da pesquisa.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar relatos locais</button>';
-    openDialog($('#info-dialog'));
-    $('#confirm-clear').addEventListener('click',()=>{
-      try{localStorage.removeItem(STORE_KEY);}catch{showToast('Não foi possível limpar o armazenamento.');return;}
-      records=[];renderRecords();$('#info-dialog').close();showToast('Relatos locais apagados.');
-    });
+    const uid=activeUid;if(!uid)return;
+    $('#info-title').textContent='Apagar cópias desta conta no aparelho?';
+    $('#info-body').innerHTML='<p>Exporte seus relatos antes se quiser uma cópia. As pendências desta conta serão perdidas. Relatos enviados permanecem no banco e pendências de outras contas são preservadas.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar cópias desta conta</button>';
+    openDialog($('#info-dialog'));$('#confirm-clear').addEventListener('click',()=>{if(activeUid!==uid)return;try{WaindLocal.remove(uid);records=[];renderRecords();$('#info-dialog').close();}catch{showToast('Não foi possível apagar as cópias locais.');}});
   });
-  renderRecords(); updateSummary();
-
-  function cache(next){
-    // Never discard unsent reports when keeping the last 100 confirmed copies.
-    const pending=next.filter(r=>r.syncStatus==='pendente-sincronizacao');
-    const confirmed=next.filter(r=>r.syncStatus!=='pendente-sincronizacao').slice(-100).map(r=>WaindPhoto.compact({...r,photo:r.photo?{...r.photo}:null}));
-    let keep;
-    for(;;){
-      keep=[...confirmed,...pending].map(r=>({...r,photo:r.photo?{...r.photo}:null})).sort((a,b)=>a.recordedAt.localeCompare(b.recordedAt));
-      try{localStorage.setItem(STORE_KEY,JSON.stringify(keep));records=keep;break;}
-      catch(error){if(error.name!=='QuotaExceededError'||!confirmed.length)throw error;confirmed.splice(0,Math.max(1,Math.ceil(confirmed.length/2)));}
-    }
-  }
-  function remember(report){cache([...records.filter(r=>r.id!==report.id),report]);renderRecords();}
+  function cache(next,uid=activeUid){const saved=WaindLocal.write(uid,next);if(uid===activeUid)records=saved;}
+  function remember(report){const uid=report.autor_uid;cache([...WaindLocal.read(uid).filter(r=>r.id!==report.id),report],uid);if(uid===activeUid)renderRecords();}
+  window.addEventListener('waind:account',()=>{
+    const uid=WaindCloud.currentAccount()?.uid||null;
+    if(uid===activeUid)return;
+    ++historyGeneration;historyBusy=false;activeUid=uid;records=WaindLocal.read(uid);cloudHistory=[];historyCursor=null;historyMore=false;
+    historyStatus=uid?'Sua conta está conectada.':'Entre na sua conta para consultar o histórico.';renderRecords();
+    if(uid){refreshHistory();syncPending();}
+  });
+  renderRecords();updateSummary();
   function startMap(){
     mapStarted=true;stopMap?.();
     WaindCloud.listenMap(items=>{publicRecords=items;window.dispatchEvent(new Event('waind:records'));},text=>{mapStatus=text;window.dispatchEvent(new Event('waind:records'));}).then(stop=>{stopMap=stop;});
   }
   async function syncPending(){
-    if(syncing||navigator.onLine===false)return;
+    const uid=activeUid;if(syncing||!uid||navigator.onLine===false)return;
     syncing=true;let sent=0;
     try{
-      for(const report of records.filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&r.consent?.version==='waind-pesquisa-mapa-0.6')){
+      for(const report of WaindLocal.read(uid).filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&r.consent?.version==='waind-pesquisa-mapa-0.7')){
+        if(activeUid!==uid)break;
         try{
           const receipt=await WaindCloud.save(report);
-          // Do not restore a local copy if the participant erased it while sending.
-          if(!records.some(r=>r.id===report.id))continue;
+          if(!WaindLocal.read(uid).some(r=>r.id===report.id))continue;
           report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
-          try{remember(report);}catch{renderRecords();}
-          sent++;
-        }catch(error){report.syncError=String(error?.code||'network');try{remember(report);}catch{/* Preserve the existing durable pending copy. */}}
+          try{remember(report);}catch{if(activeUid===uid)renderRecords();}sent++;
+        }catch(error){report.syncError=String(error?.code||'network');try{remember(report);}catch{/* Não perder pendências duráveis. */}}
       }
-    }finally{syncing=false;if(sent)showToast(`${sent} ${sent===1?'relato sincronizado':'relatos sincronizados'} com o banco da pesquisa.`);}
+    }finally{syncing=false;if(sent&&activeUid===uid){showToast(`${sent} relato(s) desta conta sincronizado(s).`);refreshHistory();}}
   }
-  window.addEventListener('online',()=>{syncPending();if(mapStarted)startMap();});
-  window.addEventListener('storage',event=>{
-    if(event.key!==STORE_KEY)return;
-    try{const next=JSON.parse(event.newValue||'[]');if(Array.isArray(next)){records=next;renderRecords();}}catch{/* Keep the current caderno if external data is invalid. */}
-  });
+  window.addEventListener('online',()=>{syncPending();if(mapStarted)startMap();if(activeUid)refreshHistory();});
+  window.addEventListener('storage',event=>{if(activeUid&&event.key===WaindLocal.key(activeUid)){records=WaindLocal.read(activeUid);renderRecords();}});
+
   setTimeout(syncPending,1200);setInterval(syncPending,60000);
 
   window.WaindApp = {
     state, levels, types, showToast, showInfo, createReport, fetchWeather,
-    startMap,syncPending,getMapStatus:()=>mapStatus,
-    getLocalRecords:()=>records.map(r=>({...r})),
-    getRecords:()=>[...new Map([...records.map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),...publicRecords].map(r=>[r.id,r])).values()],
+    startMap,syncPending,refreshHistory,getMapStatus:()=>mapStatus,
+    getLocalRecords:()=>visibleRecords().map(r=>({...r})),
+    getRecords:()=>[...new Map([...visibleRecords().map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),...publicRecords].map(r=>[r.id,r])).values()],
     getPhotoURL:()=>photoURL,
     async save(report){
+      if(!activeUid||report.autor_uid!==activeUid||WaindCloud.currentAccount()?.uid!==activeUid){showToast('Entre na conta deste relato para enviar.');return false;}
       report.syncStatus='pendente-sincronizacao';report.storage='browser-local';
       let durable=false;
       try{remember(report);durable=true;}catch{/* A confirmed cloud send can still succeed without local storage. */}
@@ -415,6 +431,7 @@
         const receipt=await WaindCloud.save(report);
         report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
         try{remember(report);}catch{showToast('Enviado ao banco. Não foi possível atualizar a cópia neste navegador.');}
+        if(activeUid===report.autor_uid)refreshHistory();
         return {status:'sincronizado',id:report.id};
       } catch(error) {
         report.syncError=String(error?.code||'network');
@@ -436,7 +453,7 @@
       $('#location-address').hidden=true;$('#location-help').hidden=true;$('#locate').disabled=false;$('#locate').textContent='Usar minha localização ↗';
       $('#test-camera').disabled=false;$('#test-camera').textContent='Autorizar / testar câmera ↗';$('#camera-status').textContent='A câmera será testada ao marcar esta opção.';
       $('#camera-footnote').textContent='Opcional. Na etapa de fotografia, a galeria abre o seletor do aparelho; você escolhe quais imagens compartilhar.';
-      updateSummary();fetchWeather(region.latitude,region.longitude,'study-area');
+      window.dispatchEvent(new Event('waind:form-reset'));updateSummary();fetchWeather(region.latitude,region.longitude,'study-area');
     }
   };
 

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#F7F5F0"><meta name="description" content="WAIND — caderno de campo urbano. Pesquisa participativa sobre percepções de odor em Santa Maria."><title>WAIND — O que o ar conta por aqui?</title>
-<meta name="waind-version" content="GPT 0.6">
+<meta name="waind-version" content="GPT 0.7">
 <style>
 /* tailwind.css */
 /*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
@@ -320,6 +320,27 @@ html{overflow-x:clip}
 @media(max-width:480px){.wizard-screen .intensity-card .intensity-key {height:132px;} .intensity-card .intensity-info {left:4px;right:auto;top:4px;} .intensity-card .selected-mark {right:5px;top:4px;} }
 
 </style>
+<style>
+/* account.css */
+/* Complemento de conta: papel, nanquim e tipografia do caderno existente. */
+.account-card{border:1px solid #cec8bd;background:#fff;padding:22px;margin:22px 0 25px;border-radius:4px}
+.account-card h2{font:normal 25px/1.2 Georgia,serif;margin:9px 0 12px;color:#111}
+.account-card .account-copy{font-size:12px;line-height:1.7;color:#514d46;max-width:65ch;margin-bottom:18px}
+.account-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0 14px}
+.account-fields>div{min-width:0}.account-fields label{display:block;font-size:11px;margin-bottom:7px}
+.account-fields input{width:100%;min-width:0;background:#FAF8F5;border:1px solid #c8c2b8;border-radius:3px;padding:12px;font:14px/1.4 system-ui,sans-serif;color:#111}
+.account-fields input:focus-visible,.account-card button:focus-visible{outline:2px solid #111;outline-offset:3px}
+#account-register-name{grid-column:1/-1}.account-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.account-separator{font:10px Consolas,monospace;color:#686257;letter-spacing:1px;margin-top:20px;padding-top:16px;border-top:1px solid #e0dbd1}
+.account-connected-line{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+#account-connected-email{font-size:13px;overflow-wrap:anywhere}#account-status{font-size:12px;line-height:1.7;margin-top:15px;min-height:20px}
+.account-card .identity-grid{margin-top:20px}.account-card input[readonly]{background:#f2efe9;color:#514d46}
+#profile-save{margin-top:12px}.history-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;width:100%}
+.history-detail{border-top:1px solid #ddd7cc;padding:12px 0;font-size:12px;line-height:1.7}.history-detail summary{cursor:pointer;font-weight:500}.history-detail dl{margin:10px 0}.history-detail dt{font-size:10px;color:#686257}.history-detail dd{margin:0 0 8px;overflow-wrap:anywhere;white-space:pre-wrap}
+#history-status{width:100%;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+@media(max-width:600px){.account-card{padding:18px 15px}.account-fields{grid-template-columns:1fr}.account-actions{align-items:stretch;gap:13px}.account-actions .button{width:100%}.account-connected-line{align-items:flex-start}.account-card h2{font-size:23px}}
+
+</style>
 </head><body>
 <a class="skip-link" href="#screens">Pular para a etapa atual</a>
 <section id="splash" class="splash-screen" aria-label="Entrada WAIND">
@@ -364,10 +385,20 @@ html{overflow-x:clip}
 
 
 <p class="intro-research">Somos uma pesquisa da Universidade Franciscana que escuta as percepções de quem vive e circula por Santa Maria. Cada relato ajuda a conhecer o território.</p>
-<div class="identity-grid"><div><label for="participant-name">Como você se chama?</label><input maxlength="120" id="participant-name" name="name" autocomplete="name" maxlength="100" required placeholder="Seu nome"></div><div><label for="participant-email">Seu e-mail</label><input maxlength="254" id="participant-email" name="email" type="email" autocomplete="email" maxlength="180" required placeholder="voce@exemplo.com"></div></div>
+<section class="account-card" aria-labelledby="account-title">
+<p class="eyebrow">SEU CADERNO / CONTA PRIVADA</p><h2 id="account-title">Um lugar para os seus relatos.</h2>
+<p class="account-copy">Entre para acompanhar seus relatos em outros aparelhos. Seu nome e e-mail ficam na pesquisa; o mapa público não mostra sua conta.</p>
+<div id="account-entry"><button type="button" class="button button-ink" id="account-google" data-account-action>Entrar com Google ↗</button>
+<p class="account-separator">OU USE SEU E-MAIL</p><div class="account-fields"><div id="account-register-name" hidden><label for="account-name">Seu nome</label><input id="account-name" autocomplete="name" maxlength="120"></div>
+<div><label for="account-email">E-mail da conta</label><input id="account-email" type="email" autocomplete="email" maxlength="254"></div><div><label for="account-password">Senha</label><input id="account-password" type="password" autocomplete="current-password" maxlength="4096"></div></div>
+<div class="account-actions"><button type="button" class="button button-outline" id="account-submit" data-account-action>Entrar com e-mail ↗</button><button type="button" class="text-button" id="account-toggle" data-account-action>Criar conta com e-mail</button><button type="button" class="text-button" id="account-reset" data-account-action>Esqueci minha senha</button></div></div>
+<div id="account-connected" hidden><div class="account-connected-line"><p id="account-connected-email"></p><button type="button" class="text-button" id="account-signout" data-account-action>Sair da conta ↗</button></div>
+<div class="identity-grid"><div><label for="participant-name">Nome de apresentação</label><input id="participant-name" name="name" autocomplete="name" maxlength="120" required></div><div><label for="participant-email">E-mail da conta conectada</label><input id="participant-email" name="email" type="email" autocomplete="email" readonly required></div></div>
+<button type="button" class="text-button" id="profile-save">Salvar nome no perfil ↗</button><p class="footnote">A mudança vale para os próximos relatos. Os anteriores mantêm os dados informados no envio.</p></div>
+<p id="account-status" role="status" aria-live="polite">Preparando acesso à conta…</p></section>
 <div class="permission-grid"><div class="permission-card"><p class="eyebrow">01 / CONTEXTO</p><label class="check-line"><input id="context-confirm" type="checkbox" required><span>Conferi a data, a hora e as condições do ar.</span></label><p class="footnote">Se o clima estiver indisponível, você ainda pode continuar. O GPS é opcional: o local também pode ser marcado no mapa.</p></div>
 <div class="permission-card"><p class="eyebrow">02 / FOTOGRAFIA</p><label class="check-line"><input id="photo-consent" type="checkbox" aria-describedby="camera-status"><span>Quero usar câmera ou galeria nas próximas etapas.</span></label><p id="camera-status" class="camera-status" role="status" aria-live="polite">A câmera será testada ao marcar esta opção.</p><div class="permission-actions"><button type="button" class="text-button" id="test-camera">Autorizar / testar câmera ↗</button></div><p class="footnote" id="camera-footnote">Opcional. Na etapa de fotografia, a galeria abre o seletor do aparelho; você escolhe quais imagens compartilhar.</p></div></div>
-<label class="check-line consent-line"><input id="data-consent" type="checkbox" required><span>Concordo com o registro do meu nome, e-mail, relato e fotografia opcional no banco privado da pesquisa WAIND e com a exibição do ponto sem nome e e-mail no mapa público.</span></label><p class="footnote">Nome, e-mail, endereço, observação e descrição livre ficam restritos aos pesquisadores no Firebase/Firestore. O mapa público mostra coordenadas exatas, data, hora, intensidade, categorias e temperatura; esses dados podem revelar sua rotina. Evite registrar locais privados. O caderno local e o JSON incluem sua identificação. Sem conexão, o relato fica pendente neste navegador e será enviado quando ela voltar. Quando uma foto opcional é anexada, uma versão redimensionada e sem metadados EXIF do aparelho é salva apenas no banco privado da pesquisa (relatos_fotos) para análise científica e treinamento futuro de modelos de Machine Learning. A imagem nunca aparece no mapa público. Clima atual: Open-Meteo; mapa: OpenStreetMap.</p><p id="identity-error" class="field-error" role="alert" hidden>Preencha nome e e-mail e confirme os dados para continuar.</p>
+<label class="check-line consent-line"><input id="data-consent" type="checkbox" required><span>Concordo com o registro vinculado à minha conta privada para histórico e pesquisa, com fotografia opcional, e com a exibição do ponto sem identificação direta no mapa público.</span></label><p class="footnote">Seu relato completo, nome, e-mail e fotografia opcional ficam vinculados à sua conta privada, para seu histórico e para pesquisa científica e treinamento futuro de modelos de Machine Learning. O mapa público mostra apenas coordenadas exatas, data, hora, intensidade, categorias e temperatura; não inclui nome, e-mail, identificador de conta, endereço, texto livre ou foto. Coordenadas e horários podem revelar rotinas. A imagem é redimensionada e reencodificada sem copiar EXIF original, permanece privada e não é exibida no histórico. Nenhuma IA analisa a foto ou estima intensidade nesta versão. Pendências ficam neste navegador, separadas por conta, e são reenviadas quando você está conectado à mesma conta e à internet. O JSON pessoal inclui identificação e metadados, sem imagens. Clima atual: Open-Meteo; mapa: OpenStreetMap.</p><p id="identity-error" class="field-error" role="alert" hidden>Entre na sua conta e confirme os dados e o consentimento para continuar.</p>
 </section>
 <section class="wizard-screen" data-step="2" aria-labelledby="screening-title" hidden><div class="screen-heading"><p class="eyebrow">UMA PAUSA PARA PERCEBER</p><h1 id="screening-title" tabindex="-1">Você se incomodou com algum mau cheiro <em>perto de você?</em></h1><p>Comece pelo que você está sentindo neste momento.</p></div><div class="screening-art" aria-hidden="true"></div><fieldset class="choice-grid"><legend class="sr-only">Percepção atual</legend><label class="choice-card"><input type="radio" name="screening" value="yes"><span><strong>Sim, senti um mau cheiro</strong><small>Quero registrar minha percepção.</small></span><span aria-hidden="true">↗</span></label><label class="choice-card"><input type="radio" name="screening" value="no"><span><strong>Não sinto mau cheiro neste momento</strong><small>Posso lembrar de uma ocorrência anterior.</small></span><span aria-hidden="true">→</span></label></fieldset></section>
 <section class="wizard-screen" data-step="past" aria-labelledby="past-title" hidden><div class="screen-heading"><p class="eyebrow">O TERRITÓRIO TAMBÉM TEM MEMÓRIA</p><h1 id="past-title" tabindex="-1">Gostaria de registrar alguma ocorrência <em>que você passou?</em></h1><p>Você pode contar sobre um mau cheiro percebido anteriormente.</p></div><fieldset class="choice-grid"><legend class="sr-only">Registrar ocorrência anterior</legend><label class="choice-card"><input type="radio" name="past-choice" value="yes"><span><strong>Sim, quero registrar</strong><small>Vou indicar quando e onde aconteceu.</small></span></label><label class="choice-card"><input type="radio" name="past-choice" value="no"><span><strong>Agora não, quero explorar o mapa</strong><small>Conhecer o território sem criar um relato.</small></span></label></fieldset><div id="past-time-field" class="other-field" hidden><label for="occurred-at">Quando aconteceu? <span class="optional">HORÁRIO DE SANTA MARIA</span></label><input type="datetime-local" id="occurred-at"><p class="footnote">Informe a data e a hora aproximadas. O clima exibido é atual e não representa aquele momento.</p></div></section>
@@ -418,9 +449,9 @@ html{overflow-x:clip}
 <div id="gps-final" class="permission-card" hidden><p id="gps-final-status">Capture sua localização para continuar.</p><button type="button" class="button button-outline" id="gps-final-button">Capturar GPS</button><p id="gps-final-help" class="permission-help footnote" role="status" hidden></p><label class="check-line" id="past-place-confirm" hidden><input type="checkbox" id="past-gps-confirm"><span>Confirmo que minha posição atual é o local da ocorrência anterior.</span></label></div>
 <div id="manual-map-panel" hidden><p class="footnote">Mapa geográfico · toque para marcar; depois toque no seu pin para conferir o resumo. A posição é indicada por você.</p><div id="pin-map"></div></div>
 <p class="field-error" id="location-error" hidden role="alert">Confirme uma localização para revisar.</p><button type="button" class="button button-ink review-button" id="review-open">Revisar meu relato ↗</button></div>
-<section id="review-panel" tabindex="-1" hidden aria-labelledby="review-title"><p class="eyebrow">UMA ÚLTIMA OLHADA</p><h2 id="review-title">Seu relato, do seu jeito.</h2><p>Confira os dados antes de finalizar.</p><dl id="review-details" class="review-details"></dl><img id="review-photo" alt="Fotografia selecionada para este relato" hidden><p class="review-disclaimer">Percepção isolada / não confirmada: não comprova uma fonte. Ao enviar, o registro completo vai ao banco privado da pesquisa (Firebase/Firestore). Coordenadas, data, hora, intensidade, categorias e temperatura aparecem no mapa público, sem identificação nem textos livres. A fotografia opcional é enviada exclusivamente à coleção privada relatos_fotos para análise científica e treinamento futuro de modelos de Machine Learning; jamais é exibida no mapa coletivo. Uma cópia fica no caderno local; se a conexão falhar, ela aguardará sincronização automática.</p><p id="send-status" class="footnote" role="status" aria-live="polite" hidden></p><div class="dialog-actions"><button type="button" class="button button-outline" id="edit-report">Voltar e Editar</button><button type="button" class="button button-ink" id="save-report">Enviar Relato ↗</button></div><nav class="edit-links" aria-label="Editar partes do relato"><button type="button" data-edit="1">Dados pessoais</button><button type="button" data-edit="3">Intensidade</button><button type="button" data-edit="4">Tipo de odor</button><button type="button" data-edit="5">Foto</button><button type="button" data-edit="6">Observação</button><button type="button" data-edit="7">Localização</button></nav></section>
+<section id="review-panel" tabindex="-1" hidden aria-labelledby="review-title"><p class="eyebrow">UMA ÚLTIMA OLHADA</p><h2 id="review-title">Seu relato, do seu jeito.</h2><p>Confira os dados antes de finalizar.</p><dl id="review-details" class="review-details"></dl><img id="review-photo" alt="Fotografia selecionada para este relato" hidden><p class="review-disclaimer">Percepção isolada / não confirmada. Seu relato completo, nome, e-mail e fotografia opcional ficam vinculados à sua conta privada, para seu histórico e para pesquisa científica e treinamento futuro de modelos de Machine Learning. O mapa público mostra apenas coordenadas exatas, data, hora, intensidade, categorias e temperatura; não inclui nome, e-mail, identificador de conta, endereço, texto livre ou foto. Coordenadas e horários podem revelar rotinas. A imagem é redimensionada e reencodificada sem copiar EXIF original, permanece privada e não é exibida no histórico. Nenhuma IA analisa a foto ou estima intensidade nesta versão. Pendências ficam neste navegador, separadas por conta, e são reenviadas quando você está conectado à mesma conta e à internet. O JSON pessoal inclui identificação e metadados, sem imagens. Clima atual: Open-Meteo; mapa: OpenStreetMap.</p><p id="send-status" class="footnote" role="status" aria-live="polite" hidden></p><div class="dialog-actions"><button type="button" class="button button-outline" id="edit-report">Voltar e Editar</button><button type="button" class="button button-ink" id="save-report">Enviar Relato ↗</button></div><nav class="edit-links" aria-label="Editar partes do relato"><button type="button" data-edit="1">Dados pessoais</button><button type="button" data-edit="3">Intensidade</button><button type="button" data-edit="4">Tipo de odor</button><button type="button" data-edit="5">Foto</button><button type="button" data-edit="6">Observação</button><button type="button" data-edit="7">Localização</button></nav></section>
 <section id="success-panel" class="success-panel" tabindex="-1" hidden aria-labelledby="success-title"><span aria-hidden="true" class="success-seal">✓</span><p class="eyebrow" id="success-caption">PERCEPÇÃO REGISTRADA</p><h2 id="success-title">Obrigado por dar voz <em>ao território.</em></h2><p id="success-description">Seu relato foi confirmado no banco da pesquisa WAIND. A cópia deste navegador pode ser exportada em JSON.</p><p id="saved-reference" class="footnote"></p><button type="button" class="button button-ink" id="new-report">Começar outro relato ↗</button></section>
-</section></form><div id="records-wrap" hidden>    <section class="local-records" aria-labelledby="records-title"><div><p class="eyebrow">CADERNO DESTE NAVEGADOR</p><h2 id="records-title">Seus relatos locais</h2><p id="records-description">Os registros que você salvar ficam disponíveis aqui.</p></div><div class="record-actions"><span id="local-count" class="local-count">00</span><button type="button" class="button button-outline" id="export-records" disabled>Exportar JSON <span aria-hidden="true">↗</span></button><button type="button" class="text-button" id="clear-records" hidden>Apagar relatos locais</button></div><div id="local-record-list"></div></section>
+</section></form><div id="records-wrap" hidden>    <section class="local-records" aria-labelledby="records-title"><div><p class="eyebrow">CADERNO DESTE NAVEGADOR</p><h2 id="records-title">Seus relatos</h2><p id="records-description">Os registros que você salvar ficam disponíveis aqui.</p></div><div class="record-actions"><span id="local-count" class="local-count">00</span><button type="button" class="button button-outline" id="export-records" disabled>Exportar JSON <span aria-hidden="true">↗</span></button><button type="button" class="text-button" id="clear-records" hidden>Apagar relatos locais</button></div><p id="history-status" role="status" aria-live="polite"></p><div class="history-actions"><button type="button" class="text-button" id="refresh-history">Atualizar histórico ↻</button><button type="button" class="text-button" id="more-history" hidden>Carregar mais relatos ↓</button></div><div id="local-record-list"></div></section>
 </div>
 <div hidden id="legacy-support">      <aside class="field-notes" aria-label="Notas de campo e resumo">
         <div class="field-notes-sticky">
@@ -1075,7 +1106,7 @@ window.WaindAppCheckConfig = Object.freeze({
 </script>
 <script>
 /* firebase-client.js */
-/* WAIND GPT 0.6: private research + public map + optional private image, one atomic batch. */
+/* WAIND GPT 0.7: private research + public map + optional private image, one atomic batch. */
 (() => {
   'use strict';
   const SDK='https://www.gstatic.com/firebasejs/13.1.0/';
@@ -1090,16 +1121,23 @@ window.WaindAppCheckConfig = Object.freeze({
       ]);
       const app=core.getApps().length?core.getApp():core.initializeApp(window.WaindFirebaseConfig);
       await window.WaindAppCheck?.initialize(app, SDK);
-      return {auth:identity.getAuth(app),identity,db:store.getFirestore(app),store};
+      const auth=identity.getAuth(app),db=store.getFirestore(app);
+      const em=window.WaindFirebaseEmulators;
+      if(em&&['127.0.0.1','localhost'].includes(location.hostname)){
+        identity.connectAuthEmulator(auth,em.auth,{disableWarnings:true});
+        store.connectFirestoreEmulator(db,em.host,em.firestorePort);
+      }
+      return {auth,identity,db,store};
     })().catch(error=>{connection=null;throw error;});
     return connection;
   }
-  async function identify(c){
-    if(!authentication)authentication=(async()=>{
-      await c.auth.authStateReady();
-      if(!c.auth.currentUser)await c.identity.signInAnonymously(c.auth);
-    })().catch(error=>{authentication=null;throw error;});
-    return authentication;
+  async function identify(c,report){
+    await c.auth.authStateReady();
+    const user=c.auth.currentUser;
+    if(!user||user.isAnonymous||user.uid!==report.autor_uid)throw Object.assign(new Error('Conta necessária'),{code:'account-required'});
+    const token=await user.getIdTokenResult(),provider=token.claims.firebase?.sign_in_provider;
+    if(!['google.com','password'].includes(provider)||provider!==report.provedor_auth||user.email!==report.participant.email)throw Object.assign(new Error('Conta diferente'),{code:'account-changed'});
+    return user.uid;
   }
   function dateTime(iso){
     const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso)).map(p=>[p.type,p.value]));
@@ -1114,7 +1152,7 @@ window.WaindAppCheckConfig = Object.freeze({
     const when=dateTime(report.occurrence?.occurredAt||report.recordedAt);
     const temperature=number(w?.temperatureC);
     const perception={
-      nome:report.participant.name.trim(),email:report.participant.email.trim(),...when,
+      autor_uid:report.autor_uid,provedor_auth:report.provedor_auth,nome:report.participant.name.trim(),email:report.participant.email.trim(),...when,
       tipo_ocorrencia:report.occurrence?.kind==='past'?'anterior':'atual',criado_em:createdAt,
       temperatura:temperature,
       clima:{temperatura_c:temperature,umidade_pct:number(w?.relativeHumidityPercent),vento_kmh:number(w?.windSpeedKmh),
@@ -1125,39 +1163,40 @@ window.WaindAppCheckConfig = Object.freeze({
       intensidade_odor:intensity,tipo_odor:{...odor,outro_descricao:categories.includes('other')?report.otherDescription||'':''},
       sem_foco_visivel:!!report.noVisibleSource,visivel_por_perto:report.visibleTags||[],observacao:report.observation||'',
       foto_metadados:report.photo?{nome:report.photo.name,mime_type:report.photo.type,tamanho_bytes:report.photo.sizeBytes,largura:report.photo.width,altura:report.photo.height,largura_original:report.photo.originalWidth,altura_original:report.photo.originalHeight,sha256:report.photo.sha256,imagem_enviada:true,colecao_foto:'relatos_fotos'}:null,
-      consentimento:{versao:'waind-pesquisa-mapa-0.6',aceito_em:report.consent.acceptedAt,pesquisa:true,mapa_publico:true,copia_local:true,contexto_confirmado:true},
+      consentimento:{versao:'waind-pesquisa-mapa-0.7',aceito_em:report.consent.acceptedAt,pesquisa:true,mapa_publico:true,copia_local:true,contexto_confirmado:true,conta_autenticada:true},
       status_qualidade:'isolado-nao-confirmado'
     };
     // Public projection is explicit: never copy identity, address, photo or free text.
     const map={latitude:loc.latitude,longitude:loc.longitude,intensidade_odor:intensity,tipo_odor:odor,...when,temperatura:temperature,status_qualidade:'isolado-nao-confirmado'};
     const p=report.photo;
-    const photo=p?{relato_id:report.id,criado_em:createdAt,mime_type:p.type,largura:p.width,altura:p.height,
+    const photo=p?{autor_uid:report.autor_uid,relato_id:report.id,criado_em:createdAt,mime_type:p.type,largura:p.width,altura:p.height,
       largura_original:p.originalWidth,altura_original:p.originalHeight,tamanho_bytes:p.sizeBytes,sha256:p.sha256,dados_base64:p.dataBase64||null,
       rotulos_ml:{intensidade_nivel:report.intensity,categorias:categories,multi_hot:odor.multi_hot,sem_foco_visivel:!!report.noVisibleSource,visivel_por_perto:report.visibleTags||[]}}:null;
     return {perception,map,photo};
   }
   const canonical=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
   async function write(report){
-    if(report.consent?.version!=='waind-pesquisa-mapa-0.6'||!report.consent.publicMap)throw Object.assign(new Error('Consent required'),{code:'consent-required'});
-    const c=await connect();await identify(c);
-    const {store,db}=c,publicRef=store.doc(db,'relatos_mapa',report.id);
+    if(report.consent?.version!=='waind-pesquisa-mapa-0.7'||!report.consent.publicMap||!report.consent.accountAuthenticated)throw Object.assign(new Error('Consent required'),{code:'consent-required'});
+    const c=await connect();const uid=await identify(c,report);
+    const {store,db}=c,publicRef=store.doc(db,'relatos_mapa',report.id),privateRef=store.doc(db,'relatos_pesquisa',report.id);
+    const confirmOwner=async()=>{const own=await store.getDocFromServer(privateRef);if(!own.exists()||own.data().autor_uid!==uid)throw Object.assign(new Error('Conflito de autoria'),{code:'id-conflict'});const expected={...perception},actual={...own.data()};delete expected.criado_em;delete actual.criado_em;if(canonical(actual)!==canonical(expected))throw Object.assign(new Error('Conflito de conteúdo'),{code:'id-conflict'});};
     const {perception,map,photo}=payload(report,store.serverTimestamp());
     // Read only the public receipt. Private research documents cannot be read by any client.
     const existing=await store.getDocFromServer(publicRef);
     if(existing.exists()){
       if(canonical(existing.data())!==canonical(map))throw Object.assign(new Error('Identifier conflict'),{code:'id-conflict'});
-      return {alreadySaved:true,id:report.id,projectId:window.WaindFirebaseConfig.projectId};
+      await confirmOwner();return {alreadySaved:true,id:report.id,projectId:window.WaindFirebaseConfig.projectId};
     }
     if(report.photo)await WaindPhoto.validate(report.photo);
     const batch=store.writeBatch(db);
     batch.set(store.doc(db,'relatos_pesquisa',report.id),perception);
     batch.set(publicRef,map);
     if(photo)batch.set(store.doc(db,'relatos_fotos',report.id),photo);
-    try{await batch.commit();}
+    try{await identify(c,report);await batch.commit();}
     catch(error){
       // Another tab or a retried request may have completed the same immutable pair.
       const receipt=await store.getDocFromServer(publicRef).catch(()=>null);
-      if(!receipt?.exists()||canonical(receipt.data())!==canonical(map))throw error;
+      if(!receipt?.exists()||canonical(receipt.data())!==canonical(map))throw error;await confirmOwner();
     }
     return {alreadySaved:false,id:report.id,projectId:window.WaindFirebaseConfig.projectId};
   }
@@ -1174,6 +1213,8 @@ window.WaindAppCheckConfig = Object.freeze({
   function message(error){
     const code=String(error?.code||'');
     if(code.includes('permission-denied')||code.includes('operation-not-allowed'))return 'Salvo neste navegador, mas o banco recusou o envio. Aguarde a revisão da configuração; você pode exportar o JSON.';
+    if(code.includes('account-required')||code.includes('account-changed'))return 'Entre na conta deste relato para sincronizar. As pendências permanecem separadas por conta.';
+    if(code.includes('id-conflict'))return 'Este identificador já corresponde a outro conteúdo. A cópia local foi preservada para conferência.';
     if(code.includes('consent-required'))return 'Este registro antigo precisa do novo consentimento para compartilhar o ponto no mapa. Ele permanece somente no caderno local.';
     return 'Salvo neste navegador, pendente de sincronização. Tentaremos enviar quando a conexão voltar.';
   }
@@ -1204,7 +1245,181 @@ window.WaindAppCheckConfig = Object.freeze({
     const snapshot=await store.getDocsFromServer(query),documents=snapshot.docs.slice(0,pageSize);
     return {documents:documents.map(doc=>({id:doc.id,data:doc.data()})),cursor:documents.at(-1)||null,hasMore:snapshot.docs.length>pageSize,returnedCount:snapshot.docs.length};
   }
-  window.WaindCloud=Object.freeze({save,message,payload,dateTime,listenMap,readMapPage});
+  window.WaindCloud=Object.freeze({connect,save,message,payload,dateTime,listenMap,readMapPage});
+})();
+
+</script>
+<script>
+/* account-service.js */
+/* GPT 0.7: sessão persistente, perfil e histórico, separados da projeção pública. */
+(() => {
+  'use strict';
+  const cloud = window.WaindCloud;
+  let account = null, generation = 0, watching, lastError = null;
+  const provider = token => token.claims?.firebase?.sign_in_provider;
+  const permanent = user => !!user && !user.isAnonymous;
+  const failure = code => Object.assign(new Error(code), {code});
+  function publish() { window.dispatchEvent(new CustomEvent('waind:account', {detail:{account:currentAccount(),error:lastError}})); }
+  function currentAccount() { return account ? {...account} : null; }
+  async function snapshot(user, c, n) {
+    if (!permanent(user)) return null;
+    const token = await user.getIdTokenResult();
+    const authProvider = provider(token);
+    if (!['google.com','password'].includes(authProvider) || !user.email) throw failure('account-provider');
+    let name = (user.displayName || '').slice(0,120), profileReady = false;
+    const ref = c.store.doc(c.db,'usuarios_perfil',user.uid);
+    try {
+      const profile = await c.store.getDocFromServer(ref);
+      if (n !== generation) return null;
+      if (profile.exists()) name = profile.data().nome || name;
+      else await c.store.setDoc(ref,{uid:user.uid,nome:name,email:user.email,provedor:authProvider,criado_em:c.store.serverTimestamp(),atualizado_em:c.store.serverTimestamp()});
+      profileReady = true;
+    } catch (error) {
+      // A conta pode ser usada offline; confirmação do perfil continua explícita.
+      if (n !== generation) return null;
+      lastError = error;
+    }
+    return {uid:user.uid,email:user.email,name,provider:authProvider,profileReady};
+  }
+  async function watchAccount() {
+    if (!watching) watching = (async () => {
+      const c = await cloud.connect();
+      await c.identity.setPersistence(c.auth,c.identity.browserLocalPersistence);
+      let first = true;
+      const initial = new Promise(resolve => c.identity.onIdTokenChanged(c.auth, async user => {
+        const n = ++generation;
+        if (!permanent(user) || account?.uid !== user.uid) { account = null; publish(); }
+        lastError = null; // Uma renovação de token da mesma conta preserva o formulário.
+        try { const next = await snapshot(user,c,n); if (n === generation) { account = next; publish(); } }
+        catch (error) { if (n === generation) { lastError = error; publish(); } }
+        finally { if (first) { first = false; resolve(); } }
+      }));
+      const intent = sessionStorage.getItem('waind-auth-redirect');
+      if (intent) {
+        sessionStorage.removeItem('waind-auth-redirect');
+        try { await c.identity.getRedirectResult(c.auth); }
+        catch (error) {
+          const credential = c.identity.GoogleAuthProvider.credentialFromError(error);
+          if (credential && ['auth/credential-already-in-use','auth/email-already-in-use'].includes(error.code)) await c.identity.signInWithCredential(c.auth,credential);
+          else { lastError = error; publish(); throw error; }
+        }
+      }
+      await c.auth.authStateReady(); await initial;
+    })().catch(error => { watching = null; throw error; });
+    return watching;
+  }
+  async function settle(user) {
+    const c = await cloud.connect();
+    const n = ++generation; if (account?.uid !== user.uid) { account = null; publish(); }
+    const next = await snapshot(user,c,n);
+    if (n === generation) { account = next; publish(); }
+    return currentAccount();
+  }
+  async function googleSignIn() {
+    const c = await cloud.connect(), p = new c.identity.GoogleAuthProvider();
+    p.setCustomParameters({prompt:'select_account'});
+    const anonymous = c.auth.currentUser?.isAnonymous;
+    try {
+      const result = anonymous ? await c.identity.linkWithPopup(c.auth.currentUser,p) : await c.identity.signInWithPopup(c.auth,p);
+      return settle(result.user);
+    } catch (error) {
+      const credential = c.identity.GoogleAuthProvider.credentialFromError(error);
+      if (credential && ['auth/credential-already-in-use','auth/email-already-in-use'].includes(error.code)) return settle((await c.identity.signInWithCredential(c.auth,credential)).user);
+      if (['auth/popup-blocked','auth/operation-not-supported-in-this-environment'].includes(error.code)) {
+        sessionStorage.setItem('waind-auth-redirect',anonymous?'link':'signin');
+        try {
+          if (anonymous) await c.identity.linkWithRedirect(c.auth.currentUser,p);
+          else await c.identity.signInWithRedirect(c.auth,p);
+        } catch (redirectError) { sessionStorage.removeItem('waind-auth-redirect'); throw redirectError; }
+        return;
+      }
+      throw error;
+    }
+  }
+  async function emailRegister(email,password,name) {
+    const c = await cloud.connect(); let result;
+    if (c.auth.currentUser?.isAnonymous) {
+      try { result = await c.identity.linkWithCredential(c.auth.currentUser,c.identity.EmailAuthProvider.credential(email,password)); }
+      catch (error) {
+        if (!['auth/credential-already-in-use','auth/email-already-in-use'].includes(error.code)) throw error;
+        return emailSignIn(email,password); // Não importa nem reatribui relatos anteriores.
+      }
+    } else result = await c.identity.createUserWithEmailAndPassword(c.auth,email,password);
+    await c.identity.updateProfile(result.user,{displayName:name.trim().slice(0,120)});
+    await settle(result.user); return updateProfileName(name);
+  }
+  async function emailSignIn(email,password) { const c=await cloud.connect(); return settle((await c.identity.signInWithEmailAndPassword(c.auth,email,password)).user); }
+  async function resetPassword(email) { const c=await cloud.connect(); return c.identity.sendPasswordResetEmail(c.auth,email); }
+  async function signOut() { const c=await cloud.connect(); ++generation; account=null; publish(); await c.identity.signOut(c.auth); }
+  async function updateProfileName(name) {
+    name = name.trim(); if (!name || name.length>120) throw failure('profile-name');
+    const c=await cloud.connect(), a=currentAccount();
+    if (!a || c.auth.currentUser?.uid!==a.uid) throw failure('account-required');
+    const ref=c.store.doc(c.db,'usuarios_perfil',a.uid), old=await c.store.getDocFromServer(ref);
+    if (currentAccount()?.uid!==a.uid) throw failure('account-changed');
+    await c.store.setDoc(ref,{uid:a.uid,nome:name,email:a.email,provedor:a.provider,criado_em:old.exists()?old.data().criado_em:c.store.serverTimestamp(),atualizado_em:c.store.serverTimestamp()});
+    await c.identity.updateProfile(c.auth.currentUser,{displayName:name});
+    if (currentAccount()?.uid===a.uid) { account={...account,name,profileReady:true}; publish(); }
+  }
+  function fromPrivate(id,d) {
+    const m=d.foto_metadados;
+    return {id,autor_uid:d.autor_uid,provedor_auth:d.provedor_auth,schemaVersion:7,
+      participant:{name:d.nome,email:d.email},recordedAt:d.criado_em?.toDate?.().toISOString()||`${d.data}T${d.hora}-03:00`,
+      occurrence:{kind:d.tipo_ocorrencia==='anterior'?'past':'current',occurredAt:`${d.data}T${d.hora}-03:00`},
+      intensity:d.intensidade_odor.nivel,categories:d.tipo_odor.categorias,multiHot:d.tipo_odor.multi_hot,otherDescription:d.tipo_odor.outro_descricao,
+      location:{latitude:d.localizacao.latitude,longitude:d.localizacao.longitude,source:d.localizacao.origem,accuracyMeters:d.localizacao.precisao_metros,address:d.localizacao.endereco},
+      weather:d.clima,visibleTags:d.visivel_por_perto,noVisibleSource:d.sem_foco_visivel,observation:d.observacao,
+      photo:m?{name:m.nome,type:m.mime_type,sizeBytes:m.tamanho_bytes,width:m.largura,height:m.altura,sha256:m.sha256,storedIn:'relatos_fotos',imageSent:true}:null,
+      consent:{version:d.consentimento.versao},syncStatus:'sincronizado',cloud:{confirmed:true},storage:'firebase'};
+  }
+  async function readHistory({cursor=null,pageSize=50}={}) {
+    if (![50,100].includes(pageSize)) throw failure('invalid-argument');
+    const c=await cloud.connect(), a=currentAccount();
+    if (!a || c.auth.currentUser?.uid!==a.uid || !permanent(c.auth.currentUser)) throw failure('account-required');
+    const q=[c.store.where('autor_uid','==',a.uid),c.store.orderBy('data','desc'),c.store.orderBy('hora','desc'),c.store.orderBy(c.store.documentId(),'desc')];
+    if(cursor)q.push(c.store.startAfter(cursor));q.push(c.store.limit(pageSize+1));
+    const result=await c.store.getDocsFromServer(c.store.query(c.store.collection(c.db,'relatos_pesquisa'),...q));
+    if(currentAccount()?.uid!==a.uid)throw failure('account-changed');
+    const docs=result.docs.slice(0,pageSize);
+    return {uid:a.uid,records:docs.map(d=>fromPrivate(d.id,d.data())),cursor:docs.at(-1)||null,hasMore:result.size>pageSize};
+  }
+  function accountMessage(error) {
+    const code=String(error?.code||'');
+    if(code.includes('invalid-credential')||code.includes('wrong-password')||code.includes('user-not-found'))return 'Não foi possível entrar. Confira e-mail e senha ou recupere seu acesso.';
+    if(code.includes('email-already-in-use'))return 'Este e-mail já possui uma conta. Use Entrar ou recupere a senha.';
+    if(code.includes('weak-password')||code.includes('password-does-not-meet-requirements'))return 'A senha não atende aos requisitos. Use uma senha mais longa e tente novamente.';
+    if(code.includes('popup-closed')||code.includes('cancelled-popup'))return 'A entrada foi cancelada. Você pode tentar novamente ou usar e-mail e senha.';
+    if(code.includes('operation-not-allowed')||code.includes('unauthorized-domain'))return 'Esta forma de entrada ainda não está disponível neste endereço. Tente a alternativa por e-mail.';
+    if(code.includes('too-many-requests'))return 'Muitas tentativas. Aguarde um pouco antes de tentar novamente.';
+    if(code.includes('permission-denied'))return 'Não foi possível confirmar seu perfil ou histórico. Suas informações anteriores foram preservadas; tente novamente.';
+    if(code.includes('profile-name'))return 'Informe um nome de apresentação com até 120 caracteres.';
+    if(code.includes('account-required')||code.includes('account-changed'))return 'Entre na conta deste relato para continuar. As pendências são separadas por conta.';
+    if(code.includes('network')||code.includes('unavailable'))return 'Sem conexão agora. Tente entrar novamente quando a internet voltar.';
+    return 'Não foi possível concluir a entrada. Tente novamente ou use e-mail e senha.';
+  }
+  window.WaindCloud=Object.freeze({...cloud,watchAccount,currentAccount,googleSignIn,emailRegister,emailSignIn,resetPassword,signOut,updateProfileName,readHistory,accountMessage});
+})();
+
+</script>
+<script>
+/* local-store.js */
+/* Pendências são lidas/escritas somente no compartimento do autor autenticado. */
+(() => {
+  'use strict';
+  const key=uid=>{if(typeof uid!=='string'||!uid.length)throw new Error('Conta necessária');return 'waind-relatos-conta-v7:'+encodeURIComponent(uid);};
+  const valid=(r,uid)=>r&&r.autor_uid===uid&&typeof r.id==='string'&&Number.isInteger(r.intensity)&&r.intensity>=1&&r.intensity<=5&&Array.isArray(r.categories);
+  function read(uid){if(!uid)return [];try{const d=JSON.parse(localStorage.getItem(key(uid))||'[]');return Array.isArray(d)?d.filter(r=>valid(r,uid)):[];}catch{return [];}}
+  function write(uid,next){
+    if(next.some(r=>!valid(r,uid)))throw new Error('Fila de outra conta recusada');
+    const pending=next.filter(r=>r.syncStatus==='pendente-sincronizacao');
+    const confirmed=next.filter(r=>r.syncStatus!=='pendente-sincronizacao').slice(-100).map(r=>WaindPhoto.compact({...r,photo:r.photo?{...r.photo}:null}));
+    for(;;){
+      const keep=[...confirmed,...pending].sort((a,b)=>a.recordedAt.localeCompare(b.recordedAt));
+      try{localStorage.setItem(key(uid),JSON.stringify(keep));return keep;}
+      catch(error){if(error.name!=='QuotaExceededError'||!confirmed.length)throw error;confirmed.splice(0,Math.max(1,Math.ceil(confirmed.length/2)));}
+    }
+  }
+  window.WaindLocal=Object.freeze({key,read,write,remove:uid=>localStorage.removeItem(key(uid))});
 })();
 
 </script>
@@ -1242,16 +1457,13 @@ window.WaindAppCheckConfig = Object.freeze({
   const region = {latitude:-29.6868,longitude:-53.8149,radiusKm:45};
   let gpsGeneration=0, cameraGeneration=0, cameraPending=false, addressController=null, lastAddressRequest=0;
   const addressCache=new Map();
-  const STORE_KEY = 'waind-relatos-local-v2';
+  let activeUid=null,cloudHistory=[],historyCursor=null,historyMore=false,historyBusy=false,historyGeneration=0;
+  let historyStatus='Entre na sua conta para consultar o histórico.';
   let records = [], publicRecords = [], mapStatus='Mapa coletivo ainda não consultado.', mapStarted=false, stopMap=null, syncing=false;
   let toastTimer, photoURL = null, photoGeneration = 0, weatherGeneration = 0;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let motionPaused = reducedMotion.matches;
   let lastFocused = null;
-  try {
-    const stored = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-    if (Array.isArray(stored)) records = stored.filter(r => r && typeof r.id === 'string' && Number.isInteger(r.intensity) && r.intensity >= 1 && r.intensity <= 5 && Array.isArray(r.categories));
-  } catch { /* Browsers may disable storage; a save will explain that state. */ }
 
   $('#hero-art').innerHTML = OdorArt.hero();
   $('#wind-art').innerHTML = OdorArt.wind();
@@ -1266,6 +1478,7 @@ window.WaindAppCheckConfig = Object.freeze({
     method:{title:'Uma percepção. Muitas possibilidades.',body:'<p><strong>Relato:</strong> o que alguém sentiu em um lugar e momento.</p><p><strong>Hipótese:</strong> uma possível fonte, sugerida por observação ou por um modelo, que ainda exige investigação.</p><p><strong>Causa comprovada:</strong> exige evidências próprias e não é estabelecida por este formulário. Relatos isolados são preservados como “isolado / não confirmado”.</p>'},
     about:{title:'Uma escuta coletiva do território.',body:'<p>Sistema Participativo de Monitoramento e Análise de Mau Odor Urbano com IA em Santa Maria e região — RS.</p><p>Projeto de pesquisa de Murillo Viçosa, no curso de IA e Ciência de Dados da Universidade Franciscana, estruturado pela metodologia Design Science Research.</p><p>Esta é uma versão de avaliação do design, com mapa geográfico OpenStreetMap. Não há reconhecimento automático de fotos nem modelos treinados de IA em execução.</p><p>Ao enviar, o relato completo e a identificação são guardados no banco da pesquisa WAIND (Firebase/Firestore), com acesso restrito aos pesquisadores. O mapa coletivo mostra coordenadas, data, hora, intensidade, categorias e temperatura sem nome, e-mail, endereço ou textos livres. As coordenadas exatas podem revelar rotinas. Uma cópia com identificação fica neste navegador e na exportação JSON. Sem conexão, os relatos ficam pendentes e serão sincronizados ao reconectar. A fotografia opcional é redimensionada, sem EXIF do aparelho, e enviada somente ao acervo privado relatos_fotos para análise científica e treinamento futuro de modelos de Machine Learning. Ela nunca aparece no mapa público. Nenhuma imagem é analisada automaticamente nesta versão. O clima usa a <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>, com coordenadas arredondadas. Ao solicitar o GPS, suas coordenadas também são usadas para consultar um endereço aproximado no OpenStreetMap / Nominatim. Nome, e-mail e conteúdo do relato não acompanham essas consultas.</p>'}
   };
+  infoContent.about.body="<p>WAIND — pesquisa de Murillo Viçosa, UFN, em Santa Maria e região, organizada por Design Science Research.</p><p>O relato registra uma percepção, não comprova a fonte nem mede concentração química. Nenhuma análise automática de fotografia ou estimativa de intensidade por IA é executada nesta versão.</p><p>Os novos relatos completos e a fotografia opcional ficam vinculados à sua conta privada para histórico pessoal, pesquisa científica e futuro treinamento de modelos. O mapa público mostra apenas coordenadas exatas, data, hora, intensidade, categorias e temperatura, sem nome, e-mail, identificador de conta, endereço, texto livre ou imagem. Coordenadas e horários podem revelar rotinas.</p><p>Fotografias são redimensionadas em até 640 px e 140 KiB, reencodificadas sem copiar EXIF original e armazenadas no acervo privado. O histórico mostra apenas seus metadados. Uma cópia local e a exportação JSON podem conter identificação; imagens não entram no JSON. Pendências são separadas por conta e exigem a mesma conta conectada para sincronizar. Registros antigos não são atribuídos automaticamente à conta.</p><p>Clima atual e regional: Open-Meteo, com coordenadas arredondadas. Endereço aproximado: OpenStreetMap/Nominatim. Fotos podem conter elementos identificáveis nos próprios pixels.</p>";
   function showToast(text) {
     clearTimeout(toastTimer); $('#toast').textContent = text; $('#toast').hidden = false;
     toastTimer = setTimeout(() => { $('#toast').hidden = true; }, 5200);
@@ -1533,7 +1746,7 @@ window.WaindAppCheckConfig = Object.freeze({
     return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
   }
   function createReport(){return {
-    schemaVersion:6,id:reportId(),
+    schemaVersion:7,id:reportId(),autor_uid:WaindCloud.currentAccount()?.uid||null,provedor_auth:WaindCloud.currentAccount()?.provider||null,
     recordedAt:new Date().toISOString(),timezone:'America/Sao_Paulo',intensity:state.intensity,
     categories:types.filter(t=>state.types.has(t.id)).map(t=>t.id),
     multiHot:Object.fromEntries(types.map(t=>[t.id,Number(state.types.has(t.id))])),
@@ -1545,81 +1758,99 @@ window.WaindAppCheckConfig = Object.freeze({
     evidenceType:'citizen-perception',verificationStatus:'isolated-unconfirmed',causeProven:false,
     ai:{computerVisionExecuted:false,predictionExecuted:false},storage:'browser-local',prototype:true
   };}
-  function renderRecords(){
-    window.dispatchEvent(new Event('waind:records'));
-    $('#local-count').textContent=String(records.length).padStart(2,'0');$('#export-records').disabled=!records.length;$('#clear-records').hidden=!records.length;
-    const waiting=records.filter(r=>r.syncStatus==='pendente-sincronizacao').length;
-    $('#records-description').textContent=records.length?`Cópias deste navegador · ${waiting} ${waiting===1?'pendente':'pendentes'} de sincronização · exportação disponível.`:'Os registros que você salvar ficam disponíveis aqui.';
-    $('#local-record-list').innerHTML=records.slice(-3).reverse().map(report=>{
-      let date;try{date=report.occurrence?.kind==='past'?`Ocorrência ${localDate(report.occurrence.occurredAt)} · registrado ${localDate(report.recordedAt)}`:localDate(report.recordedAt);}catch{date='Data não disponível';}
-      const labels=report.categories.map(id=>types.find(t=>t.id===id)?.label||id).join(', ');
-      const status=report.syncStatus==='pendente-sincronizacao'&&report.consent?.version!=='waind-pesquisa-mapa-0.6'?'ACEITE ANTERIOR · SOMENTE LOCAL':report.syncStatus==='pendente-sincronizacao'?'PENDENTE DE SINCRONIZAÇÃO':report.cloud?.confirmed?'ENVIADO AO BANCO':'SOMENTE NESTE NAVEGADOR';
-      return `<div class="record-row"><div>${escape(labels)}<small>${escape(date)} · intensidade ${report.intensity} / 5 · ${status}</small></div><span>ISOLADO /<br>NÃO CONFIRMADO</span></div>`;
-    }).join('');
+  function visibleRecords(){
+    if(!activeUid)return [];
+    return [...new Map([...cloudHistory,...records].filter(r=>r.autor_uid===activeUid).map(r=>[r.id,r])).values()].sort((a,b)=>(b.occurrence?.occurredAt||b.recordedAt).localeCompare(a.occurrence?.occurredAt||a.recordedAt));
   }
+  function renderRecords(){
+    const own=visibleRecords(),waiting=records.filter(r=>r.syncStatus==='pendente-sincronizacao').length;
+    $('#local-count').textContent=String(own.length).padStart(2,'0');$('#export-records').disabled=!own.length;
+    $('#clear-records').hidden=!activeUid||!records.length;
+    $('#records-description').textContent=activeUid?`${own.length} relatos carregados da sua conta · ${waiting} pendentes neste aparelho.`:'Entre para consultar seus relatos.';
+    $('#history-status').textContent=historyStatus;
+    $('#refresh-history').disabled=!activeUid||historyBusy;
+    $('#more-history').hidden=!historyMore;$('#more-history').disabled=historyBusy;
+    $('#local-record-list').replaceChildren(...own.map(report=>{
+      const details=document.createElement('details');details.className='history-detail';const title=document.createElement('summary');
+      const when=report.occurrence?.occurredAt||report.recordedAt;
+      let date;try{date=localDate(when);}catch{date='Data indisponível';}
+      const labels=report.categories.map(id=>types.find(t=>t.id===id)?.label||id).join(', ');
+      title.textContent=`${date} · ${report.intensity}/5 · ${labels} · ${report.syncStatus==='pendente-sincronizacao'?'Pendente neste aparelho':'Confirmado no banco'}`;
+      const dl=document.createElement('dl');
+      for(const [label,value] of [['Nome informado no envio',report.participant?.name||''],['E-mail informado no envio',report.participant?.email||''],['Observação',report.observation||'Sem observação'],['Outro odor',report.otherDescription||'Não informado'],['Por perto',report.visibleTags?.join(', ')||'Não informado'],['Foto',report.photo?'Fotografia privada associada; imagem não carregada neste histórico.':'Sem fotografia'],['Identificador',report.id],['Qualidade','Percepção isolada / não confirmada']]){
+        const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;dl.append(dt,dd);
+      }
+      details.append(title,dl);return details;
+    }));
+    window.dispatchEvent(new Event('waind:records'));
+  }
+  async function refreshHistory(append=false){
+    const uid=activeUid;if(!uid)return;
+    const n=++historyGeneration;historyBusy=true;historyStatus='Consultando o histórico privado da sua conta…';
+    if(!append){cloudHistory=[];historyCursor=null;historyMore=false;}renderRecords();
+    try{
+      const page=await WaindCloud.readHistory({cursor:append?historyCursor:null});
+      if(n!==historyGeneration||uid!==activeUid||page.uid!==uid)return;
+      cloudHistory=[...new Map([...cloudHistory,...page.records].map(r=>[r.id,r])).values()];historyCursor=page.cursor;historyMore=page.hasMore;
+      historyStatus=historyMore?'Histórico parcial. Carregue mais para consultar os anteriores.':'Histórico atualizado. Fotografias permanecem no acervo privado.';
+    }catch(error){if(n===historyGeneration&&uid===activeUid)historyStatus=String(error.code).includes('failed-precondition')?'O histórico ainda aguarda configuração da consulta. Suas cópias locais continuam disponíveis.':'Histórico indisponível agora. Suas pendências desta conta permanecem neste aparelho.';}
+    finally{if(n===historyGeneration&&uid===activeUid){historyBusy=false;renderRecords();}}
+  }
+  $('#refresh-history').addEventListener('click',()=>refreshHistory());
+  $('#more-history').addEventListener('click',()=>refreshHistory(true));
   $('#export-records').addEventListener('click',()=>{
-    if(!records.length)return;
-    const payload={project:'WAIND — UFN / Santa Maria',exportedAt:new Date().toISOString(),schemaVersion:6,notice:'Relatos de percepção. Sem comprovação de causa. JSON privado com identificação e metadados; imagens omitidas. Fotos pendentes permanecem neste navegador até sincronizar.',records:records.map(r=>{const copy={...r,photo:r.photo?{...r.photo}:null};if(copy.photo)delete copy.photo.dataBase64;return copy;})};
-    const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
-    const link=document.createElement('a');link.href=url;link.download=`waind-relatos-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+    const own=visibleRecords();if(!activeUid||!own.length)return;
+    const payload={project:'WAIND — UFN / Santa Maria',schemaVersion:7,exportedAt:new Date().toISOString(),historyPartial:historyMore,notice:'Exportação privada dos relatos carregados desta conta. Contém identificação e metadados; imagens omitidas. Não representa o dataset científico completo.',records:own.map(r=>{const copy={...r,photo:r.photo?{...r.photo}:null};if(copy.photo)delete copy.photo.dataBase64;return copy;})};
+    const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download=`waind-meus-relatos-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
   });
   $('#clear-records').addEventListener('click',()=>{
-    $('#info-title').textContent='Apagar os relatos deste navegador?';
-    $('#info-body').innerHTML='<p>Exporte o caderno antes de apagá-lo se quiser uma cópia. Registros pendentes serão perdidos e não poderão mais ser sincronizados. Os já enviados permanecem no banco da pesquisa.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar relatos locais</button>';
-    openDialog($('#info-dialog'));
-    $('#confirm-clear').addEventListener('click',()=>{
-      try{localStorage.removeItem(STORE_KEY);}catch{showToast('Não foi possível limpar o armazenamento.');return;}
-      records=[];renderRecords();$('#info-dialog').close();showToast('Relatos locais apagados.');
-    });
+    const uid=activeUid;if(!uid)return;
+    $('#info-title').textContent='Apagar cópias desta conta no aparelho?';
+    $('#info-body').innerHTML='<p>Exporte seus relatos antes se quiser uma cópia. As pendências desta conta serão perdidas. Relatos enviados permanecem no banco e pendências de outras contas são preservadas.</p><button type="button" class="button button-outline" id="confirm-clear">Apagar cópias desta conta</button>';
+    openDialog($('#info-dialog'));$('#confirm-clear').addEventListener('click',()=>{if(activeUid!==uid)return;try{WaindLocal.remove(uid);records=[];renderRecords();$('#info-dialog').close();}catch{showToast('Não foi possível apagar as cópias locais.');}});
   });
-  renderRecords(); updateSummary();
-
-  function cache(next){
-    // Never discard unsent reports when keeping the last 100 confirmed copies.
-    const pending=next.filter(r=>r.syncStatus==='pendente-sincronizacao');
-    const confirmed=next.filter(r=>r.syncStatus!=='pendente-sincronizacao').slice(-100).map(r=>WaindPhoto.compact({...r,photo:r.photo?{...r.photo}:null}));
-    let keep;
-    for(;;){
-      keep=[...confirmed,...pending].map(r=>({...r,photo:r.photo?{...r.photo}:null})).sort((a,b)=>a.recordedAt.localeCompare(b.recordedAt));
-      try{localStorage.setItem(STORE_KEY,JSON.stringify(keep));records=keep;break;}
-      catch(error){if(error.name!=='QuotaExceededError'||!confirmed.length)throw error;confirmed.splice(0,Math.max(1,Math.ceil(confirmed.length/2)));}
-    }
-  }
-  function remember(report){cache([...records.filter(r=>r.id!==report.id),report]);renderRecords();}
+  function cache(next,uid=activeUid){const saved=WaindLocal.write(uid,next);if(uid===activeUid)records=saved;}
+  function remember(report){const uid=report.autor_uid;cache([...WaindLocal.read(uid).filter(r=>r.id!==report.id),report],uid);if(uid===activeUid)renderRecords();}
+  window.addEventListener('waind:account',()=>{
+    const uid=WaindCloud.currentAccount()?.uid||null;
+    if(uid===activeUid)return;
+    ++historyGeneration;historyBusy=false;activeUid=uid;records=WaindLocal.read(uid);cloudHistory=[];historyCursor=null;historyMore=false;
+    historyStatus=uid?'Sua conta está conectada.':'Entre na sua conta para consultar o histórico.';renderRecords();
+    if(uid){refreshHistory();syncPending();}
+  });
+  renderRecords();updateSummary();
   function startMap(){
     mapStarted=true;stopMap?.();
     WaindCloud.listenMap(items=>{publicRecords=items;window.dispatchEvent(new Event('waind:records'));},text=>{mapStatus=text;window.dispatchEvent(new Event('waind:records'));}).then(stop=>{stopMap=stop;});
   }
   async function syncPending(){
-    if(syncing||navigator.onLine===false)return;
+    const uid=activeUid;if(syncing||!uid||navigator.onLine===false)return;
     syncing=true;let sent=0;
     try{
-      for(const report of records.filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&r.consent?.version==='waind-pesquisa-mapa-0.6')){
+      for(const report of WaindLocal.read(uid).filter(r=>r.syncStatus==='pendente-sincronizacao'&&r.consent?.publicMap&&r.consent?.version==='waind-pesquisa-mapa-0.7')){
+        if(activeUid!==uid)break;
         try{
           const receipt=await WaindCloud.save(report);
-          // Do not restore a local copy if the participant erased it while sending.
-          if(!records.some(r=>r.id===report.id))continue;
+          if(!WaindLocal.read(uid).some(r=>r.id===report.id))continue;
           report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
-          try{remember(report);}catch{renderRecords();}
-          sent++;
-        }catch(error){report.syncError=String(error?.code||'network');try{remember(report);}catch{/* Preserve the existing durable pending copy. */}}
+          try{remember(report);}catch{if(activeUid===uid)renderRecords();}sent++;
+        }catch(error){report.syncError=String(error?.code||'network');try{remember(report);}catch{/* Não perder pendências duráveis. */}}
       }
-    }finally{syncing=false;if(sent)showToast(`${sent} ${sent===1?'relato sincronizado':'relatos sincronizados'} com o banco da pesquisa.`);}
+    }finally{syncing=false;if(sent&&activeUid===uid){showToast(`${sent} relato(s) desta conta sincronizado(s).`);refreshHistory();}}
   }
-  window.addEventListener('online',()=>{syncPending();if(mapStarted)startMap();});
-  window.addEventListener('storage',event=>{
-    if(event.key!==STORE_KEY)return;
-    try{const next=JSON.parse(event.newValue||'[]');if(Array.isArray(next)){records=next;renderRecords();}}catch{/* Keep the current caderno if external data is invalid. */}
-  });
+  window.addEventListener('online',()=>{syncPending();if(mapStarted)startMap();if(activeUid)refreshHistory();});
+  window.addEventListener('storage',event=>{if(activeUid&&event.key===WaindLocal.key(activeUid)){records=WaindLocal.read(activeUid);renderRecords();}});
+
   setTimeout(syncPending,1200);setInterval(syncPending,60000);
 
   window.WaindApp = {
     state, levels, types, showToast, showInfo, createReport, fetchWeather,
-    startMap,syncPending,getMapStatus:()=>mapStatus,
-    getLocalRecords:()=>records.map(r=>({...r})),
-    getRecords:()=>[...new Map([...records.map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),...publicRecords].map(r=>[r.id,r])).values()],
+    startMap,syncPending,refreshHistory,getMapStatus:()=>mapStatus,
+    getLocalRecords:()=>visibleRecords().map(r=>({...r})),
+    getRecords:()=>[...new Map([...visibleRecords().map(r=>({id:r.id,location:r.location,intensity:r.intensity,categories:r.categories,recordedAt:r.recordedAt,occurrence:r.occurrence})),...publicRecords].map(r=>[r.id,r])).values()],
     getPhotoURL:()=>photoURL,
     async save(report){
+      if(!activeUid||report.autor_uid!==activeUid||WaindCloud.currentAccount()?.uid!==activeUid){showToast('Entre na conta deste relato para enviar.');return false;}
       report.syncStatus='pendente-sincronizacao';report.storage='browser-local';
       let durable=false;
       try{remember(report);durable=true;}catch{/* A confirmed cloud send can still succeed without local storage. */}
@@ -1627,6 +1858,7 @@ window.WaindAppCheckConfig = Object.freeze({
         const receipt=await WaindCloud.save(report);
         report.syncStatus='sincronizado';report.storage='firebase';report.cloud={...receipt,confirmed:true};delete report.syncError;WaindPhoto.compact(report);
         try{remember(report);}catch{showToast('Enviado ao banco. Não foi possível atualizar a cópia neste navegador.');}
+        if(activeUid===report.autor_uid)refreshHistory();
         return {status:'sincronizado',id:report.id};
       } catch(error) {
         report.syncError=String(error?.code||'network');
@@ -1648,7 +1880,7 @@ window.WaindAppCheckConfig = Object.freeze({
       $('#location-address').hidden=true;$('#location-help').hidden=true;$('#locate').disabled=false;$('#locate').textContent='Usar minha localização ↗';
       $('#test-camera').disabled=false;$('#test-camera').textContent='Autorizar / testar câmera ↗';$('#camera-status').textContent='A câmera será testada ao marcar esta opção.';
       $('#camera-footnote').textContent='Opcional. Na etapa de fotografia, a galeria abre o seletor do aparelho; você escolhe quais imagens compartilhar.';
-      updateSummary();fetchWeather(region.latitude,region.longitude,'study-area');
+      window.dispatchEvent(new Event('waind:form-reset'));updateSummary();fetchWeather(region.latitude,region.longitude,'study-area');
     }
   };
 
@@ -1705,7 +1937,7 @@ window.WaindAppCheckConfig = Object.freeze({
   WaindBrand.mount($('#enter-waind'));
   $('.screening-art').innerHTML=OdorArt.wind();
   $('#occurred-at').max=dateLocal();
-  function validIdentity(){return $('#participant-name').value.trim().length>0&&$('#participant-email').value.trim().length>0&&$('#participant-email').validity.valid&&$('#context-confirm').checked&&$('#data-consent').checked;}
+  function validIdentity(){return !!WaindCloud.currentAccount()&&$('#participant-email').value===WaindCloud.currentAccount().email&&$('#participant-name').value.trim().length>0&&$('#participant-email').value.trim().length>0&&$('#participant-email').validity.valid&&$('#context-confirm').checked&&$('#data-consent').checked;}
   function locationValid(){return mode==='pin'?!!manualLocation:mode==='gps'&&!!app.state.gpsLocation&&(!isPast()||$('#past-gps-confirm').checked);}
   function valid(){
     switch(step){case '1':return validIdentity();case '2':return !!value('screening');case 'past':return value('past-choice')==='no'||(value('past-choice')==='yes'&&!!$('#occurred-at').value&&$('#occurred-at').value<=dateLocal());case '3':return !!app.state.intensity;case '4':return app.state.types.size>0&&(!app.state.types.has('other')||!!$('#other-text').value.trim());case '5':return !app.state.photoLoading;case '7':return exploring()||saved||locationValid();default:return true;}
@@ -1799,7 +2031,7 @@ window.WaindAppCheckConfig = Object.freeze({
     if(!validIdentity()||!app.state.intensity||!app.state.types.size||(app.state.types.has('other')&&!$('#other-text').value.trim())){app.showToast('Confira seus dados e as escolhas antes de revisar.');navigate(!validIdentity()?'1':!app.state.intensity?'3':'4');return;}
     if(!locationValid()||app.state.photoLoading){$('#location-error').hidden=false;return;}
     if(isPast()&&(!$('#occurred-at').value||$('#occurred-at').value>dateLocal())){navigate('past');return;}
-    pending=app.createReport();pending.schemaVersion=6;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.6'};
+    pending=app.createReport();pending.schemaVersion=7;pending.project='WAIND';pending.participant={name:$('#participant-name').value.trim(),email:$('#participant-email').value.trim()};pending.consent={cloudStorage:true,publicMap:true,localStorage:true,contextConfirmed:true,accountAuthenticated:true,photoIntended:$('#photo-consent').checked,acceptedAt:new Date().toISOString(),version:'waind-pesquisa-mapa-0.7'};
     pending.occurrence={kind:isPast()?'past':'current',occurredAt:isPast()?new Date($('#occurred-at').value+':00-03:00').toISOString():pending.recordedAt,timezone:'America/Sao_Paulo',approximate:isPast()};
     pending.weatherContext={relationship:isPast()?'current-context-not-historical':'current-regional-context',notMeasuredAtSource:true};
     const rows=[['Nome',pending.participant.name],['E-mail',pending.participant.email],['Fuso horário','Horário de Brasília'],...summary(),['Localização',locationText(pending.location)]];
@@ -1814,9 +2046,11 @@ window.WaindAppCheckConfig = Object.freeze({
     buttons.forEach(b=>b.disabled=true);$('#save-report').textContent='Enviando relato…';
     $('#send-status').hidden=false;$('#send-status').textContent='Enviando relato ao banco da pesquisa WAIND…';updateNavigation();
     try {
-      const result=await app.save(pending);
+      const report=pending;
+      const result=await app.save(report);
+      if(WaindCloud.currentAccount()?.uid!==report.autor_uid)return;
       if(result)await withWind(()=>{
-        saved=true;savedId=pending.id;showSaved(result.status,result.message);
+        saved=true;savedId=report.id;showSaved(result.status,result.message);
         pending=null;$('#review-panel').hidden=true;$('#location-panel').hidden=true;$('#success-panel').hidden=false;
         $('#records-wrap').hidden=false;window.scrollTo({top:0,behavior:'instant'});updateNavigation();
       });
@@ -1853,11 +2087,95 @@ window.WaindAppCheckConfig = Object.freeze({
   $('#review-open').addEventListener('click',review);$('#edit-report').addEventListener('click',()=>editStep('3'));$('#save-report').addEventListener('click',save);$('#new-report').addEventListener('click',restart);
   $$('[data-edit]').forEach(b=>b.addEventListener('click',()=>editStep(b.dataset.edit)));
   ['camera-button','gallery-button'].forEach(id=>$('#'+id).addEventListener('click',()=>{$('#photo-consent').checked=true;}));
+  let lastAccountUid=null;
+  window.addEventListener('waind:account',()=>{
+    const uid=WaindCloud.currentAccount()?.uid||null;
+    if(lastAccountUid&&lastAccountUid!==uid){WaindMotion.finish();resetting=true;pending=null;saved=false;savedId=null;manualLocation=null;mode=null;app.reset();$('#review-panel').hidden=true;$('#success-panel').hidden=true;$('#location-panel').hidden=false;resetting=false;navigate('1',{animated:false});}
+    lastAccountUid=uid;updateNavigation();
+  });
   $('#other-text').required=true;$('#other-field label .optional').textContent='DESCREVA SUA PERCEPÇÃO';
   window.addEventListener('popstate',e=>{if(submitting){history.pushState({waindStep:'7'},'','#passo-7');return;}let dest=e.state?.waindStep||'0';if(dest!=='0'&&!route().includes(dest))dest='2';WaindMotion.finish();withWind(()=>{closeReview(false);navigate(dest,{historyWrite:false,animated:false});});});
   history.replaceState({waindStep:'0'},'','#inicio');navigate('0',{historyWrite:false,animated:false});
 })();
 
+
+</script>
+<script>
+/* account.js */
+/* Conta privada GPT 0.7. Senhas nunca são persistidas pelo WAIND. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let mode = 'login', busy = false, lastUid = null;
+  function status(message, error = false) {
+    $('account-status').textContent = message;
+    $('account-status').classList.toggle('field-error', error);
+  }
+  function controls(disabled) {
+    busy = disabled;
+    document.querySelectorAll('[data-account-action], #account-password, #account-email, #account-name').forEach(el => el.disabled = disabled);
+  }
+  function render() {
+    const a = WaindCloud.currentAccount();
+    if (!a && lastUid) mode = 'login';
+    $('account-entry').hidden = !!a;
+    $('account-connected').hidden = !a;
+    $('account-register-name').hidden = mode !== 'register';
+    $('account-password').autocomplete = mode === 'register' ? 'new-password' : 'current-password';
+    $('account-submit').textContent = mode === 'register' ? 'Criar minha conta ↗' : 'Entrar com e-mail ↗';
+    $('account-toggle').textContent = mode === 'register' ? 'Já tenho uma conta' : 'Criar conta com e-mail';
+    if (a) {
+      $('account-connected-email').textContent = a.email;
+      $('participant-email').value = a.email;
+      if (lastUid !== a.uid || document.activeElement !== $('participant-name')) $('participant-name').value = a.name || '';
+    } else {
+      $('participant-name').value = '';
+      $('participant-email').value = '';
+    }
+    $('participant-name').disabled = !a || busy;
+    $('profile-save').disabled = !a || busy;
+    if (lastUid !== (a?.uid || null)) {
+      $('data-consent').checked = false;
+      $('context-confirm').checked = false;
+      $('account-password').value = '';
+    }
+    lastUid = a?.uid || null;
+    window.dispatchEvent(new Event('waind:change'));
+  }
+  async function run(action, success) {
+    if (busy) return;
+    controls(true); status('Aguarde…');
+    try { await action(); status(success || 'Conta conectada. Confira seus dados e o consentimento.'); }
+    catch (error) { status(WaindCloud.accountMessage(error), true); }
+    finally { controls(false); render(); }
+  }
+  $('account-google').addEventListener('click', () => run(() => WaindCloud.googleSignIn()));
+  $('account-submit').addEventListener('click', () => {
+    const email = $('account-email'), password = $('account-password').value;
+    if (!email.value.trim() || !email.checkValidity()) { email.reportValidity(); return; }
+    if (!password || (mode === 'register' && password.length < 6)) { status('Informe a senha. Para criar a conta, use pelo menos 6 caracteres.', true); $('account-password').focus(); return; }
+    const name = $('account-name').value.trim();
+    if (mode === 'register' && !name) { status('Informe seu nome para criar a conta.', true); $('account-name').focus(); return; }
+    run(() => mode === 'register' ? WaindCloud.emailRegister(email.value.trim(), password, name) : WaindCloud.emailSignIn(email.value.trim(), password));
+  });
+  $('account-password').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('account-submit').click(); } });
+  $('account-toggle').addEventListener('click', () => { mode = mode === 'login' ? 'register' : 'login'; $('account-password').value = ''; status(''); render(); });
+  $('account-reset').addEventListener('click', () => {
+    const email = $('account-email');
+    if (!email.value.trim() || !email.checkValidity()) { status('Informe seu e-mail acima para recuperar o acesso.', true); email.focus(); return; }
+    run(() => WaindCloud.resetPassword(email.value.trim()), 'Se houver uma conta elegível, você receberá as instruções por e-mail.');
+  });
+  $('account-signout').addEventListener('click', () => run(() => WaindCloud.signOut(), 'Você saiu da conta. As pendências permanecem neste aparelho, separadas por conta.'));
+  $('profile-save').addEventListener('click', () => {
+    const name = $('participant-name').value.trim();
+    if (!name) { status('Informe seu nome de apresentação.', true); return; }
+    run(() => WaindCloud.updateProfileName(name), 'Nome atualizado para os próximos relatos. Seus relatos anteriores foram preservados.');
+  });
+  window.addEventListener('waind:form-reset',render);
+  window.addEventListener('waind:account', () => { render(); if (WaindCloud.currentAccount()) status('Conta conectada. Confira o contexto e o consentimento antes de continuar.'); });
+  render(); controls(true);
+  WaindCloud.watchAccount().then(() => { controls(false); render(); }).catch(error => { controls(false); render(); status(WaindCloud.accountMessage(error), true); });
+})();
 
 </script>
 </body></html>

@@ -1,6 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function account() { return request.auth != null && request.auth.token.firebase.sign_in_provider in ['google.com','password']; }
     function exact(d, keys) { return d is map && d.keys().size() == keys.size() && d.keys().hasOnly(keys); }
     function text(v, maximum) { return v is string && v.size() <= maximum; }
     function optionalNumber(v, low, high) { return v == null || (v is number && v >= low && v <= high); }
@@ -68,8 +69,8 @@ service cloud.firestore {
     }
     function imageData(id, f, p) {
       let m=p.foto_metadados;
-      return exact(f,['relato_id','criado_em','mime_type','largura','altura','largura_original','altura_original','tamanho_bytes','sha256','dados_base64','rotulos_ml'])
-        && f.relato_id == id && f.criado_em == request.time
+      return exact(f,['autor_uid','relato_id','criado_em','mime_type','largura','altura','largura_original','altura_original','tamanho_bytes','sha256','dados_base64','rotulos_ml'])
+        && f.autor_uid == request.auth.uid && f.autor_uid == p.autor_uid && f.relato_id == id && f.criado_em == request.time
         && f.mime_type == m.mime_type && f.largura == m.largura && f.altura == m.altura
         && f.largura_original == m.largura_original && f.altura_original == m.altura_original
         && f.tamanho_bytes == m.tamanho_bytes && f.sha256 == m.sha256
@@ -79,14 +80,15 @@ service cloud.firestore {
           'multi_hot':p.tipo_odor.multi_hot,'sem_foco_visivel':p.sem_foco_visivel,'visivel_por_perto':p.visivel_por_perto};
     }
     function consent(d) {
-      return exact(d,['versao','aceito_em','pesquisa','mapa_publico','copia_local','contexto_confirmado'])
-        && d.versao == 'waind-pesquisa-mapa-0.6' && text(d.aceito_em,40)
+      return exact(d,['versao','aceito_em','pesquisa','mapa_publico','copia_local','contexto_confirmado','conta_autenticada'])
+        && d.versao == 'waind-pesquisa-mapa-0.7' && text(d.aceito_em,40)
         && d.aceito_em.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}T.*Z$')
-        && d.pesquisa == true && d.mapa_publico == true && d.copia_local == true && d.contexto_confirmado == true;
+        && d.pesquisa == true && d.mapa_publico == true && d.copia_local == true && d.contexto_confirmado == true && d.conta_autenticada == true;
     }
     function research(d) {
-      return exact(d,['nome','email','data','hora','tipo_ocorrencia','criado_em','temperatura','clima','localizacao','intensidade_odor','tipo_odor','sem_foco_visivel','visivel_por_perto','observacao','foto_metadados','consentimento','status_qualidade'])
-        && text(d.nome,120) && d.nome.size() > 0 && text(d.email,254) && d.email.matches('^[^ @]+@[^ @]+[.][^ @]+$')
+      return exact(d,['autor_uid','provedor_auth','nome','email','data','hora','tipo_ocorrencia','criado_em','temperatura','clima','localizacao','intensidade_odor','tipo_odor','sem_foco_visivel','visivel_por_perto','observacao','foto_metadados','consentimento','status_qualidade'])
+        && d.autor_uid == request.auth.uid && d.provedor_auth == request.auth.token.firebase.sign_in_provider
+        && d.email == request.auth.token.email && text(d.nome,120) && d.nome.size() > 0 && text(d.email,254) && d.email.matches('^[^ @]+@[^ @]+[.][^ @]+$')
         && when(d) && d.tipo_ocorrencia in ['atual','anterior'] && d.criado_em == request.time
         && optionalNumber(d.temperatura,-100,70) && weather(d.clima) && d.temperatura == d.clima.temperatura_c
         && location(d.localizacao);
@@ -111,16 +113,17 @@ service cloud.firestore {
         && m.data == p.data && m.hora == p.hora && m.temperatura == p.temperatura && m.status_qualidade == p.status_qualidade;
     }
     match /relatos_pesquisa/{id} {
-      allow create: if request.auth != null && id.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
+      allow create: if account() && id.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
         && research(request.resource.data)
         && photoLink(id,request.resource.data)
         && !exists(/databases/$(database)/documents/relatos_mapa/$(id))
         && paired(request.resource.data,getAfter(/databases/$(database)/documents/relatos_mapa/$(id)).data);
-      allow read, update, delete: if false;
+      allow read: if account() && resource.data.keys().hasAll(['autor_uid']) && resource.data.autor_uid == request.auth.uid;
+      allow update, delete: if false;
     }
     match /relatos_mapa/{id} {
       allow read: if true;
-      allow create: if request.auth != null && id.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
+      allow create: if account() && id.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
         && publicMap(request.resource.data)
         && researchDetails(getAfter(/databases/$(database)/documents/relatos_pesquisa/$(id)).data)
         && !exists(/databases/$(database)/documents/relatos_pesquisa/$(id))
@@ -128,7 +131,7 @@ service cloud.firestore {
       allow update, delete: if false;
     }
     match /relatos_fotos/{id} {
-      allow create: if request.auth != null && id.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
+      allow create: if account() && id.matches('^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$')
         && !exists(/databases/$(database)/documents/relatos_fotos/$(id))
         && !exists(/databases/$(database)/documents/relatos_pesquisa/$(id))
         && !exists(/databases/$(database)/documents/relatos_mapa/$(id))
@@ -136,6 +139,18 @@ service cloud.firestore {
         && existsAfter(/databases/$(database)/documents/relatos_mapa/$(id))
         && imageData(id,request.resource.data,getAfter(/databases/$(database)/documents/relatos_pesquisa/$(id)).data);
       allow read, update, delete: if false;
+    }
+    function profile(d, uid) {
+      return exact(d,['uid','nome','email','provedor','criado_em','atualizado_em'])
+        && d.uid == uid && text(d.nome,120) && text(d.email,254) && d.email == request.auth.token.email
+        && d.provedor == request.auth.token.firebase.sign_in_provider
+        && d.criado_em is timestamp && d.atualizado_em == request.time;
+    }
+    match /usuarios_perfil/{uid} {
+      allow read: if account() && request.auth.uid == uid;
+      allow create: if account() && request.auth.uid == uid && profile(request.resource.data,uid) && request.resource.data.criado_em == request.time;
+      allow update: if account() && request.auth.uid == uid && profile(request.resource.data,uid) && request.resource.data.criado_em == resource.data.criado_em;
+      allow delete: if false;
     }
     // Retain earlier development collections; disable all browser access to them.
     match /{document=**} { allow read, write: if false; }
